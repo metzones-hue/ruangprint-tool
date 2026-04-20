@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quotation Maker — RuangPrint</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#F5A800;--dark:#181818;--white:#fff;--bg:#f6f4ef;--bg2:#eeebe3;--border:#ddd9ce;--muted:#8a8478;--text:#2a2620;--panel:#fff}
+html,body{height:100%;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--bg)}
+.app{display:grid;grid-template-columns:420px 1fr;height:100vh;overflow:hidden}
+
+/* LEFT */
+.left{display:flex;flex-direction:column;background:var(--panel);border-right:1px solid var(--border);overflow:hidden}
+.brand-bar{padding:14px 20px;border-bottom:1px solid var(--border);background:var(--dark);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.brand-bar .lm{width:26px;height:26px;background:var(--gold);border-radius:4px;display:flex;align-items:center;justify-content:center}
+.brand-bar h1{font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;color:var(--white);letter-spacing:.07em}
+.brand-bar em{font-size:10px;color:#777;margin-left:auto;font-style:normal}
+.tabs{display:flex;padding:0 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.tab{padding:9px 12px;font-size:10px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;letter-spacing:.06em;text-transform:uppercase;transition:color .15s,border-color .15s;user-select:none}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.lscroll{flex:1;overflow-y:auto;padding:14px 18px 24px}
+.lscroll::-webkit-scrollbar{width:3px}
+.lscroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* FORM */
+.st{font-family:'Outfit',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:14px 0 7px;display:flex;align-items:center;gap:7px}
+.st::after{content:'';flex:1;height:1px;background:var(--border)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:7px}
+.fc{display:flex;flex-direction:column;gap:3px;margin-bottom:7px}
+label{font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+input[type=text],input[type=number],input[type=date],input[type=email],select,textarea{width:100%;border:1px solid var(--border);border-radius:5px;padding:6px 8px;font-size:12px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);outline:none;transition:border .15s,background .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);background:var(--white);box-shadow:0 0 0 3px rgba(245,168,0,.08)}
+textarea{resize:vertical;min-height:48px}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238a8478'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px}
+input[type=checkbox]{width:auto;accent-color:var(--gold)}
+
+/* ITEM CARD */
+.icard{border:1px solid var(--border);border-radius:7px;padding:10px 10px 8px;margin-bottom:9px;background:var(--bg);position:relative;transition:border-color .15s}
+.icard:hover{border-color:var(--gold)}
+.inum{font-family:'Outfit',sans-serif;font-size:9.5px;font-weight:700;color:var(--gold);margin-bottom:7px;letter-spacing:.06em}
+.igrid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.ifl{grid-column:1/-1}
+.bdel{position:absolute;top:9px;right:9px;background:none;border:none;cursor:pointer;color:#ccc;font-size:13px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:3px;transition:all .15s}
+.bdel:hover{background:#fee;color:#c00}
+.iupload{border:1.5px dashed var(--border);border-radius:5px;padding:7px;text-align:center;cursor:pointer;background:var(--white);transition:border .15s;min-height:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.iupload:hover{border-color:var(--gold);background:#fffdf5}
+.iupload input[type=file]{display:none}
+.iupload img{max-width:100%;max-height:52px;object-fit:contain;border-radius:3px}
+.iuplbl{font-size:10px;color:var(--muted)}
+.bhapus{margin-top:3px;font-size:10px;padding:2px 7px;background:none;border:1px solid var(--border);border-radius:3px;cursor:pointer;color:var(--muted);transition:all .15s}
+.bhapus:hover{border-color:#c00;color:#c00}
+.badd{margin-top:4px;padding:7px 12px;background:var(--dark);color:var(--white);border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .15s}
+.badd:hover{background:var(--gold);color:var(--dark)}
+
+/* LOGO UPLOAD */
+.lupload{border:1.5px dashed var(--border);border-radius:5px;padding:8px;text-align:center;cursor:pointer;background:var(--bg);transition:border .15s;display:flex;flex-direction:column;align-items:center;gap:3px}
+.lupload:hover{border-color:var(--gold)}
+.lupload img{max-width:100%;max-height:56px;object-fit:contain}
+.lupload input[type=file]{display:none}
+
+/* PPN */
+.ppnrow{display:flex;align-items:center;gap:7px;margin-bottom:7px;padding:7px 9px;background:var(--bg);border-radius:5px;border:1px solid var(--border)}
+.ppnrow label{text-transform:none;font-size:12px;font-weight:500;color:var(--text);letter-spacing:0}
+
+/* TOOL BUTTONS */
+.btn-print{padding:7px 14px;background:var(--gold);color:var(--dark);border:none;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;letter-spacing:.05em;transition:all .15s;white-space:nowrap}
+.btn-print:hover{background:var(--white);color:var(--dark)}
+.btool{padding:6px 10px;background:rgba(255,255,255,.08);color:#bbb;border:1px solid #3a3a3a;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;letter-spacing:.04em;transition:all .15s;white-space:nowrap}
+.btool:hover{background:rgba(255,255,255,.14);color:var(--white);border-color:#555}
+.btool.baru{color:#f5c060;border-color:#5a4000}
+.btool.baru:hover{background:rgba(245,168,0,.15);color:var(--gold)}
+.btool.active-btn{color:var(--gold);border-color:var(--gold)}
+.bsm{padding:4px 9px;background:var(--bg);color:var(--muted);border:1px solid var(--border);border-radius:4px;font-size:10px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.bsm:hover{border-color:var(--gold);color:var(--gold);background:var(--white)}
+
+/* RIGHT */
+.right{display:flex;flex-direction:column;overflow:hidden;background:var(--bg2)}
+.rtbar{padding:9px 16px;background:var(--dark);display:flex;align-items:center;gap:6px;flex-shrink:0;border-bottom:1px solid #2a2a2a;flex-wrap:wrap}
+.thint{font-size:10px;color:#555;margin-left:auto;white-space:nowrap}
+
+/* HISTORY PANEL */
+.hpanel{display:none;background:#111;border-bottom:1px solid #2a2a2a;padding:10px 16px;flex-shrink:0;flex-direction:column;gap:8px}
+.hpanel-head{display:flex;align-items:center;justify-content:space-between}
+.hpanel-title{font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;color:var(--gold);letter-spacing:.08em}
+.hlist{display:flex;flex-direction:column;gap:5px;max-height:180px;overflow-y:auto}
+.hlist::-webkit-scrollbar{width:3px}
+.hlist::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
+.hitem{display:flex;align-items:center;gap:7px;padding:6px 9px;background:rgba(255,255,255,.04);border-radius:4px;border:1px solid #2a2a2a;transition:background .15s}
+.hitem:hover{background:rgba(255,255,255,.08);border-color:#444}
+.hno{font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;color:var(--gold);min-width:110px}
+.hcust{font-size:10px;color:#aaa;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hdate{font-size:9px;color:#555;white-space:nowrap}
+.hgrand{font-size:9px;color:#666;min-width:80px;text-align:right;white-space:nowrap}
+.hacts{display:flex;gap:3px;flex-shrink:0}
+.hbtn{padding:3px 7px;background:none;border:1px solid #3a3a3a;border-radius:3px;cursor:pointer;font-size:9px;color:#888;transition:all .15s}
+.hbtn:hover{border-color:var(--gold);color:var(--gold)}
+.hbtn.hdel:hover{border-color:#c00;color:#c00}
+.hempty{font-size:11px;color:#444;text-align:center;padding:10px 0}
+.bclear{background:none;border:none;cursor:pointer;font-size:9px;color:#444;text-decoration:underline}
+.bclear:hover{color:#888}
+
+/* RSCROLL */
+.rscroll{flex:1;overflow-y:auto;padding:22px;display:flex;justify-content:center}
+.rscroll::-webkit-scrollbar{width:4px}
+.rscroll::-webkit-scrollbar-thumb{background:#ccc;border-radius:2px}
+
+/* PDF */
+.pdf-paper{width:794px;min-height:1123px;background:var(--white);padding:34px 40px;font-size:11px;color:var(--dark);box-shadow:0 4px 32px rgba(0,0,0,.12);border-radius:2px;font-family:'DM Sans',sans-serif}
+.pdf-header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:12px;border-bottom:2.5px solid var(--gold)}
+.pdf-logo-area{display:flex;align-items:center;gap:12px}
+.pdf-logo{width:80px;height:80px;object-fit:contain}
+.pdf-logo-ph{width:80px;height:80px;background:var(--bg2);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:8px;color:var(--muted);text-align:center;border:1px dashed var(--border)}
+.pdf-co-name{font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;color:var(--dark)}
+.pdf-co-sub{font-size:9px;color:var(--muted);line-height:1.6;margin-top:2px}
+.pdf-title-block{text-align:right}
+.pdf-sph{font-family:'Outfit',sans-serif;font-size:14px;font-weight:800;letter-spacing:.03em;color:var(--dark)}
+.pdf-no{font-size:12px;font-weight:600;color:var(--gold);margin-top:3px;font-family:'Outfit',sans-serif}
+.pdf-meta{font-size:9px;color:var(--muted);line-height:1.8;margin-top:3px}
+.pdf-addr-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:11px 0 0}
+.pdf-abox{background:#faf8f3;border-left:3px solid var(--gold);padding:8px 10px;border-radius:0 4px 4px 0}
+.pdf-albl{font-size:8px;font-weight:700;letter-spacing:.07em;color:var(--muted);margin-bottom:3px;text-transform:uppercase;font-family:'Outfit',sans-serif}
+.pdf-aval{font-size:10px;line-height:1.6}
+.pdf-intro{font-size:9.5px;color:#555;margin:9px 0 8px;line-height:1.75;padding:7px 0 9px;border-bottom:1px solid #ede9de}
+.pdf-closing{font-size:9.5px;color:#555;margin:9px 0 0;line-height:1.75;padding:8px 10px;background:#faf8f3;border-left:3px solid var(--gold);border-radius:0 4px 4px 0}
+.ptbl{width:100%;border-collapse:collapse;margin:7px 0;table-layout:fixed}
+.ptbl thead tr{background:var(--dark)}
+.ptbl th{color:var(--white);padding:5px 6px;font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;text-align:left;font-family:'Outfit',sans-serif}
+.ptbl th.r,.ptbl td.r{text-align:right}
+.ptbl th.c,.ptbl td.c{text-align:center}
+.ptbl tbody tr{border-bottom:1px solid #ede9de}
+.ptbl tbody tr:nth-child(even){background:#faf8f3}
+.ptbl td{padding:6px;font-size:10px;vertical-align:middle}
+.ptbl td.dtd{vertical-align:top;padding-top:7px}
+.dname{font-weight:700;font-size:10px;margin-bottom:3px;font-family:'Outfit',sans-serif}
+.ddet{font-size:9px;color:var(--muted);line-height:1.6}
+.ptd{text-align:center;padding:5px}
+.ptd img{max-width:90px;max-height:70px;object-fit:contain;display:block;margin:0 auto}
+.pdf-totals{margin-top:5px;display:flex;justify-content:flex-end}
+.pdf-totals table{width:265px;font-size:10px;border-collapse:collapse}
+.pdf-totals td{padding:3px 7px}
+.pdf-totals td:last-child{text-align:right;font-weight:500}
+.pgrand{background:var(--gold)}
+.pgrand td{padding:5px 8px;font-size:11px;font-weight:700;font-family:'Outfit',sans-serif;color:var(--dark)}
+.psisa td{font-weight:600;font-size:10px;color:var(--gold)}
+.pdf-notes{background:#fffbe8;border:1px solid #f0e6a0;border-radius:4px;padding:8px 10px;margin-top:9px;font-size:9px;line-height:1.7}
+.pdf-notes strong{font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:#9a7b00;font-family:'Outfit',sans-serif}
+.pdf-syarat-wrap{margin-top:9px;border-top:1px solid var(--border);padding-top:6px}
+.pdf-syarat-lbl{font-size:8px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px;font-family:'Outfit',sans-serif}
+.pdf-syarat-txt{font-size:8.5px;color:var(--muted);line-height:1.75;white-space:pre-wrap;outline:none;min-height:20px;border-radius:3px;padding:3px 4px;border:1px solid transparent;transition:border .15s,background .15s}
+.pdf-syarat-txt:hover{border-color:var(--border);background:#faf8f3}
+.pdf-syarat-txt:focus{border-color:var(--gold);background:#fffef8}
+.pdf-syarat-hint{font-size:8px;color:#bbb;margin-top:1px;font-style:italic}
+.pdf-sign-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px;border-top:1px solid var(--border);padding-top:10px}
+.pdf-sbox{border:1px solid var(--border);border-radius:4px;padding:8px 8px 6px;text-align:center}
+.pdf-slbl{font-size:8px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-family:'Outfit',sans-serif}
+.pdf-sspace{height:40px}
+.pdf-sname{font-size:10px;font-weight:600;color:var(--dark);border-top:1px solid #ccc;padding-top:5px;margin-top:3px;font-family:'Outfit',sans-serif}
+.pdf-foot{text-align:center;font-size:8px;color:#bbb;margin-top:12px;padding-top:7px;border-top:1px solid #ede9de}
+.cust-item{display:flex;align-items:center;padding:7px 10px;cursor:pointer;border-bottom:1px solid var(--border);gap:8px;transition:background .12s}
+.cust-item:hover{background:var(--bg)}
+.cust-item:last-child{border-bottom:none}
+.cust-main{flex:1;min-width:0}
+.cust-name-lbl{font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cust-sub-lbl{font-size:9.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cust-del{background:none;border:none;cursor:pointer;color:#ccc;font-size:12px;padding:2px 4px;border-radius:3px;flex-shrink:0;transition:all .12s}
+.cust-del:hover{color:#c00;background:#fee}
+.cust-empty{padding:10px;font-size:11px;color:var(--muted);text-align:center}
+
+/* PRINT */
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  html,body{height:auto;background:white}
+  .app{display:block;height:auto}
+  .left,.rtbar,.hpanel{display:none!important}
+  .right{display:block;overflow:visible}
+  .rscroll{padding:0;display:block;overflow:visible}
+  .pdf-paper{box-shadow:none;width:100%;min-height:auto;padding:16mm 14mm;border-radius:0}
+  .pdf-syarat-hint{display:none}
+  @page{size:A4;margin:0}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- LEFT -->
+<div class="left">
+  <div class="brand-bar">
+    <div class="lm"><svg viewBox="0 0 18 18" fill="none"><rect x="1" y="1" width="7" height="7" rx="1.5" fill="#181818"/><rect x="10" y="1" width="7" height="7" rx="1.5" fill="#181818"/><rect x="1" y="10" width="7" height="7" rx="1.5" fill="#181818"/><rect x="10" y="10" width="7" height="7" rx="1.5" fill="rgba(24,24,24,.4)"/></svg></div>
+    <h1>RUANGPRINT</h1>
+    <em>QUOTATION MAKER</em>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('info')">Info</div>
+    <div class="tab" onclick="switchTab('item')">Item Produk</div>
+    <div class="tab" onclick="switchTab('pay')">Pembayaran</div>
+  </div>
+  <div class="lscroll">
+
+    <!-- TAB INFO -->
+    <div id="tab-info">
+      <div class="st">Info Perusahaan</div>
+      <div id="tplBanner" style="display:none;background:#fffbe8;border:1px solid #f0e6a0;border-radius:4px;padding:6px 9px;margin-bottom:7px;font-size:10px;color:#7a6200;align-items:center;gap:5px">
+        <span>✓ Template aktif</span>
+        <button onclick="clearTemplate()" style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:9px;color:#999;text-decoration:underline">Hapus</button>
+      </div>
+      <div style="display:flex;gap:5px;margin-bottom:9px">
+        <button class="bsm" onclick="saveTemplate()">💾 Simpan Template</button>
+        <button class="bsm" onclick="loadTemplate()">↺ Muat Template</button>
+      </div>
+      <div class="fc"><label>Nama Perusahaan</label><input type="text" id="comp_name" value="Ruangprint Daan Mogot Baru" oninput="rp()"></div>
+      <div class="fr">
+        <div class="fc"><label>Telepon</label><input type="text" id="comp_phone" value="08128816119" oninput="rp()"></div>
+        <div class="fc"><label>Email</label><input type="text" id="comp_email" value="ruangprint@gmail.com" oninput="rp()"></div>
+      </div>
+      <div class="fc"><label>Alamat</label><textarea id="comp_addr" rows="2" oninput="rp()">Jl Gilimanuk No 60 Kalideres Jakarta Barat</textarea></div>
+      <div class="fc"><label>Website</label><input type="text" id="comp_web" value="www.ruangprint.com" oninput="rp()"></div>
+      <div class="fc">
+        <label>Logo</label>
+        <div class="lupload" onclick="document.getElementById('logoInp').click()">
+          <input type="file" id="logoInp" accept="image/*" onchange="handleLogo(this)">
+          <div id="logoLbl" style="font-size:11px;color:var(--muted)">+ Upload Logo</div>
+          <img id="logoImg" style="display:none">
+        </div>
+      </div>
+      <div class="st">Info Customer</div>
+
+      <!-- CUSTOMER PICKER -->
+      <div id="custPickerWrap" style="margin-bottom:10px">
+        <div style="display:flex;gap:5px;align-items:center;margin-bottom:6px">
+          <div style="position:relative;flex:1">
+            <input type="text" id="custSearch" placeholder="🔍  Cari atau pilih customer tersimpan..." oninput="filterCustList()" onfocus="showCustDrop()" style="font-size:11px;padding:6px 8px;width:100%">
+            <div id="custDrop" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--white);border:1px solid var(--border);border-radius:0 0 5px 5px;max-height:180px;overflow-y:auto;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,.1)"></div>
+          </div>
+          <button class="bsm" onclick="saveCust()" title="Simpan customer aktif ke daftar">+ Simpan</button>
+        </div>
+      </div>
+
+      <div class="fc"><label>Nama / Perusahaan</label><input type="text" id="cust_name" value="PT Cimory Bersama" oninput="rp()"></div>
+      <div class="fr">
+        <div class="fc"><label>PIC / ATTN</label><input type="text" id="cust_pic" value="Ibu Mylda" oninput="rp()"></div>
+        <div class="fc"><label>Telepon</label><input type="text" id="cust_phone" value="081258822566" oninput="rp()"></div>
+      </div>
+      <div class="fc"><label>Email</label><input type="text" id="cust_email" value="marketing@cimry.com" oninput="rp()"></div>
+      <div class="fc"><label>Alamat</label><textarea id="cust_addr" rows="2" oninput="rp()">Meruya barat No 12 Jakarta Barat</textarea></div>
+    </div>
+
+    <!-- TAB ITEM -->
+    <div id="tab-item" style="display:none">
+      <div class="st">Item Produk</div>
+      <div id="itemCards"></div>
+      <button class="badd" onclick="addItem()">
+        <svg width="11" height="11" viewBox="0 0 12 12"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Tambah Item
+      </button>
+    </div>
+
+    <!-- TAB PAY -->
+    <div id="tab-pay" style="display:none">
+      <div class="st">Nomor Quotation</div>
+      <div class="fr">
+        <div class="fc"><label>Tipe</label>
+          <select id="q_tipe" onchange="rp()">
+            <option value="P">P – Penawaran</option>
+            <option value="R">R – Revisi</option>
+            <option value="F">F – Final</option>
+          </select></div>
+        <div class="fc"><label>No. Urut</label><input type="number" id="q_no" value="1" oninput="rp()"></div>
+      </div>
+      <div class="fr">
+        <div class="fc"><label>Tanggal</label><input type="date" id="q_date" oninput="rp()"></div>
+        <div class="fc"><label>Berlaku (hari)</label><input type="number" id="q_berlaku" value="14" oninput="rp()"></div>
+      </div>
+      <div class="fc"><label>Est. Produksi (hari kerja)</label><input type="number" id="q_est" value="7" oninput="rp()"></div>
+      <div class="st">Pembayaran</div>
+      <div class="fr">
+        <div class="fc"><label>Ongkir (Rp)</label><input type="number" id="p_ongkir" value="0" oninput="rp()"></div>
+        <div class="fc"><label>Diskon (Rp)</label><input type="number" id="p_diskon" value="0" oninput="rp()"></div>
+      </div>
+      <div class="fc"><label>DP / Uang Muka (Rp)</label><input type="number" id="p_dp" value="0" oninput="rp()"></div>
+      <div class="ppnrow">
+        <input type="checkbox" id="ppn_on" onchange="rp()">
+        <label for="ppn_on" style="cursor:pointer;text-transform:none;font-size:12px;font-weight:500;letter-spacing:0;color:var(--text)">Tambah PPN</label>
+        <input type="number" id="ppn_pct" value="11" min="0" max="100" style="width:55px">
+        <label style="text-transform:none;letter-spacing:0">%</label>
+      </div>
+      <div class="st">Tanda Tangan</div>
+      <div class="fr">
+        <div class="fc"><label>Nama Pembuat</label><input type="text" id="t_sales" value="Joni Dasa" oninput="rp()"></div>
+        <div class="fc"><label>Mengetahui</label><input type="text" id="t_manager" value="Rohani" oninput="rp()"></div>
+      </div>
+      <div class="st">Catatan</div>
+      <div class="fc"><label>Catatan Tambahan</label><textarea id="q_catatan" rows="2" oninput="rp()">Tidak Berlaku Kelipatan</textarea></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- RIGHT -->
+<div class="right">
+  <div class="rtbar">
+    <button class="btn-print" onclick="doPrint()">🖨 Print / PDF</button>
+    <button class="btool" onclick="saveJSON()">💾 Simpan</button>
+    <button class="btool" onclick="dupQuotation()" title="Duplikat quotation aktif">⧉ Duplikat</button>
+    <button class="btool" onclick="document.getElementById('loadInp').click()">📂 Buka</button>
+    <input type="file" id="loadInp" accept=".json" style="display:none" onchange="loadJSON(this)">
+    <button class="btool" id="btnHist" onclick="toggleHistory()">🕘 Riwayat</button>
+    <button class="btool baru" onclick="newQuotation()">✦ Baru</button>
+    <span class="thint">Ctrl+P → Save as PDF · A4</span>
+  </div>
+
+  <!-- HISTORY PANEL -->
+  <div class="hpanel" id="hpanel">
+    <div class="hpanel-head">
+      <span class="hpanel-title">RIWAYAT QUOTATION</span>
+      <button class="bclear" onclick="clearHistory()">Hapus semua</button>
+    </div>
+    <div class="hlist" id="hlist"></div>
+    <div class="hempty" id="hempty">Belum ada riwayat tersimpan</div>
+  </div>
+
+  <div class="rscroll">
+    <div id="pdfPreview" class="pdf-paper"></div>
+  </div>
+</div>
+
+</div>
+
+<!-- TOAST -->
+<div id="toast" style="position:fixed;bottom:22px;right:22px;background:var(--dark);color:var(--white);padding:9px 16px;border-radius:5px;font-size:11px;font-family:'Outfit',sans-serif;letter-spacing:.03em;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999;border-left:3px solid var(--gold)"></div>
+
+<script>
+const KATEGORI = ['A3+','Indoor','Outdoor','UV Roll to Roll','UV Flatbed','Offset Printing','Reklame','Merchandise'];
+const CETAK_OPT = ['4/0','4/4','1/0','1/1','1 Layer','2 Layer','3 Layer','Full Color'];
+const DEF_SYARAT = '1. Harga berlaku sesuai tanggal berlaku quotation.\n2. Pembayaran DP sebelum produksi dimulai.\n3. Desain/file lengkap sebelum estimasi berjalan.';
+let logoSrc = '';
+let items = [{nama:'Brosur A4',ukuran:'29.7x21 cm',bahan:'Duplex Board 300 gsm',kategori:'A3+',cetak:'4/0',finishing:'Biaya Potong',qty:1000,harga:1292.09,imgSrc:''}];
+
+const gv = id => document.getElementById(id)?.value || '';
+
+function switchTab(t){
+  ['info','item','pay'].forEach((x,i)=>{
+    document.getElementById('tab-'+x).style.display = x===t?'block':'none';
+    document.querySelectorAll('.tab')[i].classList.toggle('active', x===t);
+  });
+}
+
+// ── Toast ──
+function toast(msg, dur=2600){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.style.opacity='1';
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>el.style.opacity='0', dur);
+}
+
+// ── Items ──
+function addItem(){
+  items.push({nama:'',ukuran:'',bahan:'',kategori:'A3+',cetak:'4/0',finishing:'',qty:1,harga:0,imgSrc:''});
+  renderCards(); rp();
+}
+function removeItem(i){ items.splice(i,1); renderCards(); rp(); }
+
+function handleItemImg(inp, i){
+  const f=inp.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=e=>{
+    items[i].imgSrc=e.target.result;
+    const th=document.getElementById('ith_'+i), lb=document.getElementById('ilb_'+i);
+    if(th){th.src=e.target.result; th.style.display='block';}
+    if(lb) lb.style.display='none';
+    rp();
+  };
+  r.readAsDataURL(f);
+}
+
+function renderCards(){
+  const wrap=document.getElementById('itemCards'); wrap.innerHTML='';
+  items.forEach((it,i)=>{
+    const kOpts=KATEGORI.map(m=>`<option value="${m}"${it.kategori===m?' selected':''}>${m}</option>`).join('');
+    const cOpts=CETAK_OPT.map(c=>`<option value="${c}"${it.cetak===c?' selected':''}>${c}</option>`).join('');
+    const div=document.createElement('div'); div.className='icard';
+    div.innerHTML=`
+      <div class="inum">ITEM #${i+1}</div>
+      <button class="bdel" onclick="removeItem(${i})">✕</button>
+      <div class="igrid">
+        <div class="fc ifl"><label>Nama Barang</label><input type="text" value="${it.nama}" oninput="items[${i}].nama=this.value;rp()"></div>
+        <div class="fc"><label>Ukuran</label><input type="text" value="${it.ukuran}" oninput="items[${i}].ukuran=this.value;rp()"></div>
+        <div class="fc"><label>Bahan</label><input type="text" value="${it.bahan}" oninput="items[${i}].bahan=this.value;rp()"></div>
+        <div class="fc"><label>Kategori</label><select onchange="items[${i}].kategori=this.value;rp()">${kOpts}</select></div>
+        <div class="fc"><label>Warna / Layer</label><select onchange="items[${i}].cetak=this.value;rp()">${cOpts}</select></div>
+        <div class="fc ifl"><label>Finishing</label><input type="text" value="${it.finishing}" oninput="items[${i}].finishing=this.value;rp()"></div>
+        <div class="fc"><label>Qty</label><input type="number" value="${it.qty}" min="1" oninput="items[${i}].qty=+this.value;rp()"></div>
+        <div class="fc"><label>Harga / pcs (Rp)</label><input type="number" value="${it.harga}" step="0.01" oninput="items[${i}].harga=+this.value;rp()"></div>
+        <div class="fc ifl">
+          <label>Gambar Preview (opsional)</label>
+          <div class="iupload" onclick="document.getElementById('if_${i}').click()">
+            <input type="file" id="if_${i}" accept="image/*" onchange="handleItemImg(this,${i})">
+            <img id="ith_${i}" src="${it.imgSrc||''}" style="display:${it.imgSrc?'block':'none'}">
+            <div id="ilb_${i}" class="iuplbl" style="display:${it.imgSrc?'none':'block'}">+ Klik upload gambar preview</div>
+          </div>
+          ${it.imgSrc?`<button class="bhapus" onclick="items[${i}].imgSrc='';renderCards();rp()">✕ Hapus gambar</button>`:''}
+        </div>
+      </div>`;
+    wrap.appendChild(div);
+  });
+}
+
+function handleLogo(inp){
+  const f=inp.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=e=>{
+    logoSrc=e.target.result;
+    document.getElementById('logoImg').src=logoSrc;
+    document.getElementById('logoImg').style.display='block';
+    document.getElementById('logoLbl').style.display='none';
+    rp();
+  };
+  r.readAsDataURL(f);
+}
+
+// ── Quotation number ──
+function buildQNo(){
+  const tipe=gv('q_tipe')||'P';
+  const no=String(gv('q_no')||'1').padStart(3,'0');
+  const d=gv('q_date')||new Date().toISOString().slice(0,10);
+  const [y,m,dd]=d.split('-');
+  return `RP/${tipe}/${no}/${dd}${m}${y.slice(2)}`;
+}
+function addDays(ds,days){ const d=new Date(ds); d.setDate(d.getDate()+days); return d.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}); }
+function fmtDate(ds){ if(!ds)return''; return new Date(ds).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}); }
+function rpFmt(n){ return 'Rp '+Math.round(n).toLocaleString('id-ID'); }
+function getSyarat(){ const el=document.getElementById('pdf-syarat-txt'); return el?el.innerText:DEF_SYARAT; }
+
+// ── Render preview ──
+function rp(){
+  const subtotal=items.reduce((s,it)=>s+Math.round(it.qty*(it.harga||0)),0);
+  const ongkir=+(gv('p_ongkir')||0), diskon=+(gv('p_diskon')||0), dp=+(gv('p_dp')||0);
+  const ppnOn=document.getElementById('ppn_on')?.checked;
+  const ppnPct=+(gv('ppn_pct')||11);
+  const afterD=subtotal+ongkir-diskon;
+  const ppnVal=ppnOn?Math.round(afterD*ppnPct/100):0;
+  const grand=afterD+ppnVal;
+  const sisa=grand-dp;
+  const dateStr=gv('q_date')||new Date().toISOString().slice(0,10);
+  const berlaku=+(gv('q_berlaku')||14), est=+(gv('q_est')||7);
+  const curSyarat=getSyarat();
+  const hasImg=items.some(it=>it.imgSrc);
+  const compName=gv('comp_name')||'Ruangprint';
+
+  const rows=items.map((it,i)=>{
+    const sub=Math.round(it.qty*(it.harga||0));
+    const pcell=hasImg?`<td class="ptd">${it.imgSrc?`<img src="${it.imgSrc}">`:'<span style="display:inline-block;width:85px;height:55px"></span>'}</td>`:'';
+    return `<tr>
+      <td class="c" style="width:4%;font-weight:700">${i+1}</td>
+      <td class="dtd">
+        <div class="dname">${it.nama||'-'}</div>
+        <div class="ddet">
+          ${it.ukuran?'Ukuran : '+it.ukuran+'<br>':''}
+          ${it.bahan?'Bahan : '+it.bahan+'<br>':''}
+          ${it.kategori?'Kategori : '+it.kategori+'<br>':''}
+          ${it.cetak?'Warna/Layer : '+it.cetak+'<br>':''}
+          ${it.finishing?'Finishing : '+it.finishing:''}
+        </div>
+      </td>
+      ${pcell}
+      <td class="r" style="width:8%">${it.qty.toLocaleString('id-ID')}</td>
+      <td class="r" style="width:16%">${it.harga?rpFmt(it.harga):'-'}</td>
+      <td class="r" style="width:16%">${rpFmt(sub)}</td>
+    </tr>`;
+  }).join('');
+
+  const previewTh=hasImg?`<th class="c" style="width:20%">Preview</th>`:'';
+  const logoHtml=logoSrc?`<img class="pdf-logo" src="${logoSrc}">`:`<div class="pdf-logo-ph">LOGO</div>`;
+  const catatan=gv('q_catatan');
+
+  document.getElementById('pdfPreview').innerHTML=`
+    <div class="pdf-header">
+      <div class="pdf-logo-area">
+        ${logoHtml}
+        <div>
+          <div class="pdf-co-name">${compName}</div>
+          <div class="pdf-co-sub">${gv('comp_addr')||''}<br>${gv('comp_phone')||''} | ${gv('comp_email')||''}<br>${gv('comp_web')||''}</div>
+        </div>
+      </div>
+      <div class="pdf-title-block">
+        <div class="pdf-sph">SURAT PENAWARAN HARGA</div>
+        <div class="pdf-no">No: ${buildQNo()}</div>
+        <div class="pdf-meta">Tanggal: ${fmtDate(dateStr)}<br>Berlaku s/d: ${addDays(dateStr,berlaku)}<br>Est. Produksi: ${est} hari kerja</div>
+      </div>
+    </div>
+
+    <div class="pdf-addr-grid">
+      <div class="pdf-abox">
+        <div class="pdf-albl">Kepada Yth.</div>
+        <div class="pdf-aval"><strong>${gv('cust_name')||'-'}</strong><br>${gv('cust_pic')?'PIC: '+gv('cust_pic')+'<br>':''}${gv('cust_addr')||''}</div>
+      </div>
+      <div class="pdf-abox">
+        <div class="pdf-albl">Kontak Customer</div>
+        <div class="pdf-aval">${gv('cust_phone')||''}<br>${gv('cust_email')||''}</div>
+      </div>
+    </div>
+
+    <div class="pdf-intro">Dengan Hormat,<br>Bersama ini kami, <strong>${compName}</strong> mengajukan penawaran harga dengan perincian sebagai berikut :</div>
+
+    <table class="ptbl">
+      <thead><tr>
+        <th class="c" style="width:4%">No</th>
+        <th>Nama Barang</th>
+        ${previewTh}
+        <th class="r" style="width:8%">Qty</th>
+        <th class="r" style="width:16%">Harga</th>
+        <th class="r" style="width:16%">Total</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+
+    <div class="pdf-totals">
+      <table>
+        <tr><td style="color:var(--muted)">Subtotal</td><td>${rpFmt(subtotal)}</td></tr>
+        ${ongkir?`<tr><td style="color:var(--muted)">Ongkir</td><td>${rpFmt(ongkir)}</td></tr>`:''}
+        ${diskon?`<tr><td style="color:var(--muted)">Diskon</td><td>- ${rpFmt(diskon)}</td></tr>`:''}
+        ${ppnOn?`<tr><td style="color:var(--muted)">PPN ${ppnPct}%</td><td>${rpFmt(ppnVal)}</td></tr>`:''}
+        <tr class="pgrand"><td><strong>TOTAL</strong></td><td><strong>${rpFmt(grand)}</strong></td></tr>
+        ${dp?`<tr><td style="color:var(--muted)">DP / Uang Muka</td><td>${rpFmt(dp)}</td></tr><tr class="psisa"><td>Sisa Pelunasan</td><td>${rpFmt(sisa)}</td></tr>`:''}
+      </table>
+    </div>
+
+    <div class="pdf-closing">Demikian surat penawaran harga ini kami sampaikan, atas perhatian dan kerjasamanya kami mengucapkan terima kasih.</div>
+
+    ${catatan?`<div class="pdf-notes"><strong>Catatan:</strong><br>${catatan.replace(/\n/g,'<br>')}</div>`:''}
+
+    <div class="pdf-syarat-wrap">
+      <div class="pdf-syarat-lbl">Syarat &amp; Ketentuan:</div>
+      <div id="pdf-syarat-txt" class="pdf-syarat-txt" contenteditable="true" spellcheck="false">${curSyarat.replace(/</g,'&lt;')}</div>
+      <div class="pdf-syarat-hint">✏ Klik untuk edit langsung</div>
+    </div>
+
+    <div class="pdf-sign-grid">
+      <div class="pdf-sbox"><div class="pdf-slbl">Pembuat</div><div class="pdf-sspace"></div><div class="pdf-sname">${gv('t_sales')||''}</div></div>
+      <div class="pdf-sbox"><div class="pdf-slbl">Mengetahui</div><div class="pdf-sspace"></div><div class="pdf-sname">${gv('t_manager')||''}</div></div>
+    </div>
+
+    <div class="pdf-foot">${compName} | ${gv('comp_phone')||''} | ${gv('comp_email')||''} | ${gv('comp_web')||''} | Terima kasih atas kepercayaan Anda.</div>
+  `;
+}
+
+// ── Snapshot ──
+function getSnap(){
+  return {
+    _v:2,
+    comp:{name:gv('comp_name'),phone:gv('comp_phone'),email:gv('comp_email'),addr:gv('comp_addr'),web:gv('comp_web'),logoSrc},
+    cust:{name:gv('cust_name'),pic:gv('cust_pic'),phone:gv('cust_phone'),email:gv('cust_email'),addr:gv('cust_addr')},
+    quot:{tipe:gv('q_tipe'),no:gv('q_no'),date:gv('q_date'),berlaku:gv('q_berlaku'),est:gv('q_est')},
+    pay:{ongkir:gv('p_ongkir'),diskon:gv('p_diskon'),dp:gv('p_dp'),ppnOn:document.getElementById('ppn_on').checked,ppnPct:gv('ppn_pct')},
+    sign:{sales:gv('t_sales'),manager:gv('t_manager')},
+    catatan:gv('q_catatan'),
+    syarat:getSyarat(),
+    items:JSON.parse(JSON.stringify(items))
+  };
+}
+
+function applySnap(d){
+  const s=(id,v)=>document.getElementById(id).value=v||'';
+  s('comp_name',d.comp.name); s('comp_phone',d.comp.phone); s('comp_email',d.comp.email); s('comp_addr',d.comp.addr); s('comp_web',d.comp.web);
+  if(d.comp.logoSrc){logoSrc=d.comp.logoSrc; const li=document.getElementById('logoImg'); li.src=logoSrc; li.style.display='block'; document.getElementById('logoLbl').style.display='none';}
+  else{logoSrc=''; document.getElementById('logoImg').style.display='none'; document.getElementById('logoLbl').style.display='block';}
+  s('cust_name',d.cust.name); s('cust_pic',d.cust.pic); s('cust_phone',d.cust.phone); s('cust_email',d.cust.email); s('cust_addr',d.cust.addr);
+  s('q_tipe',d.quot.tipe); s('q_no',d.quot.no); s('q_date',d.quot.date); s('q_berlaku',d.quot.berlaku); s('q_est',d.quot.est);
+  s('p_ongkir',d.pay.ongkir); s('p_diskon',d.pay.diskon); s('p_dp',d.pay.dp);
+  document.getElementById('ppn_on').checked=d.pay.ppnOn||false;
+  s('ppn_pct',d.pay.ppnPct);
+  s('t_sales',d.sign.sales); s('t_manager',d.sign.manager);
+  s('q_catatan',d.catatan);
+  items=d.items||[];
+  window._pendingSyarat=d.syarat||'';
+  renderCards(); rp();
+  setTimeout(()=>{ const el=document.getElementById('pdf-syarat-txt'); if(el&&window._pendingSyarat) el.innerText=window._pendingSyarat; },120);
+}
+
+// ── Auto nomor dari history ──
+function nextNo(){
+  try{
+    const h=JSON.parse(localStorage.getItem('rp_history')||'[]');
+    if(!h.length) return 1;
+    return Math.max(...h.map(x=>parseInt(x.no)||0)) + 1;
+  }catch(e){return 1;}
+}
+
+// ── Template ──
+function saveTemplate(){
+  const d={comp_name:gv('comp_name'),comp_phone:gv('comp_phone'),comp_email:gv('comp_email'),comp_addr:gv('comp_addr'),comp_web:gv('comp_web'),logoSrc,t_sales:gv('t_sales'),t_manager:gv('t_manager')};
+  localStorage.setItem('rp_template',JSON.stringify(d));
+  document.getElementById('tplBanner').style.display='flex';
+  toast('✓ Template perusahaan tersimpan!');
+}
+function loadTemplate(){
+  const t=localStorage.getItem('rp_template'); if(!t){toast('Belum ada template.');return;}
+  try{
+    const d=JSON.parse(t);
+    ['comp_name','comp_phone','comp_email','comp_addr','comp_web'].forEach(id=>{if(d[id]!==undefined)document.getElementById(id).value=d[id];});
+    if(d.logoSrc){logoSrc=d.logoSrc; document.getElementById('logoImg').src=logoSrc; document.getElementById('logoImg').style.display='block'; document.getElementById('logoLbl').style.display='none';}
+    if(d.t_sales) document.getElementById('t_sales').value=d.t_sales;
+    if(d.t_manager) document.getElementById('t_manager').value=d.t_manager;
+    rp(); toast('✓ Template dimuat!');
+  }catch(e){toast('Gagal memuat template.');}
+}
+function clearTemplate(){
+  if(!confirm('Hapus template?')) return;
+  localStorage.removeItem('rp_template');
+  document.getElementById('tplBanner').style.display='none';
+  toast('Template dihapus.');
+}
+
+// ── Save / Load JSON ──
+function saveJSON(){
+  const data=getSnap();
+  addToHistory(data);
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  const qno=buildQNo().replace(/\//g,'-');
+  a.href=URL.createObjectURL(blob);
+  a.download=`Quotation-${qno}.json`;
+  a.click();
+  toast('✓ Disimpan: Quotation-'+qno+'.json');
+}
+function loadJSON(inp){
+  const f=inp.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(!d._v) throw new Error();
+      applySnap(d);
+      inp.value='';
+      toast('✓ Dimuat: '+f.name);
+    }catch(err){toast('⚠ Format tidak valid.'); inp.value='';}
+  };
+  r.readAsText(f);
+}
+
+// ── Print (auto-save history) ──
+function doPrint(){
+  addToHistory(getSnap());
+  window.print();
+}
+
+// ── History ──
+function addToHistory(data){
+  try{
+    let h=JSON.parse(localStorage.getItem('rp_history')||'[]');
+    const qno=`RP/${data.quot.tipe}/${String(data.quot.no).padStart(3,'0')}`;
+    const entry={id:Date.now(),no:data.quot.no,qno,cust:data.cust.name||'(tanpa nama)',date:data.quot.date||new Date().toISOString().slice(0,10),grand:data.items.reduce((s,it)=>s+Math.round(it.qty*(it.harga||0)),0),data};
+    const idx=h.findIndex(x=>x.qno===qno);
+    if(idx>=0) h[idx]=entry; else h.push(entry);
+    if(h.length>50) h=h.slice(-50);
+    localStorage.setItem('rp_history',JSON.stringify(h));
+    renderHistory();
+  }catch(e){}
+}
+function renderHistory(){
+  try{
+    const h=JSON.parse(localStorage.getItem('rp_history')||'[]').slice().reverse();
+    const list=document.getElementById('hlist'), empty=document.getElementById('hempty');
+    if(!h.length){list.innerHTML=''; empty.style.display='block'; return;}
+    empty.style.display='none';
+    list.innerHTML=h.map(x=>`
+      <div class="hitem">
+        <div class="hno">${x.qno}</div>
+        <div class="hcust">${x.cust}</div>
+        <div class="hdate">${x.date}</div>
+        <div class="hgrand">Rp ${Math.round(x.grand).toLocaleString('id-ID')}</div>
+        <div class="hacts">
+          <button class="hbtn" onclick="histLoad(${x.id})">Buka</button>
+          <button class="hbtn" onclick="histDup(${x.id})" title="Duplikat">⧉</button>
+          <button class="hbtn hdel" onclick="histDel(${x.id})">✕</button>
+        </div>
+      </div>`).join('');
+  }catch(e){}
+}
+function toggleHistory(){
+  const p=document.getElementById('hpanel');
+  const open=p.style.display==='flex';
+  p.style.display=open?'none':'flex';
+  document.getElementById('btnHist').classList.toggle('active-btn',!open);
+  if(!open) renderHistory();
+}
+function histLoad(id){
+  try{
+    const h=JSON.parse(localStorage.getItem('rp_history')||'[]');
+    const e=h.find(x=>x.id===id); if(!e) return;
+    applySnap(e.data);
+    toggleHistory();
+    toast('✓ '+e.qno+' dimuat.');
+  }catch(e){toast('Gagal memuat.');}
+}
+function histDup(id){
+  try{
+    const h=JSON.parse(localStorage.getItem('rp_history')||'[]');
+    const e=h.find(x=>x.id===id); if(!e) return;
+    const d=JSON.parse(JSON.stringify(e.data));
+    d.quot.no=String(nextNo());
+    d.quot.date=new Date().toISOString().slice(0,10);
+    d.cust={name:'',pic:'',phone:'',email:'',addr:''};
+    applySnap(d);
+    if(document.getElementById('hpanel').style.display==='flex') toggleHistory();
+    toast('✓ Duplikat dibuat. Isi data customer baru.');
+    switchTab('info');
+  }catch(e){toast('Gagal duplikat.');}
+}
+function histDel(id){
+  try{
+    let h=JSON.parse(localStorage.getItem('rp_history')||'[]');
+    h=h.filter(x=>x.id!==id);
+    localStorage.setItem('rp_history',JSON.stringify(h));
+    renderHistory();
+    toast('Dihapus dari riwayat.');
+  }catch(e){}
+}
+function clearHistory(){
+  if(!confirm('Hapus semua riwayat?')) return;
+  localStorage.removeItem('rp_history');
+  renderHistory();
+  toast('Semua riwayat dihapus.');
+}
+
+// ── Duplikat quotation aktif ──
+function dupQuotation(){
+  const d=JSON.parse(JSON.stringify(getSnap()));
+  d.quot.no=String(nextNo());
+  d.quot.date=new Date().toISOString().slice(0,10);
+  d.cust={name:'',pic:'',phone:'',email:'',addr:''};
+  applySnap(d);
+  toast('✓ Duplikat dibuat. Isi data customer baru.');
+  switchTab('info');
+}
+
+// ── New Quotation ──
+function newQuotation(){
+  if(!confirm('Buat quotation baru? Data yang belum disimpan akan hilang.')) return;
+  ['cust_name','cust_pic','cust_phone','cust_email','cust_addr'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('q_tipe').value='P';
+  document.getElementById('q_no').value=String(nextNo());
+  document.getElementById('q_date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('q_berlaku').value='14';
+  document.getElementById('q_est').value='7';
+  ['p_ongkir','p_diskon','p_dp'].forEach(id=>document.getElementById(id).value='0');
+  document.getElementById('ppn_on').checked=false;
+  document.getElementById('q_catatan').value='';
+  items=[{nama:'',ukuran:'',bahan:'',kategori:'A3+',cetak:'4/0',finishing:'',qty:1,harga:0,imgSrc:''}];
+  renderCards(); rp();
+  setTimeout(()=>{ const el=document.getElementById('pdf-syarat-txt'); if(el) el.innerText=DEF_SYARAT; },120);
+  switchTab('info');
+  toast('✓ Quotation baru. No. '+document.getElementById('q_no').value+' siap.');
+}
+
+// ── INIT ──
+document.getElementById('q_date').value = new Date().toISOString().slice(0,10);
+document.getElementById('q_no').value = String(nextNo());
+
+// Auto-load template
+(function(){
+  const t=localStorage.getItem('rp_template');
+  if(!t) return;
+  try{
+    const d=JSON.parse(t);
+    ['comp_name','comp_phone','comp_email','comp_addr','comp_web'].forEach(id=>{if(d[id]!==undefined)document.getElementById(id).value=d[id];});
+    if(d.logoSrc){logoSrc=d.logoSrc; document.getElementById('logoImg').src=logoSrc; document.getElementById('logoImg').style.display='block'; document.getElementById('logoLbl').style.display='none';}
+    if(d.t_sales) document.getElementById('t_sales').value=d.t_sales;
+    if(d.t_manager) document.getElementById('t_manager').value=d.t_manager;
+    document.getElementById('tplBanner').style.display='flex';
+  }catch(e){}
+})();
+
+// ── CUSTOMER LIST ──
+function getCusts(){ try{ return JSON.parse(localStorage.getItem('rp_customers')||'[]'); }catch(e){ return []; } }
+function saveCusts(arr){ localStorage.setItem('rp_customers', JSON.stringify(arr)); }
+
+function saveCust(){
+  const name=gv('cust_name').trim();
+  if(!name){ toast('Isi nama customer dulu.'); return; }
+  const custs=getCusts();
+  const entry={ id:Date.now(), name, pic:gv('cust_pic'), phone:gv('cust_phone'), email:gv('cust_email'), addr:gv('cust_addr') };
+  // Update jika nama sama (case-insensitive)
+  const idx=custs.findIndex(c=>c.name.toLowerCase()===name.toLowerCase());
+  if(idx>=0){
+    if(!confirm(`Customer "${name}" sudah ada. Update datanya?`)) return;
+    custs[idx]={...entry, id:custs[idx].id};
+  } else {
+    custs.push(entry);
+  }
+  saveCusts(custs);
+  toast(`✓ Customer "${name}" tersimpan!`);
+  document.getElementById('custSearch').value='';
+}
+
+function loadCust(id){
+  const c=getCusts().find(x=>x.id===id); if(!c) return;
+  document.getElementById('cust_name').value  = c.name  ||'';
+  document.getElementById('cust_pic').value   = c.pic   ||'';
+  document.getElementById('cust_phone').value = c.phone ||'';
+  document.getElementById('cust_email').value = c.email ||'';
+  document.getElementById('cust_addr').value  = c.addr  ||'';
+  rp();
+  hideCustDrop();
+  document.getElementById('custSearch').value='';
+  toast(`✓ "${c.name}" dimuat.`);
+}
+
+function deleteCust(id, name, e){
+  e.stopPropagation();
+  if(!confirm(`Hapus "${name}" dari daftar?`)) return;
+  saveCusts(getCusts().filter(c=>c.id!==id));
+  renderCustDrop('');
+  toast('Customer dihapus.');
+}
+
+function renderCustDrop(query){
+  const drop=document.getElementById('custDrop');
+  let custs=getCusts();
+  if(query) custs=custs.filter(c=>c.name.toLowerCase().includes(query.toLowerCase())||c.pic.toLowerCase().includes(query.toLowerCase()));
+  if(!custs.length){
+    drop.innerHTML=`<div class="cust-empty">${query?'Tidak ditemukan':'Belum ada customer tersimpan'}</div>`;
+    return;
+  }
+  drop.innerHTML=custs.map(c=>`
+    <div class="cust-item" onclick="loadCust(${c.id})">
+      <div class="cust-main">
+        <div class="cust-name-lbl">${c.name}</div>
+        <div class="cust-sub-lbl">${[c.pic,c.phone].filter(Boolean).join(' · ')}</div>
+      </div>
+      <button class="cust-del" onclick="deleteCust(${c.id},'${c.name.replace(/'/g,"\\'")}',event)" title="Hapus">✕</button>
+    </div>`).join('');
+}
+
+function showCustDrop(){
+  const drop=document.getElementById('custDrop');
+  renderCustDrop(gv('custSearch'));
+  drop.style.display='block';
+}
+function hideCustDrop(){
+  document.getElementById('custDrop').style.display='none';
+}
+function filterCustList(){
+  renderCustDrop(gv('custSearch'));
+  document.getElementById('custDrop').style.display='block';
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', e=>{
+  if(!document.getElementById('custPickerWrap')?.contains(e.target)) hideCustDrop();
+});
+
+renderCards();
+rp();
+</script>
+</body>
+</html>

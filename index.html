@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RuangPrint Tools — Digital Printing Jakarta</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #F5A800;
+  --gold-light: #FFD166;
+  --dark: #111010;
+  --dark2: #1A1918;
+  --dark3: #242220;
+  --white: #FFFFFF;
+  --gray: #888480;
+  --gray-light: #C8C4BC;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--dark);
+  color: var(--white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── BACKGROUND ── */
+.bg-grid {
+  position: fixed; inset: 0; z-index: 0;
+  background-image:
+    linear-gradient(rgba(245,168,0,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245,168,0,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+.bg-glow {
+  position: fixed; z-index: 0; pointer-events: none;
+  border-radius: 50%; filter: blur(120px); opacity: 0.18;
+}
+.bg-glow-1 { width: 600px; height: 600px; background: var(--gold); top: -200px; right: -100px; }
+.bg-glow-2 { width: 400px; height: 400px; background: #FF6B35; bottom: 0; left: -100px; opacity: 0.1; }
+
+/* ── HEADER ── */
+header {
+  position: relative; z-index: 10;
+  padding: 20px 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  backdrop-filter: blur(10px);
+  background: rgba(17,16,16,0.7);
+  position: sticky; top: 0;
+}
+.logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px; font-weight: 400;
+  letter-spacing: 2px;
+}
+.logo span { color: var(--gold); }
+.logo-sub { font-size: 10px; color: var(--gray); letter-spacing: 2px; text-transform: uppercase; margin-top: 1px; }
+.header-badge {
+  background: rgba(245,168,0,0.1);
+  border: 1px solid rgba(245,168,0,0.2);
+  color: var(--gold);
+  padding: 6px 14px; border-radius: 20px;
+  font-size: 12px; font-weight: 500;
+  display: flex; align-items: center; gap: 6px;
+}
+.header-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+
+/* ── HERO ── */
+.hero {
+  position: relative; z-index: 1;
+  padding: 100px 48px 80px;
+  max-width: 1200px; margin: 0 auto;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(245,168,0,0.08);
+  border: 1px solid rgba(245,168,0,0.15);
+  padding: 6px 14px; border-radius: 20px;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 28px;
+}
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(52px, 8vw, 96px);
+  font-weight: 400; line-height: 0.95;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+}
+.hero h1 .line-gold { color: var(--gold); }
+.hero p {
+  font-size: 17px; color: var(--gray-light);
+  line-height: 1.7; max-width: 520px;
+  margin-bottom: 40px;
+}
+.hero-stats {
+  display: flex; gap: 40px; flex-wrap: wrap;
+}
+.hero-stat-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px; font-weight: 400; color: var(--gold);
+  letter-spacing: 1px;
+}
+.hero-stat-label { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+/* ── DIVIDER ── */
+.divider {
+  position: relative; z-index: 1;
+  max-width: 1200px; margin: 0 auto;
+  padding: 0 48px;
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 48px;
+}
+.divider-line { flex: 1; height: 1px; background: rgba(255,255,255,0.07); }
+.divider-label { font-size: 11px; color: var(--gray); letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; }
+
+/* ── TOOLS GRID ── */
+.tools-section {
+  position: relative; z-index: 1;
+  max-width: 1200px; margin: 0 auto;
+  padding: 0 48px 100px;
+}
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+/* ── TOOL CARD ── */
+.tool-card {
+  background: var(--dark2);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 20px;
+  padding: 32px;
+  text-decoration: none; color: inherit;
+  display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
+  transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+.tool-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.tool-card::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(245,168,0,0.06), transparent 70%);
+  opacity: 0; transition: opacity 0.3s;
+}
+.tool-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(245,168,0,0.25);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(245,168,0,0.1);
+}
+.tool-card:hover::before { opacity: 1; }
+.tool-card:hover::after { opacity: 1; }
+
+.tool-icon {
+  width: 56px; height: 56px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; margin-bottom: 24px;
+  position: relative; z-index: 1;
+  flex-shrink: 0;
+}
+.tool-icon.offset { background: rgba(245,168,0,0.12); }
+.tool-icon.booklet { background: rgba(52,199,89,0.12); }
+.tool-icon.quotation { background: rgba(10,132,255,0.12); }
+
+.tool-tag {
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  font-weight: 600; margin-bottom: 10px;
+  position: relative; z-index: 1;
+}
+.tool-tag.offset { color: var(--gold); }
+.tool-tag.booklet { color: #34C759; }
+.tool-tag.quotation { color: #0A84FF; }
+
+.tool-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 20px; font-weight: 700;
+  margin-bottom: 10px; line-height: 1.2;
+  position: relative; z-index: 1;
+}
+.tool-desc {
+  font-size: 13px; color: var(--gray);
+  line-height: 1.7; flex: 1;
+  position: relative; z-index: 1;
+  margin-bottom: 24px;
+}
+.tool-features {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  position: relative; z-index: 1;
+  margin-bottom: 24px;
+}
+.tool-feature {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; color: var(--gray-light);
+}
+.tool-cta {
+  display: flex; align-items: center; justify-content: space-between;
+  position: relative; z-index: 1;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.tool-cta-text {
+  font-size: 13px; font-weight: 600; color: var(--gold);
+}
+.tool-cta-arrow {
+  width: 34px; height: 34px;
+  background: rgba(245,168,0,0.1);
+  border: 1px solid rgba(245,168,0,0.2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; transition: all 0.25s;
+}
+.tool-card:hover .tool-cta-arrow {
+  background: var(--gold);
+  color: var(--dark);
+  transform: translateX(4px);
+}
+
+/* ── FOOTER ── */
+footer {
+  position: relative; z-index: 1;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 32px 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 100%;
+}
+.footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 20px; font-weight: 400; letter-spacing: 2px; }
+.footer-logo span { color: var(--gold); }
+.footer-copy { font-size: 12px; color: var(--gray); }
+.footer-links { display: flex; gap: 20px; }
+.footer-links a { font-size: 12px; color: var(--gray); text-decoration: none; transition: color 0.2s; }
+.footer-links a:hover { color: var(--gold); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hero { animation: fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) both; }
+.tool-card { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+.tool-card:nth-child(1) { animation-delay: 0.1s; }
+.tool-card:nth-child(2) { animation-delay: 0.2s; }
+.tool-card:nth-child(3) { animation-delay: 0.3s; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .tools-grid { grid-template-columns: 1fr; }
+  header { padding: 16px 20px; }
+  .hero { padding: 60px 20px 50px; }
+  .tools-section { padding: 0 20px 60px; }
+  .divider { padding: 0 20px; }
+  footer { padding: 24px 20px; flex-direction: column; gap: 12px; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-glow bg-glow-1"></div>
+<div class="bg-glow bg-glow-2"></div>
+
+<!-- HEADER -->
+<header>
+  <div>
+    <div class="logo">RUANG<span>PRINT</span></div>
+    <div class="logo-sub">Tools & Kalkulator</div>
+  </div>
+  <div class="header-badge">Tools Online · Gratis</div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">🖨️ Digital Printing Jakarta</div>
+  <h1>
+    Semua Tools<br>
+    <span class="line-gold">RuangPrint</span><br>
+    dalam Satu Tempat
+  </h1>
+  <p>Kalkulator harga cetak, booklet, dan quotation maker — dirancang khusus untuk tim dan customer RuangPrint.</p>
+  <div class="hero-stats">
+    <div>
+      <div class="hero-stat-num">3</div>
+      <div class="hero-stat-label">Tools Tersedia</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">5</div>
+      <div class="hero-stat-label">Cabang Jabodetabek</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">100%</div>
+      <div class="hero-stat-label">Gratis & Online</div>
+    </div>
+  </div>
+</section>
+
+<!-- DIVIDER -->
+<div class="divider">
+  <div class="divider-line"></div>
+  <div class="divider-label">Pilih Tools</div>
+  <div class="divider-line"></div>
+</div>
+
+<!-- TOOLS GRID -->
+<section class="tools-section">
+  <div class="tools-grid">
+
+    <!-- Kalkulator Offset -->
+    <a class="tool-card" href="kalkulator-offset.html">
+      <div class="tool-icon offset">🖨️</div>
+      <div class="tool-tag offset">Cetak Offset</div>
+      <div class="tool-name">Kalkulator Offset</div>
+      <div class="tool-desc">Hitung estimasi harga cetak offset dengan cepat dan akurat. Cocok untuk order dalam jumlah besar.</div>
+      <div class="tool-features">
+        <span class="tool-feature">Harga per eksemplar</span>
+        <span class="tool-feature">Berbagai ukuran</span>
+        <span class="tool-feature">Multi-quantity</span>
+      </div>
+      <div class="tool-cta">
+        <span class="tool-cta-text">Buka Kalkulator →</span>
+        <div class="tool-cta-arrow">→</div>
+      </div>
+    </a>
+
+    <!-- Kalkulator Booklet -->
+    <a class="tool-card" href="kalkulator-booklet.html">
+      <div class="tool-icon booklet">📖</div>
+      <div class="tool-tag booklet">Booklet & Majalah</div>
+      <div class="tool-name">Kalkulator Booklet A3+</div>
+      <div class="tool-desc">Kalkulasi harga cetak booklet, katalog, dan majalah format A3+ dengan detail yang lengkap.</div>
+      <div class="tool-features">
+        <span class="tool-feature">Format A3+</span>
+        <span class="tool-feature">Saddle stitch</span>
+        <span class="tool-feature">Perfect binding</span>
+      </div>
+      <div class="tool-cta">
+        <span class="tool-cta-text">Buka Kalkulator →</span>
+        <div class="tool-cta-arrow">→</div>
+      </div>
+    </a>
+
+    <!-- Quotation Maker -->
+    <a class="tool-card" href="quotation.html">
+      <div class="tool-icon quotation">📋</div>
+      <div class="tool-tag quotation">Penawaran Harga</div>
+      <div class="tool-name">Quotation Maker</div>
+      <div class="tool-desc">Buat surat penawaran harga profesional untuk customer dalam hitungan menit. Langsung bisa di-print.</div>
+      <div class="tool-features">
+        <span class="tool-feature">Template profesional</span>
+        <span class="tool-feature">PDF ready</span>
+        <span class="tool-feature">Multi-item</span>
+      </div>
+      <div class="tool-cta">
+        <span class="tool-cta-text">Buka Quotation →</span>
+        <div class="tool-cta-arrow">→</div>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">RUANG<span>PRINT</span></div>
+  <div class="footer-copy">© 2025 RuangPrint · Digital Printing Jabodetabek</div>
+  <div class="footer-links">
+    <a href="https://metzones-hue.github.io/ruanghrd" target="_blank">RuangHRD</a>
+    <a href="#">Cabang</a>
+    <a href="#">Kontak</a>
+  </div>
+</footer>
+
+</body>
+</html>
