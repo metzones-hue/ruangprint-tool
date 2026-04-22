@@ -61,6 +61,16 @@ input[type=checkbox]{width:auto;accent-color:var(--gold)}
 .lupload img{max-width:100%;max-height:56px;object-fit:contain}
 .lupload input[type=file]{display:none}
 
+/* SIGNATURE UPLOAD */
+.supload{border:1.5px dashed var(--border);border-radius:5px;padding:8px;text-align:center;cursor:pointer;background:var(--bg);transition:border .15s;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:60px;justify-content:center}
+.supload:hover{border-color:var(--gold);background:#fffdf5}
+.supload img{max-width:100%;max-height:80px;object-fit:contain;border-radius:3px}
+.supload input[type=file]{display:none}
+.sign-preview-wrap{position:relative;display:inline-block}
+.sign-remove{position:absolute;top:-8px;right:-8px;background:#fee;color:#c00;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;display:none;align-items:center;justify-content:center}
+.sign-remove:hover{background:#c00;color:#fff}
+
+
 /* PPN */
 .ppnrow{display:flex;align-items:center;gap:7px;margin-bottom:7px;padding:7px 9px;background:var(--bg);border-radius:5px;border:1px solid var(--border)}
 .ppnrow label{text-transform:none;font-size:12px;font-weight:500;color:var(--text);letter-spacing:0}
@@ -180,6 +190,9 @@ input[type=checkbox]{width:auto;accent-color:var(--gold)}
   .pdf-paper{box-shadow:none;width:100%;min-height:auto;padding:16mm 14mm;border-radius:0}
   .pdf-syarat-hint{display:none}
   @page{size:A4;margin:0}
+  .supload{border:none;background:none;padding:0;min-height:auto}
+  .sign-remove{display:none!important}
+  .supload label{display:none}
 }
 </style>
 </head>
@@ -289,8 +302,32 @@ input[type=checkbox]{width:auto;accent-color:var(--gold)}
       </div>
       <div class="st">Tanda Tangan</div>
       <div class="fr">
-        <div class="fc"><label>Nama Pembuat</label><input type="text" id="t_sales" value="Joni Dasa" oninput="rp()"></div>
-        <div class="fc"><label>Mengetahui</label><input type="text" id="t_manager" value="Rohani" oninput="rp()"></div>
+        <div class="fc">
+          <label>Nama Pembuat</label>
+          <input type="text" id="t_sales" value="Joni Dasa" oninput="rp()">
+          <label style="margin-top:5px">Tanda Tangan Pembuat</label>
+          <div class="supload" onclick="document.getElementById('signSalesInp').click()">
+            <input type="file" id="signSalesInp" accept="image/*" onchange="handleSign(this,'sales')">
+            <div id="signSalesLbl" style="font-size:10px;color:var(--muted)">+ Upload tanda tangan</div>
+            <div class="sign-preview-wrap" id="signSalesWrap" style="display:none">
+              <img id="signSalesImg" style="max-height:70px">
+              <button class="sign-remove" onclick="removeSign('sales',event)" title="Hapus">✕</button>
+            </div>
+          </div>
+        </div>
+        <div class="fc">
+          <label>Mengetahui</label>
+          <input type="text" id="t_manager" value="Rohani" oninput="rp()">
+          <label style="margin-top:5px">Tanda Tangan Manager</label>
+          <div class="supload" onclick="document.getElementById('signManagerInp').click()">
+            <input type="file" id="signManagerInp" accept="image/*" onchange="handleSign(this,'manager')">
+            <div id="signManagerLbl" style="font-size:10px;color:var(--muted)">+ Upload tanda tangan</div>
+            <div class="sign-preview-wrap" id="signManagerWrap" style="display:none">
+              <img id="signManagerImg" style="max-height:70px">
+              <button class="sign-remove" onclick="removeSign('manager',event)" title="Hapus">✕</button>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="st">Catatan</div>
       <div class="fc"><label>Catatan Tambahan</label><textarea id="q_catatan" rows="2" oninput="rp()">Tidak Berlaku Kelipatan</textarea></div>
@@ -337,6 +374,8 @@ const KATEGORI = ['A3+','Indoor','Outdoor','UV Roll to Roll','UV Flatbed','Offse
 const CETAK_OPT = ['4/0','4/4','1/0','1/1','1 Layer','2 Layer','3 Layer','Full Color'];
 const DEF_SYARAT = '1. Harga berlaku sesuai tanggal berlaku quotation.\n2. Pembayaran DP sebelum produksi dimulai.\n3. Desain/file lengkap sebelum estimasi berjalan.';
 let logoSrc = '';
+let signSalesSrc = '';
+let signManagerSrc = '';
 let items = [{nama:'Brosur A4',ukuran:'29.7x21 cm',bahan:'Duplex Board 300 gsm',kategori:'A3+',cetak:'4/0',finishing:'Biaya Potong',qty:1000,harga:1292.09,imgSrc:''}];
 
 const gv = id => document.getElementById(id)?.value || '';
@@ -374,6 +413,47 @@ function handleItemImg(inp, i){
     rp();
   };
   r.readAsDataURL(f);
+}
+
+function handleSign(inp, type){
+  const f=inp.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=e=>{
+    const src=e.target.result;
+    if(type==='sales'){
+      signSalesSrc=src;
+      document.getElementById('signSalesImg').src=src;
+      document.getElementById('signSalesWrap').style.display='inline-block';
+      document.getElementById('signSalesLbl').style.display='none';
+      document.querySelector('#signSalesWrap .sign-remove').style.display='flex';
+    }else{
+      signManagerSrc=src;
+      document.getElementById('signManagerImg').src=src;
+      document.getElementById('signManagerWrap').style.display='inline-block';
+      document.getElementById('signManagerLbl').style.display='none';
+      document.querySelector('#signManagerWrap .sign-remove').style.display='flex';
+    }
+    rp();
+  };
+  r.readAsDataURL(f);
+}
+
+function removeSign(type, ev){
+  if(ev) ev.stopPropagation();
+  if(type==='sales'){
+    signSalesSrc='';
+    document.getElementById('signSalesImg').src='';
+    document.getElementById('signSalesWrap').style.display='none';
+    document.getElementById('signSalesLbl').style.display='block';
+    document.getElementById('signSalesInp').value='';
+  }else{
+    signManagerSrc='';
+    document.getElementById('signManagerImg').src='';
+    document.getElementById('signManagerWrap').style.display='none';
+    document.getElementById('signManagerLbl').style.display='block';
+    document.getElementById('signManagerInp').value='';
+  }
+  rp();
 }
 
 function renderCards(){
@@ -419,6 +499,47 @@ function handleLogo(inp){
     rp();
   };
   r.readAsDataURL(f);
+}
+
+function handleSign(inp, type){
+  const f=inp.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=e=>{
+    const src=e.target.result;
+    if(type==='sales'){
+      signSalesSrc=src;
+      document.getElementById('signSalesImg').src=src;
+      document.getElementById('signSalesWrap').style.display='inline-block';
+      document.getElementById('signSalesLbl').style.display='none';
+      document.querySelector('#signSalesWrap .sign-remove').style.display='flex';
+    }else{
+      signManagerSrc=src;
+      document.getElementById('signManagerImg').src=src;
+      document.getElementById('signManagerWrap').style.display='inline-block';
+      document.getElementById('signManagerLbl').style.display='none';
+      document.querySelector('#signManagerWrap .sign-remove').style.display='flex';
+    }
+    rp();
+  };
+  r.readAsDataURL(f);
+}
+
+function removeSign(type, ev){
+  if(ev) ev.stopPropagation();
+  if(type==='sales'){
+    signSalesSrc='';
+    document.getElementById('signSalesImg').src='';
+    document.getElementById('signSalesWrap').style.display='none';
+    document.getElementById('signSalesLbl').style.display='block';
+    document.getElementById('signSalesInp').value='';
+  }else{
+    signManagerSrc='';
+    document.getElementById('signManagerImg').src='';
+    document.getElementById('signManagerWrap').style.display='none';
+    document.getElementById('signManagerLbl').style.display='block';
+    document.getElementById('signManagerInp').value='';
+  }
+  rp();
 }
 
 // ── Quotation number ──
@@ -475,6 +596,12 @@ function rp(){
   const previewTh=hasImg?`<th class="c" style="width:20%">Preview</th>`:'';
   const logoHtml=logoSrc?`<img class="pdf-logo" src="${logoSrc}">`:`<div class="pdf-logo-ph">LOGO</div>`;
   const catatan=gv('q_catatan');
+    const signSalesHtml = signSalesSrc 
+      ? `<img src="${signSalesSrc}" style="max-height:60px;max-width:150px;object-fit:contain;display:block;margin:0 auto">` 
+      : `<div class="pdf-sspace"></div>`;
+    const signManagerHtml = signManagerSrc 
+      ? `<img src="${signManagerSrc}" style="max-height:60px;max-width:150px;object-fit:contain;display:block;margin:0 auto">` 
+      : `<div class="pdf-sspace"></div>`;
 
   document.getElementById('pdfPreview').innerHTML=`
     <div class="pdf-header">
@@ -539,8 +666,16 @@ function rp(){
     </div>
 
     <div class="pdf-sign-grid">
-      <div class="pdf-sbox"><div class="pdf-slbl">Pembuat</div><div class="pdf-sspace"></div><div class="pdf-sname">${gv('t_sales')||''}</div></div>
-      <div class="pdf-sbox"><div class="pdf-slbl">Mengetahui</div><div class="pdf-sspace"></div><div class="pdf-sname">${gv('t_manager')||''}</div></div>
+      <div class="pdf-sbox">
+        <div class="pdf-slbl">Pembuat</div>
+        ${signSalesHtml}
+        <div class="pdf-sname">${gv('t_sales')||''}</div>
+      </div>
+      <div class="pdf-sbox">
+        <div class="pdf-slbl">Mengetahui</div>
+        ${signManagerHtml}
+        <div class="pdf-sname">${gv('t_manager')||''}</div>
+      </div>
     </div>
 
     <div class="pdf-foot">${compName} | ${gv('comp_phone')||''} | ${gv('comp_email')||''} | ${gv('comp_web')||''} | Terima kasih atas kepercayaan Anda.</div>
@@ -555,7 +690,7 @@ function getSnap(){
     cust:{name:gv('cust_name'),pic:gv('cust_pic'),phone:gv('cust_phone'),email:gv('cust_email'),addr:gv('cust_addr')},
     quot:{tipe:gv('q_tipe'),no:gv('q_no'),date:gv('q_date'),berlaku:gv('q_berlaku'),est:gv('q_est')},
     pay:{ongkir:gv('p_ongkir'),diskon:gv('p_diskon'),dp:gv('p_dp'),ppnOn:document.getElementById('ppn_on').checked,ppnPct:gv('ppn_pct')},
-    sign:{sales:gv('t_sales'),manager:gv('t_manager')},
+    sign:{sales:gv('t_sales'),manager:gv('t_manager'),salesSrc:signSalesSrc,managerSrc:signManagerSrc},
     catatan:gv('q_catatan'),
     syarat:getSyarat(),
     items:JSON.parse(JSON.stringify(items))
@@ -573,6 +708,28 @@ function applySnap(d){
   document.getElementById('ppn_on').checked=d.pay.ppnOn||false;
   s('ppn_pct',d.pay.ppnPct);
   s('t_sales',d.sign.sales); s('t_manager',d.sign.manager);
+  signSalesSrc=d.sign.salesSrc||''; 
+  signManagerSrc=d.sign.managerSrc||'';
+  if(signSalesSrc){
+    document.getElementById('signSalesImg').src=signSalesSrc;
+    document.getElementById('signSalesWrap').style.display='inline-block';
+    document.getElementById('signSalesLbl').style.display='none';
+    document.querySelector('#signSalesWrap .sign-remove').style.display='flex';
+  }else{
+    document.getElementById('signSalesWrap').style.display='none';
+    document.getElementById('signSalesLbl').style.display='block';
+    document.querySelector('#signSalesWrap .sign-remove').style.display='none';
+  }
+  if(signManagerSrc){
+    document.getElementById('signManagerImg').src=signManagerSrc;
+    document.getElementById('signManagerWrap').style.display='inline-block';
+    document.getElementById('signManagerLbl').style.display='none';
+    document.querySelector('#signManagerWrap .sign-remove').style.display='flex';
+  }else{
+    document.getElementById('signManagerWrap').style.display='none';
+    document.getElementById('signManagerLbl').style.display='block';
+    document.querySelector('#signManagerWrap .sign-remove').style.display='none';
+  }
   s('q_catatan',d.catatan);
   items=d.items||[];
   window._pendingSyarat=d.syarat||'';
@@ -591,7 +748,7 @@ function nextNo(){
 
 // ── Template ──
 function saveTemplate(){
-  const d={comp_name:gv('comp_name'),comp_phone:gv('comp_phone'),comp_email:gv('comp_email'),comp_addr:gv('comp_addr'),comp_web:gv('comp_web'),logoSrc,t_sales:gv('t_sales'),t_manager:gv('t_manager')};
+  const d={comp_name:gv('comp_name'),comp_phone:gv('comp_phone'),comp_email:gv('comp_email'),comp_addr:gv('comp_addr'),comp_web:gv('comp_web'),logoSrc, signSalesSrc, signManagerSrc, t_sales:gv('t_sales'),t_manager:gv('t_manager')};
   localStorage.setItem('rp_template',JSON.stringify(d));
   document.getElementById('tplBanner').style.display='flex';
   toast('✓ Template perusahaan tersimpan!');
@@ -604,6 +761,8 @@ function loadTemplate(){
     if(d.logoSrc){logoSrc=d.logoSrc; document.getElementById('logoImg').src=logoSrc; document.getElementById('logoImg').style.display='block'; document.getElementById('logoLbl').style.display='none';}
     if(d.t_sales) document.getElementById('t_sales').value=d.t_sales;
     if(d.t_manager) document.getElementById('t_manager').value=d.t_manager;
+    if(d.signSalesSrc){ signSalesSrc=d.signSalesSrc; document.getElementById('signSalesImg').src=signSalesSrc; document.getElementById('signSalesWrap').style.display='inline-block'; document.getElementById('signSalesLbl').style.display='none'; document.querySelector('#signSalesWrap .sign-remove').style.display='flex'; }
+    if(d.signManagerSrc){ signManagerSrc=d.signManagerSrc; document.getElementById('signManagerImg').src=signManagerSrc; document.getElementById('signManagerWrap').style.display='inline-block'; document.getElementById('signManagerLbl').style.display='none'; document.querySelector('#signManagerWrap .sign-remove').style.display='flex'; }
     rp(); toast('✓ Template dimuat!');
   }catch(e){toast('Gagal memuat template.');}
 }
@@ -770,6 +929,8 @@ document.getElementById('q_no').value = String(nextNo());
     if(d.logoSrc){logoSrc=d.logoSrc; document.getElementById('logoImg').src=logoSrc; document.getElementById('logoImg').style.display='block'; document.getElementById('logoLbl').style.display='none';}
     if(d.t_sales) document.getElementById('t_sales').value=d.t_sales;
     if(d.t_manager) document.getElementById('t_manager').value=d.t_manager;
+    if(d.signSalesSrc){ signSalesSrc=d.signSalesSrc; document.getElementById('signSalesImg').src=signSalesSrc; document.getElementById('signSalesWrap').style.display='inline-block'; document.getElementById('signSalesLbl').style.display='none'; document.querySelector('#signSalesWrap .sign-remove').style.display='flex'; }
+    if(d.signManagerSrc){ signManagerSrc=d.signManagerSrc; document.getElementById('signManagerImg').src=signManagerSrc; document.getElementById('signManagerWrap').style.display='inline-block'; document.getElementById('signManagerLbl').style.display='none'; document.querySelector('#signManagerWrap .sign-remove').style.display='flex'; }
     document.getElementById('tplBanner').style.display='flex';
   }catch(e){}
 })();
