@@ -1,6 +1,87 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ============================================================
+// SUPABASE CONFIG — Sama dengan RuangHRD
+// ============================================================
+var SUPABASE_URL = 'https://fbrygeozyvgstsmjbmwv.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZicnlnZW96eXZnc3RzbWpibXd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczNTgwNjAsImV4cCI6MjA5MjkzNDA2MH0.c0sLrLV4-IK5VEE8_o4OCFHcDcN_UiqK-rupftFFbE8';
+var _sb = null;
+var _sbReady = false;
+
+function initSB() {
+  try {
+    _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    _sbReady = true;
+    console.log('[Supabase] Quotation client ready');
+  } catch(e) { console.error('[Supabase] Init error:', e); }
+}
+
+async function sbSaveQuotation(entry) {
+  if(!_sbReady) return false;
+  try {
+    const { error } = await _sb.from('rp_quotations').upsert({
+      id: entry.id,
+      no_quotation: entry.qno,
+      tipe: entry.tipe || 'P',
+      cabang: entry.cabang || '-',
+      cs_name: entry.csName || '-',
+      customer: entry.cust,
+      tanggal: entry.date,
+      grand_total: entry.grand,
+      data_json: JSON.stringify(entry.data)
+    }, { onConflict: 'id' });
+    if(error) { console.error('[Supabase] Save error:', error.message); return false; }
+    return true;
+  } catch(e) { console.error('[Supabase] Save exception:', e); return false; }
+}
+
+async function sbLoadHistory(cabangFilter) {
+  if(!_sbReady) return null;
+  try {
+    let query = _sb.from('rp_quotations').select('*').order('created_at', { ascending: false }).limit(100);
+    if(cabangFilter && cabangFilter !== 'semua') query = query.eq('cabang', cabangFilter);
+    const { data, error } = await query;
+    if(error) { console.error('[Supabase] Load error:', error.message); return null; }
+    return data;
+  } catch(e) { return null; }
+}
+
+async function sbDeleteQuotation(id) {
+  if(!_sbReady) return;
+  try {
+    await _sb.from('rp_quotations').delete().eq('id', id);
+  } catch(e) {}
+}
+
+async function sbClearAll(cabang) {
+  if(!_sbReady) return;
+  try {
+    let q = _sb.from('rp_quotations').delete();
+    if(cabang && cabang !== 'semua') q = q.eq('cabang', cabang);
+    else q = q.neq('id', 0); // delete all
+    await q;
+  } catch(e) {}
+}
+
+// Get current cabang from selector
+function getCurrentCabang() {
+  const el = document.getElementById('cs_cabang');
+  return el ? el.value : '-';
+}
+function getCurrentCS() {
+  const el = document.getElementById('cs_name');
+  return el ? el.value : '-';
+}
+
+// Save cabang+cs to localStorage for next session
+function saveCabangPref() {
+  localStorage.setItem('rp_cabang', document.getElementById('cs_cabang').value);
+  localStorage.setItem('rp_cs_name', document.getElementById('cs_name').value);
+}
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Quotation Maker — RuangPrint</title>
@@ -52,6 +133,15 @@ input[type=checkbox]{width:auto;accent-color:var(--gold)}
 .iuplbl{font-size:10px;color:var(--muted)}
 .bhapus{margin-top:3px;font-size:10px;padding:2px 7px;background:none;border:1px solid var(--border);border-radius:3px;cursor:pointer;color:var(--muted);transition:all .15s}
 .bhapus:hover{border-color:#c00;color:#c00}
+.sig-upload{border:1.5px dashed var(--border);border-radius:5px;padding:6px;text-align:center;cursor:pointer;background:var(--white);transition:border .15s;min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;margin-top:4px;}
+.sig-upload:hover{border-color:var(--gold);}
+.sig-upload img{max-width:100%;max-height:44px;object-fit:contain;}
+.sig-upload input[type=file]{display:none;}
+.sig-lbl{font-size:10px;color:var(--muted);}
+.cs-field{background:rgba(255,255,255,.1);border:1px solid #3a3a3a;border-radius:4px;padding:4px 8px;font-size:11px;color:#ddd;font-family:'DM Sans',sans-serif;height:28px;}
+.cs-field:focus{outline:none;border-color:var(--gold);}
+.cs-label{font-size:9px;color:#666;margin-right:3px;white-space:nowrap;}
+.hcabang{font-size:9px;color:#888;background:rgba(245,168,0,.1);border:1px solid rgba(245,168,0,.2);border-radius:3px;padding:1px 5px;white-space:nowrap;}
 .badd{margin-top:4px;padding:7px 12px;background:var(--dark);color:var(--white);border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .15s}
 .badd:hover{background:var(--gold);color:var(--dark)}
 
@@ -60,16 +150,6 @@ input[type=checkbox]{width:auto;accent-color:var(--gold)}
 .lupload:hover{border-color:var(--gold)}
 .lupload img{max-width:100%;max-height:56px;object-fit:contain}
 .lupload input[type=file]{display:none}
-
-/* SIGNATURE UPLOAD */
-.supload{border:1.5px dashed var(--border);border-radius:5px;padding:8px;text-align:center;cursor:pointer;background:var(--bg);transition:border .15s;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:60px;justify-content:center}
-.supload:hover{border-color:var(--gold);background:#fffdf5}
-.supload img{max-width:100%;max-height:80px;object-fit:contain;border-radius:3px}
-.supload input[type=file]{display:none}
-.sign-preview-wrap{position:relative;display:inline-block}
-.sign-remove{position:absolute;top:-8px;right:-8px;background:#fee;color:#c00;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;display:none;align-items:center;justify-content:center}
-.sign-remove:hover{background:#c00;color:#fff}
-
 
 /* PPN */
 .ppnrow{display:flex;align-items:center;gap:7px;margin-bottom:7px;padding:7px 9px;background:var(--bg);border-radius:5px;border:1px solid var(--border)}
@@ -190,9 +270,6 @@ input[type=checkbox]{width:auto;accent-color:var(--gold)}
   .pdf-paper{box-shadow:none;width:100%;min-height:auto;padding:16mm 14mm;border-radius:0}
   .pdf-syarat-hint{display:none}
   @page{size:A4;margin:0}
-  .supload{border:none;background:none;padding:0;min-height:auto}
-  .sign-remove{display:none!important}
-  .supload label{display:none}
 }
 </style>
 </head>
@@ -201,10 +278,23 @@ input[type=checkbox]{width:auto;accent-color:var(--gold)}
 
 <!-- LEFT -->
 <div class="left">
-  <div class="brand-bar">
+  <div class="brand-bar" style="gap:8px;flex-wrap:wrap;">
     <div class="lm"><svg viewBox="0 0 18 18" fill="none"><rect x="1" y="1" width="7" height="7" rx="1.5" fill="#181818"/><rect x="10" y="1" width="7" height="7" rx="1.5" fill="#181818"/><rect x="1" y="10" width="7" height="7" rx="1.5" fill="#181818"/><rect x="10" y="10" width="7" height="7" rx="1.5" fill="rgba(24,24,24,.4)"/></svg></div>
     <h1>RUANGPRINT</h1>
     <em>QUOTATION MAKER</em>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span class="cs-label">Cabang:</span>
+      <select id="cs_cabang" class="cs-field" onchange="saveCabangPref()">
+        <option value="HO">Head Office</option>
+        <option value="DMB">Daan Mogot</option>
+        <option value="CTR">Citra Raya</option>
+        <option value="GDS">Gading Serpong</option>
+        <option value="CGK">Cengkareng</option>
+        <option value="BKS">Bekasi</option>
+      </select>
+      <span class="cs-label">Nama CS:</span>
+      <input id="cs_name" class="cs-field" type="text" placeholder="Nama kamu..." style="width:110px;" onchange="saveCabangPref()">
+    </div>
   </div>
   <div class="tabs">
     <div class="tab active" onclick="switchTab('info')">Info</div>
@@ -305,28 +395,22 @@ input[type=checkbox]{width:auto;accent-color:var(--gold)}
         <div class="fc">
           <label>Nama Pembuat</label>
           <input type="text" id="t_sales" value="Joni Dasa" oninput="rp()">
-          <label style="margin-top:5px">Tanda Tangan Pembuat</label>
-          <div class="supload" onclick="document.getElementById('signSalesInp').click()">
-            <input type="file" id="signSalesInp" accept="image/*" onchange="handleSign(this,'sales')">
-            <div id="signSalesLbl" style="font-size:10px;color:var(--muted)">+ Upload tanda tangan</div>
-            <div class="sign-preview-wrap" id="signSalesWrap" style="display:none">
-              <img id="signSalesImg" style="max-height:70px">
-              <button class="sign-remove" onclick="removeSign('sales',event)" title="Hapus">✕</button>
-            </div>
+          <div class="sig-upload" onclick="document.getElementById('sig_sales_inp').click()" id="sig_sales_box">
+            <input type="file" id="sig_sales_inp" accept="image/*" onchange="loadSig('sales',this)">
+            <img id="sig_sales_img" src="" style="display:none;">
+            <span class="sig-lbl" id="sig_sales_lbl">+ Upload tanda tangan</span>
           </div>
+          <button class="bhapus" id="sig_sales_del" style="display:none;" onclick="clearSig('sales')">✕ Hapus</button>
         </div>
         <div class="fc">
           <label>Mengetahui</label>
           <input type="text" id="t_manager" value="Rohani" oninput="rp()">
-          <label style="margin-top:5px">Tanda Tangan Manager</label>
-          <div class="supload" onclick="document.getElementById('signManagerInp').click()">
-            <input type="file" id="signManagerInp" accept="image/*" onchange="handleSign(this,'manager')">
-            <div id="signManagerLbl" style="font-size:10px;color:var(--muted)">+ Upload tanda tangan</div>
-            <div class="sign-preview-wrap" id="signManagerWrap" style="display:none">
-              <img id="signManagerImg" style="max-height:70px">
-              <button class="sign-remove" onclick="removeSign('manager',event)" title="Hapus">✕</button>
-            </div>
+          <div class="sig-upload" onclick="document.getElementById('sig_manager_inp').click()" id="sig_manager_box">
+            <input type="file" id="sig_manager_inp" accept="image/*" onchange="loadSig('manager',this)">
+            <img id="sig_manager_img" src="" style="display:none;">
+            <span class="sig-lbl" id="sig_manager_lbl">+ Upload tanda tangan</span>
           </div>
+          <button class="bhapus" id="sig_manager_del" style="display:none;" onclick="clearSig('manager')">✕ Hapus</button>
         </div>
       </div>
       <div class="st">Catatan</div>
@@ -352,8 +436,20 @@ input[type=checkbox]{width:auto;accent-color:var(--gold)}
   <!-- HISTORY PANEL -->
   <div class="hpanel" id="hpanel">
     <div class="hpanel-head">
-      <span class="hpanel-title">RIWAYAT QUOTATION</span>
-      <button class="bclear" onclick="clearHistory()">Hapus semua</button>
+      <span class="hpanel-title">🕘 RIWAYAT QUOTATION</span>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span id="sb-hist-status" style="font-size:9px;color:#555;">☁️ Cloud</span>
+        <select id="hist_cabang_filter" class="cs-field" style="height:24px;font-size:9px;padding:2px 6px;" onchange="renderHistory()">
+          <option value="semua">Semua Cabang</option>
+          <option value="HO">Head Office</option>
+          <option value="DMB">Daan Mogot</option>
+          <option value="CTR">Citra Raya</option>
+          <option value="GDS">Gading Serpong</option>
+          <option value="CGK">Cengkareng</option>
+          <option value="BKS">Bekasi</option>
+        </select>
+        <button class="bclear" onclick="clearHistory()">Hapus</button>
+      </div>
     </div>
     <div class="hlist" id="hlist"></div>
     <div class="hempty" id="hempty">Belum ada riwayat tersimpan</div>
@@ -374,8 +470,45 @@ const KATEGORI = ['A3+','Indoor','Outdoor','UV Roll to Roll','UV Flatbed','Offse
 const CETAK_OPT = ['4/0','4/4','1/0','1/1','1 Layer','2 Layer','3 Layer','Full Color'];
 const DEF_SYARAT = '1. Harga berlaku sesuai tanggal berlaku quotation.\n2. Pembayaran DP sebelum produksi dimulai.\n3. Desain/file lengkap sebelum estimasi berjalan.';
 let logoSrc = '';
-let signSalesSrc = '';
-let signManagerSrc = '';
+let sigSalesSrc = '';
+let sigManagerSrc = '';
+
+function loadSig(who, inp){
+  const f = inp.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    if(who==='sales'){
+      sigSalesSrc = e.target.result;
+      document.getElementById('sig_sales_img').src = sigSalesSrc;
+      document.getElementById('sig_sales_img').style.display = 'block';
+      document.getElementById('sig_sales_lbl').style.display = 'none';
+      document.getElementById('sig_sales_del').style.display = 'inline-block';
+    } else {
+      sigManagerSrc = e.target.result;
+      document.getElementById('sig_manager_img').src = sigManagerSrc;
+      document.getElementById('sig_manager_img').style.display = 'block';
+      document.getElementById('sig_manager_lbl').style.display = 'none';
+      document.getElementById('sig_manager_del').style.display = 'inline-block';
+    }
+    inp.value=''; rp();
+  };
+  r.readAsDataURL(f);
+}
+
+function clearSig(who){
+  if(who==='sales'){
+    sigSalesSrc='';
+    document.getElementById('sig_sales_img').style.display='none';
+    document.getElementById('sig_sales_lbl').style.display='block';
+    document.getElementById('sig_sales_del').style.display='none';
+  } else {
+    sigManagerSrc='';
+    document.getElementById('sig_manager_img').style.display='none';
+    document.getElementById('sig_manager_lbl').style.display='block';
+    document.getElementById('sig_manager_del').style.display='none';
+  }
+  rp();
+}
 let items = [{nama:'Brosur A4',ukuran:'29.7x21 cm',bahan:'Duplex Board 300 gsm',kategori:'A3+',cetak:'4/0',finishing:'Biaya Potong',qty:1000,harga:1292.09,imgSrc:''}];
 
 const gv = id => document.getElementById(id)?.value || '';
@@ -413,47 +546,6 @@ function handleItemImg(inp, i){
     rp();
   };
   r.readAsDataURL(f);
-}
-
-function handleSign(inp, type){
-  const f=inp.files[0]; if(!f) return;
-  const r=new FileReader();
-  r.onload=e=>{
-    const src=e.target.result;
-    if(type==='sales'){
-      signSalesSrc=src;
-      document.getElementById('signSalesImg').src=src;
-      document.getElementById('signSalesWrap').style.display='inline-block';
-      document.getElementById('signSalesLbl').style.display='none';
-      document.querySelector('#signSalesWrap .sign-remove').style.display='flex';
-    }else{
-      signManagerSrc=src;
-      document.getElementById('signManagerImg').src=src;
-      document.getElementById('signManagerWrap').style.display='inline-block';
-      document.getElementById('signManagerLbl').style.display='none';
-      document.querySelector('#signManagerWrap .sign-remove').style.display='flex';
-    }
-    rp();
-  };
-  r.readAsDataURL(f);
-}
-
-function removeSign(type, ev){
-  if(ev) ev.stopPropagation();
-  if(type==='sales'){
-    signSalesSrc='';
-    document.getElementById('signSalesImg').src='';
-    document.getElementById('signSalesWrap').style.display='none';
-    document.getElementById('signSalesLbl').style.display='block';
-    document.getElementById('signSalesInp').value='';
-  }else{
-    signManagerSrc='';
-    document.getElementById('signManagerImg').src='';
-    document.getElementById('signManagerWrap').style.display='none';
-    document.getElementById('signManagerLbl').style.display='block';
-    document.getElementById('signManagerInp').value='';
-  }
-  rp();
 }
 
 function renderCards(){
@@ -499,47 +591,6 @@ function handleLogo(inp){
     rp();
   };
   r.readAsDataURL(f);
-}
-
-function handleSign(inp, type){
-  const f=inp.files[0]; if(!f) return;
-  const r=new FileReader();
-  r.onload=e=>{
-    const src=e.target.result;
-    if(type==='sales'){
-      signSalesSrc=src;
-      document.getElementById('signSalesImg').src=src;
-      document.getElementById('signSalesWrap').style.display='inline-block';
-      document.getElementById('signSalesLbl').style.display='none';
-      document.querySelector('#signSalesWrap .sign-remove').style.display='flex';
-    }else{
-      signManagerSrc=src;
-      document.getElementById('signManagerImg').src=src;
-      document.getElementById('signManagerWrap').style.display='inline-block';
-      document.getElementById('signManagerLbl').style.display='none';
-      document.querySelector('#signManagerWrap .sign-remove').style.display='flex';
-    }
-    rp();
-  };
-  r.readAsDataURL(f);
-}
-
-function removeSign(type, ev){
-  if(ev) ev.stopPropagation();
-  if(type==='sales'){
-    signSalesSrc='';
-    document.getElementById('signSalesImg').src='';
-    document.getElementById('signSalesWrap').style.display='none';
-    document.getElementById('signSalesLbl').style.display='block';
-    document.getElementById('signSalesInp').value='';
-  }else{
-    signManagerSrc='';
-    document.getElementById('signManagerImg').src='';
-    document.getElementById('signManagerWrap').style.display='none';
-    document.getElementById('signManagerLbl').style.display='block';
-    document.getElementById('signManagerInp').value='';
-  }
-  rp();
 }
 
 // ── Quotation number ──
@@ -596,12 +647,6 @@ function rp(){
   const previewTh=hasImg?`<th class="c" style="width:20%">Preview</th>`:'';
   const logoHtml=logoSrc?`<img class="pdf-logo" src="${logoSrc}">`:`<div class="pdf-logo-ph">LOGO</div>`;
   const catatan=gv('q_catatan');
-    const signSalesHtml = signSalesSrc 
-      ? `<img src="${signSalesSrc}" style="max-height:60px;max-width:150px;object-fit:contain;display:block;margin:0 auto">` 
-      : `<div class="pdf-sspace"></div>`;
-    const signManagerHtml = signManagerSrc 
-      ? `<img src="${signManagerSrc}" style="max-height:60px;max-width:150px;object-fit:contain;display:block;margin:0 auto">` 
-      : `<div class="pdf-sspace"></div>`;
 
   document.getElementById('pdfPreview').innerHTML=`
     <div class="pdf-header">
@@ -668,12 +713,12 @@ function rp(){
     <div class="pdf-sign-grid">
       <div class="pdf-sbox">
         <div class="pdf-slbl">Pembuat</div>
-        ${signSalesHtml}
+        ${sigSalesSrc ? `<div style="height:44px;display:flex;align-items:center;justify-content:center;"><img src="${sigSalesSrc}" style="max-height:44px;max-width:120px;object-fit:contain;"></div>` : '<div class="pdf-sspace"></div>'}
         <div class="pdf-sname">${gv('t_sales')||''}</div>
       </div>
       <div class="pdf-sbox">
         <div class="pdf-slbl">Mengetahui</div>
-        ${signManagerHtml}
+        ${sigManagerSrc ? `<div style="height:44px;display:flex;align-items:center;justify-content:center;"><img src="${sigManagerSrc}" style="max-height:44px;max-width:120px;object-fit:contain;"></div>` : '<div class="pdf-sspace"></div>'}
         <div class="pdf-sname">${gv('t_manager')||''}</div>
       </div>
     </div>
@@ -690,7 +735,7 @@ function getSnap(){
     cust:{name:gv('cust_name'),pic:gv('cust_pic'),phone:gv('cust_phone'),email:gv('cust_email'),addr:gv('cust_addr')},
     quot:{tipe:gv('q_tipe'),no:gv('q_no'),date:gv('q_date'),berlaku:gv('q_berlaku'),est:gv('q_est')},
     pay:{ongkir:gv('p_ongkir'),diskon:gv('p_diskon'),dp:gv('p_dp'),ppnOn:document.getElementById('ppn_on').checked,ppnPct:gv('ppn_pct')},
-    sign:{sales:gv('t_sales'),manager:gv('t_manager'),salesSrc:signSalesSrc,managerSrc:signManagerSrc},
+    sign:{sales:gv('t_sales'),manager:gv('t_manager'),sigSales:sigSalesSrc,sigManager:sigManagerSrc},
     catatan:gv('q_catatan'),
     syarat:getSyarat(),
     items:JSON.parse(JSON.stringify(items))
@@ -708,28 +753,9 @@ function applySnap(d){
   document.getElementById('ppn_on').checked=d.pay.ppnOn||false;
   s('ppn_pct',d.pay.ppnPct);
   s('t_sales',d.sign.sales); s('t_manager',d.sign.manager);
-  signSalesSrc=d.sign.salesSrc||''; 
-  signManagerSrc=d.sign.managerSrc||'';
-  if(signSalesSrc){
-    document.getElementById('signSalesImg').src=signSalesSrc;
-    document.getElementById('signSalesWrap').style.display='inline-block';
-    document.getElementById('signSalesLbl').style.display='none';
-    document.querySelector('#signSalesWrap .sign-remove').style.display='flex';
-  }else{
-    document.getElementById('signSalesWrap').style.display='none';
-    document.getElementById('signSalesLbl').style.display='block';
-    document.querySelector('#signSalesWrap .sign-remove').style.display='none';
-  }
-  if(signManagerSrc){
-    document.getElementById('signManagerImg').src=signManagerSrc;
-    document.getElementById('signManagerWrap').style.display='inline-block';
-    document.getElementById('signManagerLbl').style.display='none';
-    document.querySelector('#signManagerWrap .sign-remove').style.display='flex';
-  }else{
-    document.getElementById('signManagerWrap').style.display='none';
-    document.getElementById('signManagerLbl').style.display='block';
-    document.querySelector('#signManagerWrap .sign-remove').style.display='none';
-  }
+  // Restore signatures
+  if(d.sign.sigSales){ sigSalesSrc=d.sign.sigSales; document.getElementById('sig_sales_img').src=sigSalesSrc; document.getElementById('sig_sales_img').style.display='block'; document.getElementById('sig_sales_lbl').style.display='none'; document.getElementById('sig_sales_del').style.display='inline-block'; } else { clearSig('sales'); }
+  if(d.sign.sigManager){ sigManagerSrc=d.sign.sigManager; document.getElementById('sig_manager_img').src=sigManagerSrc; document.getElementById('sig_manager_img').style.display='block'; document.getElementById('sig_manager_lbl').style.display='none'; document.getElementById('sig_manager_del').style.display='inline-block'; } else { clearSig('manager'); }
   s('q_catatan',d.catatan);
   items=d.items||[];
   window._pendingSyarat=d.syarat||'';
@@ -738,8 +764,12 @@ function applySnap(d){
 }
 
 // ── Auto nomor dari history ──
-function nextNo(){
+async function nextNo(){
   try{
+    if(_sbReady){
+      const {data} = await _sb.from('rp_quotations').select('id').order('id', {ascending:false}).limit(1);
+      if(data && data.length) return data[0].id + 1;
+    }
     const h=JSON.parse(localStorage.getItem('rp_history')||'[]');
     if(!h.length) return 1;
     return Math.max(...h.map(x=>parseInt(x.no)||0)) + 1;
@@ -748,7 +778,7 @@ function nextNo(){
 
 // ── Template ──
 function saveTemplate(){
-  const d={comp_name:gv('comp_name'),comp_phone:gv('comp_phone'),comp_email:gv('comp_email'),comp_addr:gv('comp_addr'),comp_web:gv('comp_web'),logoSrc, signSalesSrc, signManagerSrc, t_sales:gv('t_sales'),t_manager:gv('t_manager')};
+  const d={comp_name:gv('comp_name'),comp_phone:gv('comp_phone'),comp_email:gv('comp_email'),comp_addr:gv('comp_addr'),comp_web:gv('comp_web'),logoSrc,t_sales:gv('t_sales'),t_manager:gv('t_manager'),sigSalesSrc,sigManagerSrc};
   localStorage.setItem('rp_template',JSON.stringify(d));
   document.getElementById('tplBanner').style.display='flex';
   toast('✓ Template perusahaan tersimpan!');
@@ -761,8 +791,8 @@ function loadTemplate(){
     if(d.logoSrc){logoSrc=d.logoSrc; document.getElementById('logoImg').src=logoSrc; document.getElementById('logoImg').style.display='block'; document.getElementById('logoLbl').style.display='none';}
     if(d.t_sales) document.getElementById('t_sales').value=d.t_sales;
     if(d.t_manager) document.getElementById('t_manager').value=d.t_manager;
-    if(d.signSalesSrc){ signSalesSrc=d.signSalesSrc; document.getElementById('signSalesImg').src=signSalesSrc; document.getElementById('signSalesWrap').style.display='inline-block'; document.getElementById('signSalesLbl').style.display='none'; document.querySelector('#signSalesWrap .sign-remove').style.display='flex'; }
-    if(d.signManagerSrc){ signManagerSrc=d.signManagerSrc; document.getElementById('signManagerImg').src=signManagerSrc; document.getElementById('signManagerWrap').style.display='inline-block'; document.getElementById('signManagerLbl').style.display='none'; document.querySelector('#signManagerWrap .sign-remove').style.display='flex'; }
+    if(d.sigSalesSrc){ sigSalesSrc=d.sigSalesSrc; document.getElementById('sig_sales_img').src=sigSalesSrc; document.getElementById('sig_sales_img').style.display='block'; document.getElementById('sig_sales_lbl').style.display='none'; document.getElementById('sig_sales_del').style.display='inline-block'; }
+    if(d.sigManagerSrc){ sigManagerSrc=d.sigManagerSrc; document.getElementById('sig_manager_img').src=sigManagerSrc; document.getElementById('sig_manager_img').style.display='block'; document.getElementById('sig_manager_lbl').style.display='none'; document.getElementById('sig_manager_del').style.display='inline-block'; }
     rp(); toast('✓ Template dimuat!');
   }catch(e){toast('Gagal memuat template.');}
 }
@@ -807,11 +837,29 @@ function doPrint(){
 }
 
 // ── History ──
-function addToHistory(data){
+async function addToHistory(data){
   try{
-    let h=JSON.parse(localStorage.getItem('rp_history')||'[]');
     const qno=`RP/${data.quot.tipe}/${String(data.quot.no).padStart(3,'0')}`;
-    const entry={id:Date.now(),no:data.quot.no,qno,cust:data.cust.name||'(tanpa nama)',date:data.quot.date||new Date().toISOString().slice(0,10),grand:data.items.reduce((s,it)=>s+Math.round(it.qty*(it.harga||0)),0),data};
+    const entry={
+      id:Date.now(),
+      no:data.quot.no,
+      qno,
+      tipe:data.quot.tipe||'P',
+      cabang:getCurrentCabang(),
+      csName:getCurrentCS(),
+      cust:data.cust.name||'(tanpa nama)',
+      date:data.quot.date||new Date().toISOString().slice(0,10),
+      grand:data.items.reduce((s,it)=>s+Math.round(it.qty*(it.harga||0)),0),
+      data
+    };
+    // Save to Supabase
+    const ok = await sbSaveQuotation(entry);
+    if(ok) {
+      document.getElementById('sb-hist-status').textContent='☁️ Tersimpan';
+      document.getElementById('sb-hist-status').style.color='#4a9';
+    }
+    // Also save to localStorage as backup
+    let h=JSON.parse(localStorage.getItem('rp_history')||'[]');
     const idx=h.findIndex(x=>x.qno===qno);
     if(idx>=0) h[idx]=entry; else h.push(entry);
     if(h.length>50) h=h.slice(-50);
@@ -819,10 +867,38 @@ function addToHistory(data){
     renderHistory();
   }catch(e){}
 }
-function renderHistory(){
+async function renderHistory(){
+  const list=document.getElementById('hlist'), empty=document.getElementById('hempty');
+  const filterCabang = document.getElementById('hist_cabang_filter')?.value || 'semua';
+  list.innerHTML='<div style="color:#555;font-size:10px;padding:8px;">Memuat...</div>';
+  empty.style.display='none';
+
+  // Try Supabase first
+  const sbData = await sbLoadHistory(filterCabang);
+  if(sbData && sbData.length > 0){
+    document.getElementById('sb-hist-status').textContent='☁️ '+sbData.length+' data';
+    document.getElementById('sb-hist-status').style.color='#4a9';
+    empty.style.display='none';
+    list.innerHTML=sbData.map(x=>`
+      <div class="hitem">
+        <div class="hno">${x.no_quotation}</div>
+        <div class="hcust">${x.customer}</div>
+        <span class="hcabang">${x.cabang||'-'}</span>
+        <div style="font-size:9px;color:#666;white-space:nowrap;">${x.cs_name||''}</div>
+        <div class="hdate">${(x.tanggal||'').slice(0,10)}</div>
+        <div class="hgrand">Rp ${Math.round(x.grand_total||0).toLocaleString('id-ID')}</div>
+        <div class="hacts">
+          <button class="hbtn" onclick="histLoadSB(${x.id})">Buka</button>
+          <button class="hbtn hdel" onclick="histDelSB(${x.id})">✕</button>
+        </div>
+      </div>`).join('');
+    return;
+  }
+
+  // Fallback to localStorage
   try{
-    const h=JSON.parse(localStorage.getItem('rp_history')||'[]').slice().reverse();
-    const list=document.getElementById('hlist'), empty=document.getElementById('hempty');
+    let h=JSON.parse(localStorage.getItem('rp_history')||'[]').slice().reverse();
+    if(filterCabang!=='semua') h=h.filter(x=>x.cabang===filterCabang);
     if(!h.length){list.innerHTML=''; empty.style.display='block'; return;}
     empty.style.display='none';
     list.innerHTML=h.map(x=>`
@@ -833,7 +909,6 @@ function renderHistory(){
         <div class="hgrand">Rp ${Math.round(x.grand).toLocaleString('id-ID')}</div>
         <div class="hacts">
           <button class="hbtn" onclick="histLoad(${x.id})">Buka</button>
-          <button class="hbtn" onclick="histDup(${x.id})" title="Duplikat">⧉</button>
           <button class="hbtn hdel" onclick="histDel(${x.id})">✕</button>
         </div>
       </div>`).join('');
@@ -878,6 +953,22 @@ function histDel(id){
     toast('Dihapus dari riwayat.');
   }catch(e){}
 }
+async function histDelSB(id){
+  if(!confirm('Hapus quotation ini?')) return;
+  await sbDeleteQuotation(id);
+  renderHistory();
+  toast('Dihapus dari riwayat.');
+}
+async function histLoadSB(id){
+  try{
+    const {data,error} = await _sb.from('rp_quotations').select('data_json').eq('id',id).single();
+    if(error||!data) { toast('Gagal memuat.'); return; }
+    const d = JSON.parse(data.data_json);
+    applySnap(d);
+    toggleHistory();
+    toast('✓ Quotation dimuat.');
+  }catch(e){ toast('Gagal memuat.'); }
+}
 function clearHistory(){
   if(!confirm('Hapus semua riwayat?')) return;
   localStorage.removeItem('rp_history');
@@ -917,7 +1008,22 @@ function newQuotation(){
 
 // ── INIT ──
 document.getElementById('q_date').value = new Date().toISOString().slice(0,10);
-document.getElementById('q_no').value = String(nextNo());
+
+// Init Supabase
+initSB();
+
+// Restore cabang + cs name preference
+(function(){
+  const cab = localStorage.getItem('rp_cabang');
+  const cs = localStorage.getItem('rp_cs_name');
+  if(cab) document.getElementById('cs_cabang').value = cab;
+  if(cs) document.getElementById('cs_name').value = cs;
+})();
+
+// Set nomor quotation (async)
+(async function(){
+  document.getElementById('q_no').value = String(await nextNo());
+})();
 
 // Auto-load template
 (function(){
@@ -929,8 +1035,6 @@ document.getElementById('q_no').value = String(nextNo());
     if(d.logoSrc){logoSrc=d.logoSrc; document.getElementById('logoImg').src=logoSrc; document.getElementById('logoImg').style.display='block'; document.getElementById('logoLbl').style.display='none';}
     if(d.t_sales) document.getElementById('t_sales').value=d.t_sales;
     if(d.t_manager) document.getElementById('t_manager').value=d.t_manager;
-    if(d.signSalesSrc){ signSalesSrc=d.signSalesSrc; document.getElementById('signSalesImg').src=signSalesSrc; document.getElementById('signSalesWrap').style.display='inline-block'; document.getElementById('signSalesLbl').style.display='none'; document.querySelector('#signSalesWrap .sign-remove').style.display='flex'; }
-    if(d.signManagerSrc){ signManagerSrc=d.signManagerSrc; document.getElementById('signManagerImg').src=signManagerSrc; document.getElementById('signManagerWrap').style.display='inline-block'; document.getElementById('signManagerLbl').style.display='none'; document.querySelector('#signManagerWrap .sign-remove').style.display='flex'; }
     document.getElementById('tplBanner').style.display='flex';
   }catch(e){}
 })();
