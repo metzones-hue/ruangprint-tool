@@ -78,6 +78,10 @@ input,select,button{font-family:inherit;font-size:inherit;color:inherit}
 .btn-primary:hover{background:var(--yellow-d)}
 .btn-outline{background:transparent;border-color:var(--bdr2);color:var(--txt2)}
 .btn-outline:hover{background:var(--surf2);color:var(--txt)}
+.btn-danger{background:transparent;border-color:var(--red);color:var(--red)}
+.btn-danger:hover{background:var(--red-l)}
+.btn-success{background:var(--grn);border-color:var(--grn);color:#fff}
+.btn-success:hover{filter:brightness(.95)}
 
 .sec-label{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--txt2);display:flex;align-items:center;gap:.45rem;padding:.15rem 0 .75rem}
 .sec-label::after{content:'';flex:1;height:1px;background:var(--bdr)}
@@ -137,17 +141,31 @@ input,select,button{font-family:inherit;font-size:inherit;color:inherit}
 .tunit{font-size:.63rem;color:var(--txt2);margin-top:2px}
 
 /* kertas tier block */
-.kblk{background:var(--surf2);border:1px solid var(--bdr);border-radius:var(--r-sm);padding:.85rem 1rem;margin-bottom:1rem}
+.kblk{background:var(--surf2);border:1px solid var(--bdr);border-radius:var(--r-sm);padding:.85rem 1rem;margin-bottom:1rem;position:relative}
 .kblk:last-child{margin-bottom:0}
-.kblk-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:.65rem}
+.kblk-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:.65rem;gap:.5rem;flex-wrap:wrap}
 .kblk-name{font-weight:800;font-size:.85rem}
 .kblk-sku{font-size:.65rem;color:var(--txt3);margin-top:1px}
+.kblk-actions{display:flex;gap:.4rem;flex-shrink:0}
+.kblk.custom{border-left:3px solid var(--grn)}
 
 /* 2-sisi auto note */
 .auto2{font-size:.68rem;background:var(--surf3);color:var(--txt2);padding:.2rem .55rem;border-radius:99px;border:1px solid var(--bdr2);margin-left:.4rem}
+.badge-custom{font-size:.6rem;background:var(--grn-l);color:var(--grn);padding:.18rem .5rem;border-radius:99px;border:1px solid var(--grn);margin-left:.4rem;font-weight:800}
 
 .theme-btn{width:34px;height:34px;border-radius:99px;border:1.5px solid var(--bdr);background:var(--surf2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
 .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1a6b32;color:#fff;padding:.55rem 1.4rem;border-radius:8px;font-size:.82rem;font-weight:700;z-index:9999;opacity:1;transition:opacity .4s;pointer-events:none}
+
+/* Modal */
+.modal-bd{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:300;padding:1rem}
+.modal-bd.show{display:flex}
+.modal{background:var(--surf);border-radius:var(--r);max-width:520px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 12px 48px rgba(0,0,0,.25)}
+.modal-hd{padding:1rem 1.25rem;border-bottom:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;background:var(--surf2);border-radius:var(--r) var(--r) 0 0}
+.modal-title{font-size:.95rem;font-weight:800}
+.modal-x{background:none;border:none;font-size:1.25rem;color:var(--txt2);cursor:pointer;padding:0 .25rem}
+.modal-bd-c{padding:1.25rem}
+.modal-ft{padding:1rem 1.25rem;border-top:1px solid var(--bdr);display:flex;justify-content:flex-end;gap:.6rem;background:var(--surf2);border-radius:0 0 var(--r) var(--r)}
+
 @media print{
   .hdr,.nav-tabs,.no-print{display:none!important}
   .wrap{padding:0;max-width:100%}
@@ -218,9 +236,7 @@ input,select,button{font-family:inherit;font-size:inherit;color:inherit}
         </div>
         <div class="field">
           <label>Jumlah Halaman Isi</label>
-          <select id="fHalaman" onchange="onSpecChange()">
-            <!-- populated by JS: 8,12,16,...100 -->
-          </select>
+          <select id="fHalaman" onchange="onSpecChange()"></select>
         </div>
       </div>
       <div id="customSizeRow" style="display:none;margin-bottom:.75rem" class="fg2">
@@ -248,9 +264,7 @@ input,select,button{font-family:inherit;font-size:inherit;color:inherit}
       <div class="fg2" style="margin-bottom:.75rem">
         <div class="field">
           <label>Kertas Isi</label>
-          <select id="fKertasIsi" onchange="onSpecChange()">
-            <!-- populated by JS -->
-          </select>
+          <select id="fKertasIsi" onchange="onSpecChange()"></select>
         </div>
         <div class="field">
           <label>Mode Cetak Isi</label>
@@ -264,9 +278,7 @@ input,select,button{font-family:inherit;font-size:inherit;color:inherit}
       <div class="fg2" style="margin-bottom:.75rem">
         <div class="field">
           <label>Kertas Cover</label>
-          <select id="fKertasCover">
-            <!-- populated by JS -->
-          </select>
+          <select id="fKertasCover"></select>
         </div>
         <div class="field">
           <label>Mode Cetak Cover</label>
@@ -277,7 +289,6 @@ input,select,button{font-family:inherit;font-size:inherit;color:inherit}
         </div>
       </div>
       <div class="sec-label">Jilid & Finishing</div>
-      <!-- SATU BARIS: jilid + finishing cover + potong -->
       <div class="fg3">
         <div class="field">
           <label>Jenis Jilid</label>
@@ -361,13 +372,15 @@ input,select,button{font-family:inherit;font-size:inherit;color:inherit}
 <div class="tc" id="t-tarif">
   <div style="font-size:.78rem;color:var(--txt2);margin-bottom:.85rem;background:var(--yellow-ll);border:1px solid var(--yellow);border-radius:8px;padding:.65rem 1rem;line-height:1.75">
     💡 Harga sudah <strong>termasuk bahan + ongkos cetak</strong>. Harga 2 sisi = 2× harga 1 sisi (otomatis).<br>
-    📌 Kolom <strong>Min. Lembar</strong> = jumlah minimum lembar A3+ untuk mendapat harga tersebut.
+    📌 Kolom <strong>Min. Lembar</strong> = jumlah minimum lembar A3+ untuk mendapat harga tersebut.<br>
+    ➕ Klik tombol <strong>+ Tambah Kertas</strong> untuk menambah jenis kertas baru.
   </div>
   <!-- ISI -->
   <div class="card" style="margin-bottom:1rem">
     <div class="card-hd">
       <div class="card-hd-title"><div class="dot"></div>📄 Tarif Kertas ISI</div>
-      <div style="display:flex;gap:.5rem">
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <button class="btn btn-success btn-sm" onclick="openAddKertas('isi')">➕ Tambah Kertas</button>
         <button class="btn btn-outline btn-sm" onclick="resetTarif()">↺ Reset</button>
         <button class="btn btn-primary btn-sm" onclick="saveKertas()">💾 Simpan</button>
       </div>
@@ -380,7 +393,10 @@ input,select,button{font-family:inherit;font-size:inherit;color:inherit}
   <div class="card" style="margin-bottom:1rem">
     <div class="card-hd">
       <div class="card-hd-title"><div class="dot"></div>🎨 Tarif Kertas COVER</div>
-      <button class="btn btn-primary btn-sm" onclick="saveKertas()">💾 Simpan</button>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <button class="btn btn-success btn-sm" onclick="openAddKertas('cover')">➕ Tambah Kertas</button>
+        <button class="btn btn-primary btn-sm" onclick="saveKertas()">💾 Simpan</button>
+      </div>
     </div>
     <div class="card-body">
       <div id="tarifCoverWrap"></div>
@@ -398,6 +414,45 @@ input,select,button{font-family:inherit;font-size:inherit;color:inherit}
 
 </div><!-- /wrap -->
 
+<!-- ══ MODAL TAMBAH KERTAS ══ -->
+<div class="modal-bd" id="addKertasModal">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-title" id="addKertasTitle">➕ Tambah Kertas Baru</div>
+      <button class="modal-x" onclick="closeAddKertas()">✕</button>
+    </div>
+    <div class="modal-bd-c">
+      <div class="field" style="margin-bottom:.75rem">
+        <label>Nama Kertas <span class="req">*</span></label>
+        <input id="nkLabel" type="text" placeholder="Contoh: Art Carton 230gr">
+      </div>
+      <div class="fg2" style="margin-bottom:.75rem">
+        <div class="field">
+          <label>SKU</label>
+          <input id="nkSku" type="text" placeholder="RP-A3-AC.230">
+        </div>
+        <div class="field">
+          <label>Untuk</label>
+          <select id="nkFor">
+            <option value="false">Hanya Isi</option>
+            <option value="true">Hanya Cover</option>
+            <option value="both">Isi & Cover</option>
+          </select>
+        </div>
+      </div>
+      <div class="sec-label">Tarif per Tier (1 Sisi) — 2 sisi otomatis 2×</div>
+      <div id="nkTiersWrap"></div>
+      <div style="font-size:.7rem;color:var(--txt2);margin-top:.5rem;line-height:1.6">
+        💡 Tier 0 wajib min. lembar = 1. Tier berikutnya min. lembar harus lebih besar dari sebelumnya.
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-outline btn-sm" onclick="closeAddKertas()">Batal</button>
+      <button class="btn btn-primary btn-sm" onclick="submitAddKertas()">💾 Simpan Kertas</button>
+    </div>
+  </div>
+</div>
+
 <script>
 var $=function(id){return document.getElementById(id);};
 var G=function(id){var e=$(id);return e?e.value:'';};
@@ -405,9 +460,8 @@ var N=function(id){return Number(G(id))||0;};
 
 /* ══════════════════════════════════════════
    TARIF DATA
-   Setiap kertas punya:
-     tiers: [{minQty, harga1s}]   (1 sisi)
-     harga2s otomatis = harga1s × 2
+   custom:true → kertas tambahan dari user (bisa dihapus)
+   custom:false / undefined → bawaan (tidak bisa dihapus)
 ══════════════════════════════════════════ */
 var TARIF_DEF = {
   kertas: {
@@ -423,9 +477,10 @@ var TARIF_DEF = {
         {minQty:200, h1s:2500}
       ]
     },
-    'art_paper_120': {
-      label:'Art Paper 120gr', sku:'RP-A3-AP.120',
-      forCover:false,
+    /* ─── ART CARTON (dual: isi & cover) ─── */
+    'art_carton_120': {
+      label:'AC 120gr', sku:'RP-A3-AC.120',
+      forCover:'both',
       tiers:[
         {minQty:1,   h1s:5000},
         {minQty:50,  h1s:4500},
@@ -434,8 +489,8 @@ var TARIF_DEF = {
         {minQty:200, h1s:3000}
       ]
     },
-    'art_paper_150': {
-      label:'Art Paper 150gr', sku:'RP-A3-AP.150',
+    'art_carton_150': {
+      label:'AC 150gr', sku:'RP-A3-AC.150',
       forCover:'both',
       tiers:[
         {minQty:1,   h1s:5500},
@@ -445,10 +500,9 @@ var TARIF_DEF = {
         {minQty:200, h1s:3500}
       ]
     },
-    /* ─── COVER ─── */
     'art_carton_210': {
-      label:'Art Carton 210gr', sku:'RP-A3-AC.210',
-      forCover:true,
+      label:'AC 210gr', sku:'RP-A3-AC.210',
+      forCover:'both',
       tiers:[
         {minQty:1,   h1s:6000},
         {minQty:50,  h1s:5500},
@@ -458,8 +512,8 @@ var TARIF_DEF = {
       ]
     },
     'art_carton_260': {
-      label:'Art Carton 260gr', sku:'RP-A3-AC.260',
-      forCover:true,
+      label:'AC 260gr', sku:'RP-A3-AC.260',
+      forCover:'both',
       tiers:[
         {minQty:1,   h1s:7000},
         {minQty:50,  h1s:6500},
@@ -469,7 +523,7 @@ var TARIF_DEF = {
       ]
     },
     'art_carton_310': {
-      label:'Art Carton 310gr', sku:'RP-A3-AC.310',
+      label:'AC 310gr', sku:'RP-A3-AC.310',
       forCover:true,
       tiers:[
         {minQty:1,   h1s:8500},
@@ -495,7 +549,6 @@ var TARIF = JSON.parse(JSON.stringify(TARIF_DEF));
 
 /* ── helper tiered ── */
 function getTH(key, lembar, mode){
-  // mode: '1s' or '2s'
   var t=TARIF.kertas[key]; if(!t) return 0;
   var h1s=t.tiers[0].h1s;
   for(var i=0;i<t.tiers.length;i++) if(lembar>=t.tiers[i].minQty) h1s=t.tiers[i].h1s;
@@ -514,7 +567,6 @@ function getNextTier(key, lembar){
 
 /* ── populate dropdowns ── */
 function buildHalamanSelect(){
-  // A5: kelipatan 8 (8 hal/lembar), A4: kelipatan 4 (4 hal/lembar)
   var uk=getUk();
   var step = (uk==='A4') ? 4 : 8;
   var hSel=$('fHalaman');
@@ -523,7 +575,6 @@ function buildHalamanSelect(){
   for(var h=step;h<=104;h+=step){
     var o=document.createElement('option');
     o.value=h; o.textContent=h+' halaman';
-    // select closest valid previous value
     if(h<=prev) o.selected=true;
     hSel.appendChild(o);
   }
@@ -531,8 +582,9 @@ function buildHalamanSelect(){
 
 function buildSelects(){
   buildHalamanSelect();
-  // Kertas isi — tampilkan forCover:false dan forCover:'both'
-  var iSel=$('fKertasIsi'); iSel.innerHTML='';
+  var iSel=$('fKertasIsi');
+  var prevIsi=iSel.value;
+  iSel.innerHTML='';
   Object.keys(TARIF.kertas).forEach(function(k){
     var t=TARIF.kertas[k];
     if(t.forCover===false||t.forCover==='both'){
@@ -540,8 +592,11 @@ function buildSelects(){
       o.value=k; o.textContent=t.label; iSel.appendChild(o);
     }
   });
-  // Kertas cover — tampilkan forCover:true dan forCover:'both'
-  var cSel=$('fKertasCover'); cSel.innerHTML='';
+  if(prevIsi&&iSel.querySelector('option[value="'+prevIsi+'"]')) iSel.value=prevIsi;
+
+  var cSel=$('fKertasCover');
+  var prevCov=cSel.value;
+  cSel.innerHTML='';
   Object.keys(TARIF.kertas).forEach(function(k){
     var t=TARIF.kertas[k];
     if(t.forCover===true||t.forCover==='both'){
@@ -549,6 +604,7 @@ function buildSelects(){
       o.value=k; o.textContent=t.label; cSel.appendChild(o);
     }
   });
+  if(prevCov&&cSel.querySelector('option[value="'+prevCov+'"]')) cSel.value=prevCov;
 }
 
 var UKURAN_DIM={'A5':{pj:21,lb:14.8},'A4':{pj:29.7,lb:21}};
@@ -620,10 +676,10 @@ function calcCore(qty, waste, margin, bulatVal){
   if(bulatVal>1) hjEks=Math.ceil(hjEks/bulatVal)*bulatVal;
   var hj=hjEks*qty;
 
-  return {hal,uk,upPS,lbrIsiPerEks,lbrCovPerEks,lbrIsi,lbrCov,
-    kIsi,mIsi,kCov,mCov,hIsi,hCov,bIsi,bCov,
-    finKey,hFin,bFin,hJilid,bJilid,bPotong,
-    hpp,hj,hjEks};
+  return {hal:hal,uk:uk,upPS:upPS,lbrIsiPerEks:lbrIsiPerEks,lbrCovPerEks:lbrCovPerEks,lbrIsi:lbrIsi,lbrCov:lbrCov,
+    kIsi:kIsi,mIsi:mIsi,kCov:kCov,mCov:mCov,hIsi:hIsi,hCov:hCov,bIsi:bIsi,bCov:bCov,
+    finKey:finKey,hFin:hFin,bFin:bFin,hJilid:hJilid,bJilid:bJilid,bPotong:bPotong,
+    hpp:hpp,hj:hj,hjEks:hjEks};
 }
 
 function doCalc(){
@@ -641,7 +697,6 @@ function doCalc(){
   var modeIsiLabel = c.mIsi==='2s'?'bolak-balik':'1 sisi';
   var modeCovLabel = c.mCov==='2s'?'2 sisi':'1 sisi';
 
-  // KPIs — tanpa keuntungan
   var kpiHtml=
     '<div class="kpis">'+
       '<div class="kpi"><div class="kpi-l">Total HPP</div><div class="kpi-v">'+rpS(c.hpp)+'</div></div>'+
@@ -649,10 +704,9 @@ function doCalc(){
       '<div class="kpi"><div class="kpi-l">Harga Jual / eks</div><div class="kpi-v accent">'+rp(c.hjEks)+'</div></div>'+
     '</div>';
 
-  // Breakdown
   var rows=[
     ['Kertas isi '+discHtml+' ('+c.lbrIsi+' lbr × '+rp(c.hIsi)+')', c.bIsi, false],
-    ['Kertas cover '+kCovLabel+' '+modeCovLabel+' ('+c.lbrCov+' lbr × '+rp(c.hCov)+')', c.bCov, false],
+    ['Kertas cover '+kCovLabel+' '+modeCovLabel+' ('+c.lbrCov+' lbr × '+rp(c.hCov)+')', c.bCov, false]
   ];
   if(c.hFin>0) rows.push([finLabel(c.finKey)+' ('+rp(c.hFin)+'/eks × '+qty+')', c.bFin, false]);
   rows.push([jilidLabel(G('fJilid'))+' ('+rp(c.hJilid)+'/eks × '+qty+')', c.bJilid, false]);
@@ -742,11 +796,17 @@ function renderInfo(c, waste){
 
 /* ══ RENDER TARIF TAB ══ */
 function renderKertasBlock(k, t){
+  var customCls = t.custom?'custom':'';
+  var customBadge = t.custom?'<span class="badge-custom">CUSTOM</span>':'';
+  var deleteBtn = t.custom
+    ? '<button class="btn btn-danger btn-sm" onclick="deleteKertas(\''+k+'\')" title="Hapus kertas">🗑️ Hapus</button>'
+    : '';
   var html=
-    '<div class="kblk">'+
+    '<div class="kblk '+customCls+'">'+
       '<div class="kblk-hd">'+
-        '<div><div class="kblk-name">'+t.label+'<span class="auto2">2 sisi = 2× otomatis</span></div>'+
+        '<div><div class="kblk-name">'+t.label+customBadge+'<span class="auto2">2 sisi = 2× otomatis</span></div>'+
         '<div class="kblk-sku">'+t.sku+'</div></div>'+
+        '<div class="kblk-actions">'+deleteBtn+'</div>'+
       '</div>'+
       '<div style="overflow-x:auto">'+
       '<table class="tarif-tbl">'+
@@ -774,7 +834,7 @@ function renderKertasBlock(k, t){
 }
 
 function renderTarifKertas(){
-  var wIsi=$('tarifIsiWrap'); 
+  var wIsi=$('tarifIsiWrap');
   var wCov=$('tarifCoverWrap');
   if(!wIsi||!wCov) return;
   var hIsi='', hCov='';
@@ -783,8 +843,8 @@ function renderTarifKertas(){
     if(t.forCover===false||t.forCover==='both') hIsi+=renderKertasBlock(k,t);
     if(t.forCover===true||t.forCover==='both') hCov+=renderKertasBlock(k,t);
   });
-  wIsi.innerHTML=hIsi;
-  wCov.innerHTML=hCov;
+  wIsi.innerHTML=hIsi || '<div style="text-align:center;color:var(--txt3);padding:1.5rem;font-size:.85rem">Belum ada kertas isi. Klik <strong>+ Tambah Kertas</strong> di atas.</div>';
+  wCov.innerHTML=hCov || '<div style="text-align:center;color:var(--txt3);padding:1.5rem;font-size:.85rem">Belum ada kertas cover. Klik <strong>+ Tambah Kertas</strong> di atas.</div>';
 }
 
 function syncH2(k,i){
@@ -810,8 +870,95 @@ function renderTarifFin(){
     '<tbody>'+rows+'</tbody></table></div>';
 }
 
-/* ══ SAVE/LOAD ══ */
-function saveKertas(){
+/* ══ MODAL TAMBAH KERTAS ══ */
+function openAddKertas(typeHint){
+  // Sebelum buka modal, simpan dulu input yang sedang dipegang user (biar nggak hilang)
+  collectTarifInputs();
+  $('nkLabel').value='';
+  $('nkSku').value='';
+  $('nkFor').value = typeHint==='cover' ? 'true' : (typeHint==='isi' ? 'false' : 'both');
+  // 5 tier default kosong
+  var defaultTiers = [
+    {minQty:1,   h1s:0},
+    {minQty:50,  h1s:0},
+    {minQty:100, h1s:0},
+    {minQty:150, h1s:0},
+    {minQty:200, h1s:0}
+  ];
+  var html='<table class="tarif-tbl"><thead><tr><th>Tier</th><th>Min. Lembar</th><th>Harga / Lbr A3+ (1 sisi)</th></tr></thead><tbody>';
+  defaultTiers.forEach(function(t,i){
+    html+='<tr>'+
+      '<td><span class="ti">Tier '+i+'</span></td>'+
+      '<td><input class="tinput" id="nkmq_'+i+'" type="number" value="'+t.minQty+'" min="0" step="1" style="width:80px"'+(i===0?' disabled':'')+'></td>'+
+      '<td><input class="tinput" id="nkh1_'+i+'" type="number" value="'+t.h1s+'" min="0" step="100" style="width:110px" placeholder="0">'+
+      '<span class="tunit" style="display:inline;margin-left:.3rem">Rp/lbr</span></td>'+
+    '</tr>';
+  });
+  html+='</tbody></table>';
+  $('nkTiersWrap').innerHTML=html;
+  $('addKertasModal').classList.add('show');
+  setTimeout(function(){$('nkLabel').focus();},100);
+}
+
+function closeAddKertas(){$('addKertasModal').classList.remove('show');}
+
+function submitAddKertas(){
+  var label=$('nkLabel').value.trim();
+  var sku=$('nkSku').value.trim();
+  var forCov=$('nkFor').value;
+  if(!label){alert('Nama kertas wajib diisi!');$('nkLabel').focus();return;}
+  if(!sku) sku='RP-A3-'+idS(label).toUpperCase();
+
+  var forVal = forCov==='true'?true : forCov==='false'?false : 'both';
+
+  // Generate unique key
+  var baseKey = idS(label).toLowerCase();
+  var key = baseKey;
+  var n=1;
+  while(TARIF.kertas[key]){key=baseKey+'_'+n;n++;}
+
+  // Collect tiers
+  var tiers=[];
+  var prevMin=-1;
+  for(var i=0;i<5;i++){
+    var mq=parseInt($('nkmq_'+i).value)||0;
+    var h1=parseFloat($('nkh1_'+i).value)||0;
+    if(i===0) mq=1;
+    if(i>0 && mq<=prevMin){
+      alert('Tier '+i+': Min. lembar harus lebih besar dari tier sebelumnya ('+prevMin+').');
+      return;
+    }
+    tiers.push({minQty:mq, h1s:h1});
+    prevMin=mq;
+  }
+
+  TARIF.kertas[key] = {
+    label:label, sku:sku, forCover:forVal,
+    tiers:tiers, custom:true
+  };
+
+  // Persist + refresh
+  try{localStorage.setItem('rp_bl3_k',JSON.stringify(TARIF.kertas));}catch(e){}
+  renderTarifKertas();
+  buildSelects();
+  closeAddKertas();
+  showToast('✓ Kertas "'+label+'" berhasil ditambahkan!');
+}
+
+function deleteKertas(key){
+  var t=TARIF.kertas[key]; if(!t) return;
+  if(!t.custom){alert('Kertas bawaan tidak bisa dihapus.');return;}
+  if(!confirm('Hapus kertas "'+t.label+'"? Aksi ini tidak bisa dibatalkan.')) return;
+  collectTarifInputs(); // simpan dulu input lain
+  delete TARIF.kertas[key];
+  try{localStorage.setItem('rp_bl3_k',JSON.stringify(TARIF.kertas));}catch(e){}
+  renderTarifKertas();
+  buildSelects();
+  showToast('✓ Kertas dihapus.');
+}
+
+/* helper: kumpulkan nilai input tarif yang sedang ditampilkan ke TARIF (tanpa save ke localStorage) */
+function collectTarifInputs(){
   Object.keys(TARIF.kertas).forEach(function(k){
     TARIF.kertas[k].tiers.forEach(function(tier,i){
       var h1=$('kt_'+idS(k)+'_h1_'+i);
@@ -820,6 +967,11 @@ function saveKertas(){
       if(mq&&i>0) tier.minQty=parseInt(mq.value)||tier.minQty;
     });
   });
+}
+
+/* ══ SAVE/LOAD ══ */
+function saveKertas(){
+  collectTarifInputs();
   try{localStorage.setItem('rp_bl3_k',JSON.stringify(TARIF.kertas));}catch(e){}
   showToast('✓ Tarif kertas tersimpan!');
 }
@@ -832,16 +984,23 @@ function saveFin(){
   showToast('✓ Tarif finishing tersimpan!');
 }
 function resetTarif(){
-  if(!confirm('Reset semua tarif ke default?')) return;
+  if(!confirm('Reset semua tarif ke default? Kertas custom yang kamu tambahkan juga akan dihapus.')) return;
   TARIF=JSON.parse(JSON.stringify(TARIF_DEF));
   try{localStorage.removeItem('rp_bl3_k');localStorage.removeItem('rp_bl3_f');}catch(e){}
   renderTarifKertas();renderTarifFin();
+  buildSelects();
   showToast('✓ Reset ke default!');
 }
 function loadTarif(){
   try{
     var k=localStorage.getItem('rp_bl3_k');
-    if(k){var tk=JSON.parse(k);Object.keys(tk).forEach(function(key){if(TARIF.kertas[key])TARIF.kertas[key]=tk[key];});}
+    if(k){
+      var tk=JSON.parse(k);
+      // Merge: bawaan ambil dari saved (kalau ada), custom langsung masuk
+      Object.keys(tk).forEach(function(key){
+        TARIF.kertas[key]=tk[key];
+      });
+    }
     var f=localStorage.getItem('rp_bl3_f');
     if(f){var tf=JSON.parse(f);Object.keys(tf).forEach(function(key){if(TARIF.fin[key])TARIF.fin[key].harga=tf[key].harga;});}
   }catch(e){}
@@ -854,11 +1013,20 @@ function switchTab(tab){
   var tc=$('t-'+tab); if(tc) tc.classList.add('active');
   var tb=$('tab-'+tab); if(tb) tb.classList.add('active');
   if(tab==='tarif'){renderTarifKertas();renderTarifFin();}
+  if(tab==='kalk'){buildSelects();}
 }
 function markErr(id){var e=$(id);if(!e)return;var p=e.closest('.field');if(p){p.classList.add('invalid');setTimeout(function(){p.classList.remove('invalid');},2500);}}
 function showStat(msg,type){var b=$('statusBox');if(!b)return;b.innerHTML='<div class="sbox s'+type+'">'+msg+'</div>';}
 function toggleTheme(){var d=document.documentElement;var next=d.getAttribute('data-theme')==='dark'?'light':'dark';d.setAttribute('data-theme',next);$('themeBtn').textContent=next==='dark'?'☀️':'🌙';try{localStorage.setItem('rp_bl3_th',next);}catch(e){}}
 function showToast(msg){var t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.style.opacity='0';setTimeout(function(){if(t.parentNode)t.remove();},400);},2200);}
+
+/* close modal on backdrop click */
+document.addEventListener('click',function(e){
+  if(e.target.id==='addKertasModal') closeAddKertas();
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape' && $('addKertasModal').classList.contains('show')) closeAddKertas();
+});
 
 /* ══ PRINT ══ */
 function printHasil(){
@@ -867,7 +1035,6 @@ function printHasil(){
   var sim=$('simBody')?$('simBody').innerHTML:'';
   if(!hasil||hasil.indexOf('Isi form')>=0){alert('Hitung dulu sebelum print!');return;}
 
-  // Kumpulkan data form untuk ditampilkan
   var uk=G('fUkuran'), hal=G('fHalaman'), qty=G('fQty'), waste=G('fWaste');
   var kIsi=G('fKertasIsi'), mIsi=G('fModeIsi'), kCov=G('fKertasCover'), mCov=G('fModeCover');
   var jilid=G('fJilid'), finCov=G('fFinCover'), potong=G('fPotong'), margin=G('fMargin');
@@ -940,7 +1107,6 @@ function printHasil(){
     '</div>'+
     (sim?'<div class="sim-wrap"><div class="sec-title">Simulasi Harga per Qty</div>'+sim+'</div>':'');
 
-  // Inject ke iframe tersembunyi lalu print
   var old=document.getElementById('__printFrame');
   if(old) old.remove();
   var fr=document.createElement('iframe');
