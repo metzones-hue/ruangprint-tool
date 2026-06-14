@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+env:
+  DOMAIN: tool.ruangprint.co.id
+  DOCROOT: /var/www/tool.ruangprint.co.id
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -23,18 +27,54 @@ jobs:
           target: /tmp/ruangprint-deploy
           rm: true
 
-      - name: Pindahkan file ke document root cPanel
+      - name: Setup Nginx, deploy file & reload
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          envs: DOMAIN,DOCROOT
           script: |
-            DEST=/home/ruangpr8/tool.ruangprint.co.id
-            sudo mkdir -p "$DEST"
-            sudo cp -f /tmp/ruangprint-deploy/*.html "$DEST"/
-            sudo chown ruangpr8:ruangpr8 "$DEST"/*.html
-            sudo chmod 644 "$DEST"/*.html
+            set -e
+            DOMAIN=tool.ruangprint.co.id
+            DOCROOT=/var/www/tool.ruangprint.co.id
+
+            # Install Nginx kalau belum ada
+            if ! command -v nginx >/dev/null 2>&1; then
+              echo "Nginx belum ada, menginstall..."
+              sudo apt-get update -y
+              sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nginx
+            fi
+
+            # Siapkan document root
+            sudo mkdir -p "$DOCROOT"
+            sudo cp -f /tmp/ruangprint-deploy/*.html "$DOCROOT"/
+            sudo chown -R www-data:www-data "$DOCROOT"
+            sudo find "$DOCROOT" -type f -exec chmod 644 {} \;
+            sudo chmod 755 "$DOCROOT"
             rm -rf /tmp/ruangprint-deploy
-            echo "Deploy selesai. File di $DEST:"
-            ls -la "$DEST"/*.html
+
+            # Buat virtual host kalau belum ada
+            CONF=/etc/nginx/sites-available/$DOMAIN
+            sudo tee "$CONF" > /dev/null <<NGINX
+            server {
+                listen 80;
+                listen [::]:80;
+                server_name $DOMAIN;
+
+                root $DOCROOT;
+                index index.html;
+
+                location / {
+                    try_files \$uri \$uri/ =404;
+                }
+            }
+            NGINX
+            sudo ln -sf "$CONF" /etc/nginx/sites-enabled/$DOMAIN
+
+            # Test config & reload
+            sudo nginx -t
+            sudo systemctl reload nginx
+
+            echo "Deploy selesai. Isi $DOCROOT:"
+            ls -la "$DOCROOT"
