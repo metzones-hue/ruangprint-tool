@@ -1,72 +1,45 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// ============================================================
-// SUPABASE CONFIG — Sama dengan RuangHRD
-// ============================================================
-var SUPABASE_URL = 'https://fbrygeozyvgstsmjbmwv.supabase.co';
-var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZicnlnZW96eXZnc3RzbWpibXd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczNTgwNjAsImV4cCI6MjA5MjkzNDA2MH0.c0sLrLV4-IK5VEE8_o4OCFHcDcN_UiqK-rupftFFbE8';
-var _sb = null;
-var _sbReady = false;
+// ── API CONFIG (self-hosted di VPS) ──────────────────────────
+const API_BASE = '/api';
+let _authToken = localStorage.getItem('rp_auth_token') || '';
 
-function initSB() {
+async function apiCall(method, path, body) {
   try {
-    _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    _sbReady = true;
-    console.log('[Supabase] Quotation client ready');
-  } catch(e) { console.error('[Supabase] Init error:', e); }
-}
-
-async function sbSaveQuotation(entry) {
-  if(!_sbReady) return false;
-  try {
-    const { error } = await _sb.from('rp_quotations').upsert({
-      id: entry.id,
-      no_quotation: entry.qno,
-      tipe: entry.tipe || 'P',
-      cabang: entry.cabang || '-',
-      cs_name: entry.csName || '-',
-      customer: entry.cust,
-      tanggal: entry.date,
-      grand_total: entry.grand,
-      data_json: JSON.stringify(entry.data)
-    }, { onConflict: 'id' });
-    if(error) { console.error('[Supabase] Save error:', error.message); return false; }
-    return true;
-  } catch(e) { console.error('[Supabase] Save exception:', e); return false; }
-}
-
-async function sbLoadHistory(cabangFilter) {
-  if(!_sbReady) return null;
-  try {
-    let query = _sb.from('rp_quotations').select('*').order('created_at', { ascending: false }).limit(100);
-    if(cabangFilter && cabangFilter !== 'semua') query = query.eq('cabang', cabangFilter);
-    const { data, error } = await query;
-    if(error) { console.error('[Supabase] Load error:', error.message); return null; }
-    return data;
+    const opts = { method, headers: { 'Content-Type': 'application/json' } };
+    if (_authToken) opts.headers['Authorization'] = 'Bearer ' + _authToken;
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(API_BASE + path, opts);
+    if (res.status === 401) { showLoginOverlay(); return null; }
+    return res.ok ? res.json() : null;
   } catch(e) { return null; }
 }
 
-async function sbDeleteQuotation(id) {
-  if(!_sbReady) return;
-  try {
-    await _sb.from('rp_quotations').delete().eq('id', id);
-  } catch(e) {}
+async function apiSaveQuotation(entry) {
+  return await apiCall('POST', '/quotations', {
+    id: entry.id, no_quotation: entry.qno,
+    tipe: entry.tipe || 'P', cabang: entry.cabang || '-',
+    cs_name: entry.csName || '-', customer: entry.cust,
+    tanggal: entry.date, grand_total: entry.grand,
+    data_json: JSON.stringify(entry.data)
+  });
+}
+async function apiLoadHistory(cabangFilter) {
+  const qs = (cabangFilter && cabangFilter !== 'semua') ? `?cabang=${cabangFilter}` : '';
+  return await apiCall('GET', '/quotations' + qs);
+}
+async function apiDeleteQuotation(id) { await apiCall('DELETE', '/quotations/' + id); }
+async function apiClearAll(cabang) {
+  const qs = (cabang && cabang !== 'semua') ? `?cabang=${cabang}` : '';
+  await apiCall('DELETE', '/quotations' + qs);
+}
+async function apiGetQuotationData(id) {
+  const res = await apiCall('GET', '/quotations/' + id + '/data');
+  return res ? res.data_json : null;
 }
 
-async function sbClearAll(cabang) {
-  if(!_sbReady) return;
-  try {
-    let q = _sb.from('rp_quotations').delete();
-    if(cabang && cabang !== 'semua') q = q.eq('cabang', cabang);
-    else q = q.neq('id', 0); // delete all
-    await q;
-  } catch(e) {}
-}
-
-// Get current cabang from selector
 function getCurrentCabang() {
   const el = document.getElementById('cs_cabang');
   return el ? el.value : '-';
@@ -75,11 +48,13 @@ function getCurrentCS() {
   const el = document.getElementById('cs_name');
   return el ? el.value : '-';
 }
-
-// Save cabang+cs to localStorage for next session
 function saveCabangPref() {
   localStorage.setItem('rp_cabang', document.getElementById('cs_cabang').value);
   localStorage.setItem('rp_cs_name', document.getElementById('cs_name').value);
+}
+function showLoginOverlay() {
+  document.getElementById('loginOverlay').style.display = 'flex';
+  document.getElementById('brandUserEmail').textContent = '';
 }
 </script>
 <meta charset="UTF-8">
@@ -464,7 +439,7 @@ input[type=checkbox]{width:auto;accent-color:var(--gold)}
     <div class="hpanel-head">
       <span class="hpanel-title">🕘 RIWAYAT QUOTATION</span>
       <div style="display:flex;align-items:center;gap:6px;">
-        <span id="sb-hist-status" style="font-size:9px;color:#555;">☁️ Cloud</span>
+        <span id="sb-hist-status" style="font-size:9px;color:#555;">🖥 VPS</span>
         <select id="hist_cabang_filter" class="cs-field" style="height:24px;font-size:9px;padding:2px 6px;" onchange="renderHistory()">
           <option value="semua">Semua Cabang</option>
           <option value="HO">Head Office</option>
@@ -492,65 +467,65 @@ input[type=checkbox]{width:auto;accent-color:var(--gold)}
 <div id="toast" style="position:fixed;bottom:22px;right:22px;background:var(--dark);color:var(--white);padding:9px 16px;border-radius:5px;font-size:11px;font-family:'Outfit',sans-serif;letter-spacing:.03em;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999;border-left:3px solid var(--gold)"></div>
 
 <script>
-// ── AUTH ──
-// Untuk menambah user: Supabase Dashboard → Authentication → Users → Add user
-// Set User Metadata: {"cabang":"DMB","name":"Nama CS"}
-// Cabang: HO / DMB / CTR / GDS / CGK / BKS
+// ── AUTH (self-hosted) ──────────────────────────────────────
+// Kelola user via SSH: node /opt/ruangprint-api/setup-user.js add email password "Nama" CABANG
 
 async function initAuth() {
-  if (!_sbReady) { return; } // Stay on login if Supabase not ready
-
-  // Check existing session
-  const { data: { session } } = await _sb.auth.getSession();
-  if (session) {
-    applyAuthUser(session.user);
+  if (!_authToken) { showLoginOverlay(); return; }
+  const user = await apiCall('GET', '/auth/me');
+  if (user) {
+    applyAuthUser(user);
     document.getElementById('loginOverlay').style.display = 'none';
+  } else {
+    _authToken = '';
+    localStorage.removeItem('rp_auth_token');
+    showLoginOverlay();
   }
-
-  // Watch for login/logout
-  _sb.auth.onAuthStateChange((event, session) => {
-    if (session) {
-      applyAuthUser(session.user);
-      document.getElementById('loginOverlay').style.display = 'none';
-    } else {
-      document.getElementById('loginOverlay').style.display = 'flex';
-      document.getElementById('brandUserEmail').textContent = '';
-    }
-  });
 }
 
 function applyAuthUser(user) {
-  const meta = user.user_metadata || {};
-  // Auto-set cabang from user metadata
-  if (meta.cabang) {
-    document.getElementById('cs_cabang').value = meta.cabang;
-    localStorage.setItem('rp_cabang', meta.cabang);
+  if (user.cabang) {
+    document.getElementById('cs_cabang').value = user.cabang;
+    localStorage.setItem('rp_cabang', user.cabang);
   }
-  // Auto-set nama CS from user metadata
-  if (meta.name) {
-    document.getElementById('cs_name').value = meta.name;
-    localStorage.setItem('rp_cs_name', meta.name);
+  if (user.name) {
+    document.getElementById('cs_name').value = user.name;
+    localStorage.setItem('rp_cs_name', user.name);
   }
-  // Show email in brand bar
   document.getElementById('brandUserEmail').textContent = user.email || '';
 }
 
 async function doLogin() {
   const email = document.getElementById('loginEmail').value.trim();
-  const pwd = document.getElementById('loginPwd').value;
+  const pwd   = document.getElementById('loginPwd').value;
   const errEl = document.getElementById('loginErr');
-  const btn = document.getElementById('loginBtn');
+  const btn   = document.getElementById('loginBtn');
   if (!email || !pwd) { errEl.textContent = 'Isi email dan password.'; return; }
   errEl.textContent = '';
   btn.disabled = true; btn.textContent = 'Memproses...';
-  const { error } = await _sb.auth.signInWithPassword({ email, password: pwd });
+  try {
+    const res  = await fetch(API_BASE + '/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pwd })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Login gagal.');
+    _authToken = data.token;
+    localStorage.setItem('rp_auth_token', _authToken);
+    applyAuthUser(data.user);
+    document.getElementById('loginOverlay').style.display = 'none';
+  } catch(e) {
+    errEl.textContent = e.message;
+  }
   btn.disabled = false; btn.textContent = 'Masuk';
-  if (error) errEl.textContent = 'Email atau password salah.';
 }
 
 async function doLogout() {
   if (!confirm('Keluar dari Quotation Maker?')) return;
-  await _sb.auth.signOut();
+  _authToken = '';
+  localStorage.removeItem('rp_auth_token');
+  showLoginOverlay();
   renderCards(); rp();
 }
 
@@ -854,14 +829,17 @@ function applySnap(d){
 // ── Auto nomor dari history ──
 async function nextNo(){
   try{
-    if(_sbReady){
-      const {data} = await _sb.from('rp_quotations').select('id').order('id', {ascending:false}).limit(1);
-      if(data && data.length) return data[0].id + 1;
+    const data = await apiLoadHistory('semua');
+    if(data && data.length){
+      const nos = data.map(x=>{ const m=(x.no_quotation||'').match(/\/(\d+)\//); return m?parseInt(m[1]):0; });
+      return Math.max(...nos) + 1;
     }
+  }catch(e){}
+  try{
     const h=JSON.parse(localStorage.getItem('rp_history')||'[]');
-    if(!h.length) return 1;
-    return Math.max(...h.map(x=>parseInt(x.no)||0)) + 1;
-  }catch(e){return 1;}
+    if(h.length) return Math.max(...h.map(x=>parseInt(x.no)||0)) + 1;
+  }catch(e){}
+  return 1;
 }
 
 // ── Template ──
@@ -940,10 +918,10 @@ async function addToHistory(data){
       grand:data.items.reduce((s,it)=>s+Math.round(it.qty*(it.harga||0)),0),
       data
     };
-    // Save to Supabase
-    const ok = await sbSaveQuotation(entry);
+    // Save ke VPS
+    const ok = await apiSaveQuotation(entry);
     if(ok) {
-      document.getElementById('sb-hist-status').textContent='☁️ Tersimpan';
+      document.getElementById('sb-hist-status').textContent='🖥 Tersimpan';
       document.getElementById('sb-hist-status').style.color='#4a9';
     }
     // Also save to localStorage as backup
@@ -961,13 +939,13 @@ async function renderHistory(){
   list.innerHTML='<div style="color:#555;font-size:10px;padding:8px;">Memuat...</div>';
   empty.style.display='none';
 
-  // Try Supabase first
-  const sbData = await sbLoadHistory(filterCabang);
-  if(sbData && sbData.length > 0){
-    document.getElementById('sb-hist-status').textContent='☁️ '+sbData.length+' data';
+  // Muat dari VPS API
+  const apiData = await apiLoadHistory(filterCabang);
+  if(apiData && apiData.length > 0){
+    document.getElementById('sb-hist-status').textContent='🖥 '+apiData.length+' data';
     document.getElementById('sb-hist-status').style.color='#4a9';
     empty.style.display='none';
-    list.innerHTML=sbData.map(x=>`
+    list.innerHTML=apiData.map(x=>`
       <div class="hitem">
         <div class="hno">${x.no_quotation}</div>
         <div class="hcust">${x.customer}</div>
@@ -976,8 +954,8 @@ async function renderHistory(){
         <div class="hdate">${(x.tanggal||'').slice(0,10)}</div>
         <div class="hgrand">Rp ${Math.round(x.grand_total||0).toLocaleString('id-ID')}</div>
         <div class="hacts">
-          <button class="hbtn" onclick="histLoadSB(${x.id})">Buka</button>
-          <button class="hbtn hdel" onclick="histDelSB(${x.id})">✕</button>
+          <button class="hbtn" onclick="histLoadApi(${x.id})">Buka</button>
+          <button class="hbtn hdel" onclick="histDelApi(${x.id})">✕</button>
         </div>
       </div>`).join('');
     return;
@@ -1041,24 +1019,25 @@ function histDel(id){
     toast('Dihapus dari riwayat.');
   }catch(e){}
 }
-async function histDelSB(id){
+async function histDelApi(id){
   if(!confirm('Hapus quotation ini?')) return;
-  await sbDeleteQuotation(id);
+  await apiDeleteQuotation(id);
   renderHistory();
   toast('Dihapus dari riwayat.');
 }
-async function histLoadSB(id){
+async function histLoadApi(id){
   try{
-    const {data,error} = await _sb.from('rp_quotations').select('data_json').eq('id',id).single();
-    if(error||!data) { toast('Gagal memuat.'); return; }
-    const d = JSON.parse(data.data_json);
+    const dataJson = await apiGetQuotationData(id);
+    if(!dataJson) { toast('Gagal memuat.'); return; }
+    const d = JSON.parse(dataJson);
     applySnap(d);
     toggleHistory();
     toast('✓ Quotation dimuat.');
   }catch(e){ toast('Gagal memuat.'); }
 }
-function clearHistory(){
+async function clearHistory(){
   if(!confirm('Hapus semua riwayat?')) return;
+  await apiClearAll(getCurrentCabang());
   localStorage.removeItem('rp_history');
   renderHistory();
   toast('Semua riwayat dihapus.');
@@ -1096,9 +1075,6 @@ function newQuotation(){
 
 // ── INIT ──
 document.getElementById('q_date').value = new Date().toISOString().slice(0,10);
-
-// Init Supabase
-initSB();
 
 // Set brand bar + login screen logo
 document.getElementById('brandLogo').src = logoSrc;
