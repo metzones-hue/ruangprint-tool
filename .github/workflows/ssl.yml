@@ -1,0 +1,42 @@
+name: Setup HTTPS (Let's Encrypt)
+
+# Jalankan MANUAL dari tab Actions setelah DNS tool.ruangprint.co.id
+# sudah mengarah ke IP VPS (103.93.163.43).
+on:
+  workflow_dispatch:
+
+jobs:
+  ssl:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pasang sertifikat SSL via Certbot
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            DOMAIN=tool.ruangprint.co.id
+            EMAIL=metzones@gmail.com
+
+            # Install certbot kalau belum ada
+            if ! command -v certbot >/dev/null 2>&1; then
+              sudo apt-get update -y
+              sudo DEBIAN_FRONTEND=noninteractive apt-get install -y certbot python3-certbot-nginx
+            fi
+
+            # Minta & pasang sertifikat, sekaligus auto-redirect HTTP -> HTTPS
+            sudo certbot --nginx \
+              -d "$DOMAIN" \
+              --non-interactive \
+              --agree-tos \
+              --redirect \
+              -m "$EMAIL"
+
+            # Pastikan auto-renew aktif
+            sudo systemctl enable --now certbot.timer || true
+
+            echo "SSL selesai. Cek: https://$DOMAIN"
+            sudo certbot certificates
