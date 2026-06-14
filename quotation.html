@@ -274,15 +274,41 @@ input[type=checkbox]{width:auto;accent-color:var(--gold)}
 </style>
 </head>
 <body>
+
+<!-- LOGIN OVERLAY -->
+<div id="loginOverlay" style="position:fixed;inset:0;background:#111010;z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;font-family:'DM Sans',sans-serif">
+  <img id="loginLogo" style="width:88px;height:88px;border-radius:50%;object-fit:cover;margin-bottom:18px;box-shadow:0 0 0 3px rgba(245,168,0,.3)">
+  <div style="font-family:'Outfit',sans-serif;font-size:20px;font-weight:800;color:#fff;letter-spacing:.07em;margin-bottom:2px">RUANGPRINT</div>
+  <div style="font-size:10px;color:#444;letter-spacing:.15em;margin-bottom:28px">QUOTATION MAKER</div>
+  <div style="background:#1a1918;border:1px solid #2a2a2a;border-radius:12px;padding:26px 28px;width:300px;display:flex;flex-direction:column;gap:11px">
+    <div style="font-size:11px;font-weight:600;color:#666;text-align:center;letter-spacing:.05em;margin-bottom:2px">MASUK KE AKUN ANDA</div>
+    <input id="loginEmail" type="email" placeholder="Email" autocomplete="email"
+      style="width:100%;border:1px solid #2a2a2a;border-radius:6px;padding:9px 12px;font-size:13px;background:#111;color:#fff;outline:none;font-family:'DM Sans',sans-serif;transition:border .15s"
+      onfocus="this.style.borderColor='#F5A800'" onblur="this.style.borderColor='#2a2a2a'"
+      onkeydown="if(event.key==='Enter')document.getElementById('loginPwd').focus()">
+    <input id="loginPwd" type="password" placeholder="Password" autocomplete="current-password"
+      style="width:100%;border:1px solid #2a2a2a;border-radius:6px;padding:9px 12px;font-size:13px;background:#111;color:#fff;outline:none;font-family:'DM Sans',sans-serif;transition:border .15s"
+      onfocus="this.style.borderColor='#F5A800'" onblur="this.style.borderColor='#2a2a2a'"
+      onkeydown="if(event.key==='Enter')doLogin()">
+    <button id="loginBtn" onclick="doLogin()"
+      style="width:100%;padding:10px;background:#F5A800;color:#181818;border:none;border-radius:6px;font-size:13px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;letter-spacing:.05em;transition:all .15s"
+      onmouseover="this.style.background='#ffbd2e'" onmouseout="this.style.background='#F5A800'">Masuk</button>
+    <div id="loginErr" style="font-size:11px;color:#e05050;text-align:center;min-height:15px"></div>
+  </div>
+  <div style="font-size:10px;color:#2a2a2a;margin-top:20px">Akses khusus internal RuangPrint</div>
+</div>
+
 <div class="app">
 
 <!-- LEFT -->
 <div class="left">
   <div class="brand-bar" style="gap:8px;flex-wrap:wrap;">
-    <div class="lm"><svg viewBox="0 0 18 18" fill="none"><rect x="1" y="1" width="7" height="7" rx="1.5" fill="#181818"/><rect x="10" y="1" width="7" height="7" rx="1.5" fill="#181818"/><rect x="1" y="10" width="7" height="7" rx="1.5" fill="#181818"/><rect x="10" y="10" width="7" height="7" rx="1.5" fill="rgba(24,24,24,.4)"/></svg></div>
+    <img id="brandLogo" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0">
     <h1>RUANGPRINT</h1>
     <em>QUOTATION MAKER</em>
+    <span id="brandUserEmail" style="font-size:9px;color:#555;margin-left:4px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-style:normal"></span>
     <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <button onclick="doLogout()" style="padding:3px 9px;background:none;border:1px solid #3a3a3a;border-radius:4px;color:#666;font-size:10px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s" onmouseover="this.style.color='#e05050';this.style.borderColor='#e05050'" onmouseout="this.style.color='#666';this.style.borderColor='#3a3a3a'">⇥ Keluar</button>
       <span class="cs-label">Cabang:</span>
       <select id="cs_cabang" class="cs-field" onchange="saveCabangPref()">
         <option value="HO">Head Office</option>
@@ -466,6 +492,68 @@ input[type=checkbox]{width:auto;accent-color:var(--gold)}
 <div id="toast" style="position:fixed;bottom:22px;right:22px;background:var(--dark);color:var(--white);padding:9px 16px;border-radius:5px;font-size:11px;font-family:'Outfit',sans-serif;letter-spacing:.03em;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999;border-left:3px solid var(--gold)"></div>
 
 <script>
+// ── AUTH ──
+// Untuk menambah user: Supabase Dashboard → Authentication → Users → Add user
+// Set User Metadata: {"cabang":"DMB","name":"Nama CS"}
+// Cabang: HO / DMB / CTR / GDS / CGK / BKS
+
+async function initAuth() {
+  if (!_sbReady) { return; } // Stay on login if Supabase not ready
+
+  // Check existing session
+  const { data: { session } } = await _sb.auth.getSession();
+  if (session) {
+    applyAuthUser(session.user);
+    document.getElementById('loginOverlay').style.display = 'none';
+  }
+
+  // Watch for login/logout
+  _sb.auth.onAuthStateChange((event, session) => {
+    if (session) {
+      applyAuthUser(session.user);
+      document.getElementById('loginOverlay').style.display = 'none';
+    } else {
+      document.getElementById('loginOverlay').style.display = 'flex';
+      document.getElementById('brandUserEmail').textContent = '';
+    }
+  });
+}
+
+function applyAuthUser(user) {
+  const meta = user.user_metadata || {};
+  // Auto-set cabang from user metadata
+  if (meta.cabang) {
+    document.getElementById('cs_cabang').value = meta.cabang;
+    localStorage.setItem('rp_cabang', meta.cabang);
+  }
+  // Auto-set nama CS from user metadata
+  if (meta.name) {
+    document.getElementById('cs_name').value = meta.name;
+    localStorage.setItem('rp_cs_name', meta.name);
+  }
+  // Show email in brand bar
+  document.getElementById('brandUserEmail').textContent = user.email || '';
+}
+
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pwd = document.getElementById('loginPwd').value;
+  const errEl = document.getElementById('loginErr');
+  const btn = document.getElementById('loginBtn');
+  if (!email || !pwd) { errEl.textContent = 'Isi email dan password.'; return; }
+  errEl.textContent = '';
+  btn.disabled = true; btn.textContent = 'Memproses...';
+  const { error } = await _sb.auth.signInWithPassword({ email, password: pwd });
+  btn.disabled = false; btn.textContent = 'Masuk';
+  if (error) errEl.textContent = 'Email atau password salah.';
+}
+
+async function doLogout() {
+  if (!confirm('Keluar dari Quotation Maker?')) return;
+  await _sb.auth.signOut();
+  renderCards(); rp();
+}
+
 const KATEGORI = ['A3+','Indoor','Outdoor','UV Roll to Roll','UV Flatbed','Offset Printing','Reklame','Merchandise'];
 const CETAK_OPT = ['4/0','4/4','1/0','1/1','1 Layer','2 Layer','3 Layer','Full Color'];
 const DEF_SYARAT = '1. Harga berlaku sesuai tanggal berlaku quotation.\n2. Pembayaran DP sebelum produksi dimulai.\n3. Desain/file lengkap sebelum estimasi berjalan.';
@@ -1011,6 +1099,13 @@ document.getElementById('q_date').value = new Date().toISOString().slice(0,10);
 
 // Init Supabase
 initSB();
+
+// Set brand bar + login screen logo
+document.getElementById('brandLogo').src = logoSrc;
+document.getElementById('loginLogo').src = logoSrc;
+
+// Init auth gate
+initAuth();
 
 // Restore cabang + cs name preference
 (function(){
