@@ -54,12 +54,12 @@ jobs:
             sudo chmod 755 "$DOCROOT"
             rm -rf /tmp/ruangprint-deploy
 
-            # Buat virtual host kalau belum ada
+            # Buat virtual host (sekaligus default_server agar akses via IP juga tampil)
             CONF=/etc/nginx/sites-available/$DOMAIN
             sudo tee "$CONF" > /dev/null <<NGINX
             server {
-                listen 80;
-                listen [::]:80;
+                listen 80 default_server;
+                listen [::]:80 default_server;
                 server_name $DOMAIN;
 
                 root $DOCROOT;
@@ -71,6 +71,9 @@ jobs:
             }
             NGINX
             sudo ln -sf "$CONF" /etc/nginx/sites-enabled/$DOMAIN
+
+            # Matikan halaman bawaan Nginx supaya tidak bentrok default_server
+            sudo rm -f /etc/nginx/sites-enabled/default
 
             # Test config & reload
             sudo nginx -t
