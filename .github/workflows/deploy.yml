@@ -13,12 +13,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Upload file HTML ke VPS
+      - name: Upload file HTML ke folder sementara di VPS
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           source: "*.html"
-          target: /home/ruangpr8/tool.ruangprint.co.id
-          strip_components: 0
+          target: /tmp/ruangprint-deploy
+          rm: true
+
+      - name: Pindahkan file ke document root cPanel
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            DEST=/home/ruangpr8/tool.ruangprint.co.id
+            sudo mkdir -p "$DEST"
+            sudo cp -f /tmp/ruangprint-deploy/*.html "$DEST"/
+            sudo chown ruangpr8:ruangpr8 "$DEST"/*.html
+            sudo chmod 644 "$DEST"/*.html
+            rm -rf /tmp/ruangprint-deploy
+            echo "Deploy selesai. File di $DEST:"
+            ls -la "$DEST"/*.html
