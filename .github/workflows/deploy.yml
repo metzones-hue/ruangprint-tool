@@ -13,19 +13,45 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Deploy ke VPS via SCP
+      - name: Buat folder web root jika belum ada
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: sudo mkdir -p /var/www/tool.ruangprint.co.id && sudo chown -R $USER:$USER /var/www/tool.ruangprint.co.id
+
+      - name: Upload file HTML ke VPS
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           source: "*.html"
-          target: ${{ secrets.VPS_TARGET_PATH }}
+          target: /var/www/tool.ruangprint.co.id
 
-      - name: Reload Nginx
+      - name: Setup Nginx config & reload
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          script: sudo nginx -t && sudo systemctl reload nginx
+          script: |
+            CONF=/etc/nginx/sites-available/tool.ruangprint.co.id
+            if [ ! -f "$CONF" ]; then
+              sudo tee "$CONF" > /dev/null <<'NGINX'
+            server {
+                listen 80;
+                server_name tool.ruangprint.co.id;
+
+                root /var/www/tool.ruangprint.co.id;
+                index index.html;
+
+                location / {
+                    try_files $uri $uri/ =404;
+                }
+            }
+            NGINX
+              sudo ln -sf "$CONF" /etc/nginx/sites-enabled/tool.ruangprint.co.id
+            fi
+            sudo nginx -t && sudo systemctl reload nginx
