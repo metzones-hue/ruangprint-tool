@@ -6,8 +6,10 @@ on:
       - main
 
 env:
-  DOMAIN: tool.ruangprint.co.id
+  DOMAIN:  tool.ruangprint.co.id
   DOCROOT: /var/www/tool.ruangprint.co.id
+  API_DIR: /opt/ruangprint-api
+  DB_DIR:  /var/lib/ruangprint
 
 jobs:
   deploy:
@@ -17,44 +19,112 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Upload file HTML ke folder sementara di VPS
+      # ── Upload HTML ke VPS ──────────────────────────────────
+      - name: Upload file HTML ke VPS
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.VPS_HOST }}
+          host:     ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          source: "*.html"
-          target: /tmp/ruangprint-deploy
-          rm: true
+          key:      ${{ secrets.VPS_SSH_KEY }}
+          source:   "*.html"
+          target:   /tmp/ruangprint-deploy
+          rm:       true
 
-      - name: Setup Nginx, deploy file & reload
+      # ── Upload API backend ──────────────────────────────────
+      - name: Upload API backend ke VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host:     ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key:      ${{ secrets.VPS_SSH_KEY }}
+          source:   "api/"
+          target:   /tmp/ruangprint-deploy
+          rm:       false
+
+      # ── SSH: setup Nginx + deploy HTML + deploy API ─────────
+      - name: Setup Nginx, API, dan deploy semua file
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.VPS_HOST }}
+          host:     ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          envs: DOMAIN,DOCROOT
+          key:      ${{ secrets.VPS_SSH_KEY }}
+          envs:     DOMAIN,DOCROOT,API_DIR,DB_DIR
           script: |
             set -e
             DOMAIN=tool.ruangprint.co.id
             DOCROOT=/var/www/tool.ruangprint.co.id
+            API_DIR=/opt/ruangprint-api
+            DB_DIR=/var/lib/ruangprint
 
-            # Install Nginx kalau belum ada
+            # ── 1. Nginx ────────────────────────────────────────────
             if ! command -v nginx >/dev/null 2>&1; then
-              echo "Nginx belum ada, menginstall..."
               sudo apt-get update -y
               sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nginx
             fi
 
-            # Siapkan document root
+            # ── 2. Deploy HTML ───────────────────────────────────────
             sudo mkdir -p "$DOCROOT"
             sudo cp -f /tmp/ruangprint-deploy/*.html "$DOCROOT"/
             sudo chown -R www-data:www-data "$DOCROOT"
             sudo find "$DOCROOT" -type f -exec chmod 644 {} \;
             sudo chmod 755 "$DOCROOT"
+
+            # ── 3. Deploy API ────────────────────────────────────────
+            sudo mkdir -p "$API_DIR" "$DB_DIR"
+            sudo cp -f /tmp/ruangprint-deploy/api/server.js     "$API_DIR"/
+            sudo cp -f /tmp/ruangprint-deploy/api/setup-user.js "$API_DIR"/
+            sudo cp -f /tmp/ruangprint-deploy/api/package.json  "$API_DIR"/
+
             rm -rf /tmp/ruangprint-deploy
 
-            # Buat virtual host (sekaligus default_server agar akses via IP juga tampil)
+            # Install Node.js 20 jika belum ada
+            if ! command -v node >/dev/null 2>&1; then
+              curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+              sudo apt-get install -y nodejs
+            fi
+
+            # npm install
+            cd "$API_DIR"
+            sudo npm install --production --silent
+
+            # Buat .env jika belum ada (JWT_SECRET hanya di-generate sekali)
+            if [ ! -f "$API_DIR/.env" ]; then
+              sudo bash -c "cat > $API_DIR/.env" <<ENV
+            JWT_SECRET=$(openssl rand -hex 32)
+            DB_PATH=$DB_DIR/ruangprint.db
+            PORT=3001
+            ENV
+              echo "✓ .env dibuat dengan JWT_SECRET baru"
+            fi
+
+            sudo chown -R www-data:www-data "$API_DIR" "$DB_DIR"
+
+            # ── 4. Systemd service ───────────────────────────────────
+            sudo tee /etc/systemd/system/ruangprint-api.service > /dev/null <<SERVICE
+            [Unit]
+            Description=RuangPrint Quotation API
+            After=network.target
+
+            [Service]
+            Type=simple
+            User=www-data
+            WorkingDirectory=$API_DIR
+            EnvironmentFile=$API_DIR/.env
+            ExecStart=/usr/bin/node $API_DIR/server.js
+            Restart=on-failure
+            RestartSec=5
+
+            [Install]
+            WantedBy=multi-user.target
+            SERVICE
+
+            sudo systemctl daemon-reload
+            sudo systemctl enable ruangprint-api
+            sudo systemctl restart ruangprint-api
+            sleep 2
+            sudo systemctl is-active ruangprint-api && echo "✓ API berjalan" || echo "✗ API gagal start"
+
+            # ── 5. Nginx vhost (dengan /api/ proxy) ──────────────────
             CONF=/etc/nginx/sites-available/$DOMAIN
             sudo tee "$CONF" > /dev/null <<NGINX
             server {
@@ -65,19 +135,36 @@ jobs:
                 root $DOCROOT;
                 index index.html;
 
+                location /api/ {
+                    proxy_pass         http://127.0.0.1:3001;
+                    proxy_http_version 1.1;
+                    proxy_set_header   Host              \$host;
+                    proxy_set_header   X-Real-IP         \$remote_addr;
+                    proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+                    proxy_set_header   X-Forwarded-Proto \$scheme;
+                }
+
                 location / {
                     try_files \$uri \$uri/ =404;
                 }
             }
             NGINX
-            sudo ln -sf "$CONF" /etc/nginx/sites-enabled/$DOMAIN
 
-            # Matikan halaman bawaan Nginx supaya tidak bentrok default_server
+            sudo ln -sf "$CONF" /etc/nginx/sites-enabled/$DOMAIN
             sudo rm -f /etc/nginx/sites-enabled/default
 
-            # Test config & reload
+            # Re-apply SSL jika sertifikat sudah ada
+            if sudo test -d "/etc/letsencrypt/live/$DOMAIN"; then
+              sudo certbot --nginx -d "$DOMAIN" \
+                --non-interactive --agree-tos -m metzones@gmail.com \
+                --keep-until-expiring 2>/dev/null && echo "✓ SSL re-applied" || true
+            fi
+
             sudo nginx -t
             sudo systemctl reload nginx
 
-            echo "Deploy selesai. Isi $DOCROOT:"
+            echo "=== Deploy selesai ==="
+            echo "HTML  : $DOCROOT"
+            echo "API   : $API_DIR"
+            echo "DB    : $DB_DIR/ruangprint.db"
             ls -la "$DOCROOT"
