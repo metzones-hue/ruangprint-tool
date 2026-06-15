@@ -91,6 +91,7 @@ footer{position:relative;z-index:1;border-top:1px solid rgba(255,255,255,.06);pa
     <div class="h">LOGIN CABANG</div>
     <input id="loginUser" type="text" placeholder="Username" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('loginPwd').focus()">
     <input id="loginPwd" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:#888;cursor:pointer;margin-top:-4px"><input type="checkbox" style="width:auto;accent-color:var(--gold)" onclick="document.getElementById('loginPwd').type=this.checked?'text':'password'"> Lihat password</label>
     <button id="loginBtn" onclick="doLogin()">Masuk</button>
     <div id="loginErr"></div>
   </div>
