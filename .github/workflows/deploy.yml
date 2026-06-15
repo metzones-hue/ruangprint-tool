@@ -128,7 +128,14 @@ jobs:
 
             sudo systemctl daemon-reload
             sudo systemctl enable ruangprint-api
-            sudo systemctl restart ruangprint-api
+
+            # Stop service & bersihkan proses/port lama supaya tidak EADDRINUSE
+            sudo systemctl stop ruangprint-api || true
+            sudo pkill -f "node $API_DIR/server.js" 2>/dev/null || true
+            sudo fuser -k 3001/tcp 2>/dev/null || true
+            sleep 2
+
+            sudo systemctl start ruangprint-api
             sleep 3
             if [ "$(sudo systemctl is-active ruangprint-api)" = "active" ]; then
               echo "✓ API berjalan"
