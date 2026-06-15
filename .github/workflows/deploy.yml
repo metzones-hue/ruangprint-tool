@@ -105,6 +105,19 @@ jobs:
               echo "✓ .env dibuat dengan JWT_SECRET baru"
             fi
 
+            # Kredensial superadmin awal — di-generate acak sekali, dicetak di log ini
+            if ! grep -q BOOTSTRAP_ADMIN_PASSWORD "$API_DIR/.env"; then
+              ADMINPW=$(openssl rand -hex 8)
+              echo "BOOTSTRAP_ADMIN_EMAIL=admin@ruangprint.co.id" | sudo tee -a "$API_DIR/.env" >/dev/null
+              echo "BOOTSTRAP_ADMIN_PASSWORD=$ADMINPW"           | sudo tee -a "$API_DIR/.env" >/dev/null
+              echo "=================================================="
+              echo "  SUPERADMIN AWAL DIBUAT:"
+              echo "  Email    : admin@ruangprint.co.id"
+              echo "  Password : $ADMINPW"
+              echo "  >> Login di /admin.html lalu segera ganti password"
+              echo "=================================================="
+            fi
+
             sudo chown -R www-data:www-data "$API_DIR" "$DB_DIR"
 
             # ── 4. Systemd service ───────────────────────────────────

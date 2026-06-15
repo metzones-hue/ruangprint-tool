@@ -283,6 +283,7 @@ input[type=checkbox]{width:auto;accent-color:var(--gold)}
     <em>QUOTATION MAKER</em>
     <span id="brandUserEmail" style="font-size:9px;color:#555;margin-left:4px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-style:normal"></span>
     <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <a id="adminLink" href="admin.html" style="display:none;padding:3px 9px;background:rgba(245,168,0,.12);border:1px solid rgba(245,168,0,.3);border-radius:4px;color:var(--gold);font-size:10px;text-decoration:none;font-family:'DM Sans',sans-serif">⚙ Admin</a>
       <button onclick="doLogout()" style="padding:3px 9px;background:none;border:1px solid #3a3a3a;border-radius:4px;color:#666;font-size:10px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s" onmouseover="this.style.color='#e05050';this.style.borderColor='#e05050'" onmouseout="this.style.color='#666';this.style.borderColor='#3a3a3a'">⇥ Keluar</button>
       <span class="cs-label">Cabang:</span>
       <select id="cs_cabang" class="cs-field" onchange="saveCabangPref()">
@@ -493,6 +494,17 @@ function applyAuthUser(user) {
     localStorage.setItem('rp_cs_name', user.name);
   }
   document.getElementById('brandUserEmail').textContent = user.email || '';
+
+  // Superadmin: tampilkan link ke Admin Panel. CS: kunci pilihan cabang.
+  const adminLink = document.getElementById('adminLink');
+  const cabSel = document.getElementById('cs_cabang');
+  if (user.role === 'superadmin') {
+    if (adminLink) adminLink.style.display = 'inline-block';
+    if (cabSel) cabSel.disabled = false;
+  } else {
+    if (adminLink) adminLink.style.display = 'none';
+    if (cabSel) cabSel.disabled = true; // cabang CS mengikuti akun
+  }
 }
 
 async function doLogin() {
