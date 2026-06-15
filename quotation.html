@@ -649,7 +649,7 @@ function renderCards(){
         <div class="fc"><label>Kategori</label><select onchange="items[${i}].kategori=this.value;rp()">${kOpts}</select></div>
         <div class="fc"><label>Warna / Layer</label><select onchange="items[${i}].cetak=this.value;rp()">${cOpts}</select></div>
         <div class="fc ifl"><label>Finishing</label><input type="text" value="${it.finishing}" oninput="items[${i}].finishing=this.value;rp()"></div>
-        <div class="fc ifl"><label>Material / Custom</label><input type="text" value="${it.custom||''}" placeholder="cth: Material : Holow 3 x 3" oninput="items[${i}].custom=this.value;rp()"></div>
+        <div class="fc ifl"><label>Material / Custom</label><textarea rows="3" placeholder="cth: Material : Holow 3 x 3" oninput="items[${i}].custom=this.value;rp()" style="resize:vertical;font-size:13px">${(it.custom||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</textarea></div>
         <div class="fc"><label>Qty</label><input type="number" value="${it.qty}" min="1" oninput="items[${i}].qty=+this.value;rp()"></div>
         <div class="fc"><label>Harga / pcs (Rp)</label><input type="number" value="${it.harga}" step="0.01" oninput="items[${i}].harga=+this.value;rp()"></div>
         <div class="fc ifl">
@@ -721,7 +721,7 @@ function rp(){
           ${it.kategori?'Kategori : '+it.kategori+'<br>':''}
           ${it.cetak?'Warna/Layer : '+it.cetak+'<br>':''}
           ${it.finishing?'Finishing : '+it.finishing+'<br>':''}
-          ${it.custom?it.custom:''}
+          ${it.custom?it.custom.replace(/\n/g,'<br>'):''}
         </div>
       </td>
       ${pcell}
