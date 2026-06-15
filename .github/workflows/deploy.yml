@@ -142,15 +142,26 @@ jobs:
             sudo systemctl daemon-reload
             sudo systemctl enable ruangprint-api
 
-            # Stop service & bersihkan proses/port lama supaya tidak EADDRINUSE
+            # Pastikan fuser tersedia (paket psmisc)
+            command -v fuser >/dev/null 2>&1 || sudo apt-get install -y psmisc
+
+            # Stop service & bersihkan SEMUA proses/port lama (cegah EADDRINUSE)
             sudo systemctl stop ruangprint-api || true
-            sudo pkill -f "node $API_DIR/server.js" 2>/dev/null || true
-            sudo fuser -k 3001/tcp 2>/dev/null || true
-            sleep 2
+            for i in 1 2 3; do
+              sudo pkill -9 -f "ruangprint-api/server.js" 2>/dev/null || true
+              sudo fuser -k 3001/tcp 2>/dev/null || true
+              sleep 1
+            done
 
             sudo systemctl start ruangprint-api
-            sleep 3
-            if [ "$(sudo systemctl is-active ruangprint-api)" = "active" ]; then
+
+            # Verifikasi dengan retry (toleransi start agak lambat)
+            OK=""
+            for i in $(seq 1 10); do
+              if [ "$(sudo systemctl is-active ruangprint-api)" = "active" ]; then OK=1; break; fi
+              sleep 1
+            done
+            if [ -n "$OK" ]; then
               echo "✓ API berjalan"
             else
               echo "✗ API gagal start — log 30 baris terakhir:"
