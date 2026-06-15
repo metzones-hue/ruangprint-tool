@@ -83,9 +83,17 @@ jobs:
               sudo apt-get install -y nodejs
             fi
 
-            # npm install
+            # Build tools (fallback kalau better-sqlite3 perlu kompilasi)
+            if ! command -v make >/dev/null 2>&1; then
+              sudo apt-get install -y build-essential python3
+            fi
+
+            echo "Node: $(node -v) | npm: $(npm -v)"
+
+            # npm install (bersih, supaya native module sesuai Node yg terpasang)
             cd "$API_DIR"
-            sudo npm install --production --silent
+            sudo rm -rf node_modules
+            sudo npm install --production --no-audit --no-fund
 
             # Buat .env jika belum ada (JWT_SECRET hanya di-generate sekali)
             if [ ! -f "$API_DIR/.env" ]; then
@@ -121,8 +129,17 @@ jobs:
             sudo systemctl daemon-reload
             sudo systemctl enable ruangprint-api
             sudo systemctl restart ruangprint-api
-            sleep 2
-            sudo systemctl is-active ruangprint-api && echo "✓ API berjalan" || echo "✗ API gagal start"
+            sleep 3
+            if [ "$(sudo systemctl is-active ruangprint-api)" = "active" ]; then
+              echo "✓ API berjalan"
+            else
+              echo "✗ API gagal start — log 30 baris terakhir:"
+              sudo journalctl -u ruangprint-api -n 30 --no-pager || true
+            fi
+
+            # Tes endpoint API lokal
+            echo "Tes /api lokal:"
+            curl -s -o /dev/null -w "  HTTP %{http_code}\n" http://127.0.0.1:3001/api/auth/me || true
 
             # ── 5. Nginx vhost (dengan /api/ proxy) ──────────────────
             CONF=/etc/nginx/sites-available/$DOMAIN
