@@ -32,7 +32,7 @@ jobs:
               const D=require("better-sqlite3");
               const db=new D(process.env.DB_PATH);
               const hash=b.hashSync(process.env.NEWPASS,10);
-              const r=db.prepare("UPDATE users SET password_hash=?, username=COALESCE(NULLIF(username,\"\"),\"admin\") WHERE role=\"superadmin\"").run(hash);
+              const r=db.prepare("UPDATE users SET password_hash=?, username=? WHERE role=?").run(hash,"admin","superadmin");
               if(r.changes===0){
                 db.prepare("INSERT INTO users (email,username,password_hash,name,cabang,role) VALUES (?,?,?,?,?,?)")
                   .run("admin@ruangprint.co.id","admin",hash,"Super Admin","HO","superadmin");
