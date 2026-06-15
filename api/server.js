@@ -14,7 +14,6 @@ const ADMIN_EMAIL = (process.env.BOOTSTRAP_ADMIN_EMAIL || 'admin@ruangprint.co.i
 // Tidak ada default password di source: kalau env kosong, pakai acak (aman, recover via setup-user.js)
 const ADMIN_PWD   =  process.env.BOOTSTRAP_ADMIN_PASSWORD || require('crypto').randomBytes(9).toString('hex');
 
-// Pastikan direktori DB ada
 fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
 
 const db = new Database(DB_PATH);
@@ -22,11 +21,12 @@ db.pragma('journal_mode = WAL');
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id            INTEGER PRIMARY KEY AUTOINCREMENT,
-    email         TEXT    UNIQUE NOT NULL,
+    email         TEXT    UNIQUE,
+    username      TEXT    UNIQUE,
     password_hash TEXT    NOT NULL,
     name          TEXT    DEFAULT '',
     cabang        TEXT    DEFAULT 'HO',
-    role          TEXT    DEFAULT 'cs',
+    role          TEXT    DEFAULT 'cabang',
     created_at    DATETIME DEFAULT CURRENT_TIMESTAMP
   );
   CREATE TABLE IF NOT EXISTS quotations (
@@ -42,119 +42,172 @@ db.exec(`
     created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+  CREATE TABLE IF NOT EXISTS settings (
+    key   TEXT PRIMARY KEY,
+    value TEXT
+  );
 `);
 
-// Migrasi: tambah kolom role kalau DB lama belum punya
-try { db.prepare('SELECT role FROM users LIMIT 1').get(); }
-catch { db.exec("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'cs'"); }
+// Migrasi kolom untuk DB lama
+function ensureColumn(col, ddl) {
+  try { db.prepare(`SELECT ${col} FROM users LIMIT 1`).get(); }
+  catch { db.exec(`ALTER TABLE users ADD COLUMN ${ddl}`); }
+}
+ensureColumn('role',     "role TEXT DEFAULT 'cabang'");
+ensureColumn('username', "username TEXT");
 
-// Bootstrap superadmin pertama (tanpa perlu SSH)
+// Superadmin lama (sebelum ada kolom username) → set username 'admin'
+try { db.prepare("UPDATE users SET username='admin' WHERE role='superadmin' AND (username IS NULL OR username='')").run(); }
+catch (e) {}
+
+// Bootstrap superadmin (username 'admin' + email), tanpa SSH
 const adminExists = db.prepare("SELECT id FROM users WHERE role='superadmin' LIMIT 1").get();
 if (!adminExists) {
   db.prepare(`
-    INSERT INTO users (email, password_hash, name, cabang, role)
-    VALUES (?, ?, 'Super Admin', 'HO', 'superadmin')
-    ON CONFLICT(email) DO UPDATE SET role='superadmin'
+    INSERT INTO users (email, username, password_hash, name, cabang, role)
+    VALUES (?, 'admin', ?, 'Super Admin', 'HO', 'superadmin')
+    ON CONFLICT(email) DO UPDATE SET role='superadmin', username='admin'
   `).run(ADMIN_EMAIL, bcrypt.hashSync(ADMIN_PWD, 10));
-  console.log(`[Bootstrap] Superadmin dibuat: ${ADMIN_EMAIL}`);
+  console.log(`[Bootstrap] Superadmin dibuat: ${ADMIN_EMAIL} (username: admin)`);
 }
 
 const app = express();
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: '20mb' }));
 
-// ── Auth middleware ──────────────────────────────────────────
+// ── Middleware ───────────────────────────────────────────────
 function auth(req, res, next) {
   const header = req.headers['authorization'] || '';
   if (!header.startsWith('Bearer ')) return res.status(401).json({ error: 'Unauthorized' });
-  try {
-    req.user = jwt.verify(header.slice(7), JWT_SECRET);
-    next();
-  } catch {
-    res.status(401).json({ error: 'Token tidak valid atau kadaluarsa, silakan login ulang.' });
-  }
+  try { req.user = jwt.verify(header.slice(7), JWT_SECRET); next(); }
+  catch { res.status(401).json({ error: 'Sesi berakhir, silakan login ulang.' }); }
 }
 function adminOnly(req, res, next) {
   if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Khusus superadmin.' });
   next();
 }
+const isAdmin = u => u.role === 'superadmin';
 
-// ── POST /api/auth/login ─────────────────────────────────────
+// Buat kode cabang dari teks (uppercase alnum, maks 10)
+function makeCode(s) {
+  return (s || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10) || ('C' + Date.now().toString().slice(-5));
+}
+
+// ── AUTH ─────────────────────────────────────────────────────
 app.post('/api/auth/login', (req, res) => {
-  const { email, password } = req.body || {};
-  if (!email || !password) return res.status(400).json({ error: 'Email dan password diperlukan.' });
+  const id = (req.body.username || req.body.email || '').toLowerCase().trim();
+  const password = req.body.password || '';
+  if (!id || !password) return res.status(400).json({ error: 'Username dan password diperlukan.' });
 
-  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email.toLowerCase().trim());
+  const user = db.prepare('SELECT * FROM users WHERE lower(username)=? OR lower(email)=?').get(id, id);
   if (!user || !bcrypt.compareSync(password, user.password_hash))
-    return res.status(401).json({ error: 'Email atau password salah.' });
+    return res.status(401).json({ error: 'Username atau password salah.' });
 
-  const token = jwt.sign(
-    { id: user.id, email: user.email, name: user.name, cabang: user.cabang, role: user.role || 'cs' },
-    JWT_SECRET,
-    { expiresIn: '30d' }
-  );
-  res.json({ token, user: { id: user.id, email: user.email, name: user.name, cabang: user.cabang, role: user.role || 'cs' } });
+  const payload = { id: user.id, username: user.username, email: user.email, name: user.name, cabang: user.cabang, role: user.role || 'cabang' };
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '30d' });
+  res.json({ token, user: payload });
 });
 
-// ── GET /api/auth/me ─────────────────────────────────────────
 app.get('/api/auth/me', auth, (req, res) => res.json(req.user));
 
-// ── POST /api/auth/change-password (ganti password sendiri) ──
 app.post('/api/auth/change-password', auth, (req, res) => {
   const { old_password, new_password } = req.body || {};
-  if (!new_password || new_password.length < 6)
-    return res.status(400).json({ error: 'Password baru minimal 6 karakter.' });
+  if (!new_password || new_password.length < 6) return res.status(400).json({ error: 'Password baru minimal 6 karakter.' });
   const u = db.prepare('SELECT * FROM users WHERE id=?').get(req.user.id);
-  if (!u || !bcrypt.compareSync(old_password || '', u.password_hash))
-    return res.status(401).json({ error: 'Password lama salah.' });
+  if (!u || !bcrypt.compareSync(old_password || '', u.password_hash)) return res.status(401).json({ error: 'Password lama salah.' });
   db.prepare('UPDATE users SET password_hash=? WHERE id=?').run(bcrypt.hashSync(new_password, 10), req.user.id);
   res.json({ ok: true });
 });
 
-// ════════════════════════════════════════════════════════════
-//  ADMIN — kelola user (khusus superadmin)
-// ════════════════════════════════════════════════════════════
+// ── ADMIN: kelola cabang / user ──────────────────────────────
 app.get('/api/admin/users', auth, adminOnly, (req, res) => {
-  res.json(db.prepare('SELECT id,email,name,cabang,role,created_at FROM users ORDER BY id').all());
+  res.json(db.prepare('SELECT id,username,email,name,cabang,role,created_at FROM users ORDER BY role DESC, id').all());
 });
 
 app.post('/api/admin/users', auth, adminOnly, (req, res) => {
-  const { id, email, password, name, cabang, role } = req.body || {};
-  if (!email) return res.status(400).json({ error: 'Email wajib diisi.' });
+  let { id, username, password, name, cabang, role } = req.body || {};
+  username = (username || '').toLowerCase().trim();
+  role = role || 'cabang';
+  if (!username) return res.status(400).json({ error: 'Username wajib diisi.' });
+  if (!name)     return res.status(400).json({ error: 'Nama cabang wajib diisi.' });
+  // Kode cabang: pakai yg diberikan, atau buat dari nama
+  const code = (cabang && cabang.trim()) ? makeCode(cabang) : makeCode(name);
 
   if (id) {
-    // Update user yg sudah ada
     const u = db.prepare('SELECT * FROM users WHERE id=?').get(id);
-    if (!u) return res.status(404).json({ error: 'User tidak ditemukan.' });
+    if (!u) return res.status(404).json({ error: 'Tidak ditemukan.' });
     const hash = password ? bcrypt.hashSync(password, 10) : u.password_hash;
-    db.prepare('UPDATE users SET email=?, password_hash=?, name=?, cabang=?, role=? WHERE id=?')
-      .run(email.toLowerCase().trim(), hash, name || '', cabang || 'HO', role || 'cs', id);
+    try {
+      db.prepare('UPDATE users SET username=?, password_hash=?, name=?, cabang=?, role=? WHERE id=?')
+        .run(username, hash, name, role === 'superadmin' ? (u.cabang || 'HO') : code, role, id);
+    } catch { return res.status(400).json({ error: 'Username sudah dipakai.' }); }
     return res.json({ ok: true });
   }
 
-  // User baru — password wajib
-  if (!password) return res.status(400).json({ error: 'Password wajib untuk user baru.' });
+  if (!password) return res.status(400).json({ error: 'Password wajib untuk akun baru.' });
   try {
-    db.prepare('INSERT INTO users (email,password_hash,name,cabang,role) VALUES (?,?,?,?,?)')
-      .run(email.toLowerCase().trim(), bcrypt.hashSync(password, 10), name || '', cabang || 'HO', role || 'cs');
+    db.prepare('INSERT INTO users (username,password_hash,name,cabang,role) VALUES (?,?,?,?,?)')
+      .run(username, bcrypt.hashSync(password, 10), name, role === 'superadmin' ? 'HO' : code, role);
     res.json({ ok: true });
-  } catch (e) {
-    res.status(400).json({ error: 'Email sudah terdaftar.' });
-  }
+  } catch { res.status(400).json({ error: 'Username sudah terdaftar.' }); }
 });
 
 app.delete('/api/admin/users/:id', auth, adminOnly, (req, res) => {
-  if (Number(req.params.id) === req.user.id)
-    return res.status(400).json({ error: 'Tidak bisa menghapus akun sendiri.' });
+  if (Number(req.params.id) === req.user.id) return res.status(400).json({ error: 'Tidak bisa menghapus akun sendiri.' });
   db.prepare('DELETE FROM users WHERE id=?').run(req.params.id);
   res.json({ ok: true });
 });
 
-// ════════════════════════════════════════════════════════════
-//  QUOTATIONS — CS hanya cabang sendiri, superadmin semua
-// ════════════════════════════════════════════════════════════
-const isAdmin = u => u.role === 'superadmin';
+// ── ADMIN: statistik dashboard ───────────────────────────────
+app.get('/api/admin/stats', auth, adminOnly, (req, res) => {
+  const totalBranches   = db.prepare("SELECT COUNT(*) n FROM users WHERE role!='superadmin'").get().n;
+  const totalQuotations = db.prepare('SELECT COUNT(*) n FROM quotations').get().n;
+  const totalValue      = db.prepare('SELECT COALESCE(SUM(grand_total),0) v FROM quotations').get().v;
 
+  // Per cabang (gabung nama cabang dari users bila ada)
+  const perBranch = db.prepare(`
+    SELECT q.cabang AS code,
+           COALESCE(MAX(u.name), q.cabang) AS name,
+           COUNT(*) AS count,
+           COALESCE(SUM(q.grand_total),0) AS value
+    FROM quotations q
+    LEFT JOIN users u ON u.cabang = q.cabang AND u.role!='superadmin'
+    GROUP BY q.cabang ORDER BY value DESC
+  `).all();
+
+  const recent = db.prepare(`
+    SELECT no_quotation, cabang, cs_name, customer, grand_total, created_at
+    FROM quotations ORDER BY created_at DESC LIMIT 10
+  `).all();
+
+  const byMonth = db.prepare(`
+    SELECT substr(created_at,1,7) AS ym, COUNT(*) AS count, COALESCE(SUM(grand_total),0) AS value
+    FROM quotations GROUP BY ym ORDER BY ym DESC LIMIT 6
+  `).all().reverse();
+
+  res.json({ totalBranches, totalQuotations, totalValue, perBranch, recent, byMonth });
+});
+
+// ── ADMIN: settings ──────────────────────────────────────────
+app.get('/api/admin/settings', auth, adminOnly, (req, res) => {
+  const rows = db.prepare('SELECT key, value FROM settings').all();
+  const out = {}; rows.forEach(r => out[r.key] = r.value);
+  res.json(out);
+});
+app.post('/api/admin/settings', auth, adminOnly, (req, res) => {
+  const up = db.prepare('INSERT INTO settings (key,value) VALUES (?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value');
+  const tx = db.transaction(obj => { for (const k in obj) up.run(k, String(obj[k])); });
+  tx(req.body || {});
+  res.json({ ok: true });
+});
+// Settings publik (dibaca tool tanpa harus superadmin) — mis. info perusahaan
+app.get('/api/settings/public', auth, (req, res) => {
+  const rows = db.prepare("SELECT key, value FROM settings WHERE key LIKE 'comp_%'").all();
+  const out = {}; rows.forEach(r => out[r.key] = r.value);
+  res.json(out);
+});
+
+// ── QUOTATIONS (CS/cabang hanya cabang sendiri) ──────────────
 app.get('/api/quotations', auth, (req, res) => {
   let rows;
   if (isAdmin(req.user)) {
@@ -163,7 +216,6 @@ app.get('/api/quotations', auth, (req, res) => {
       ? db.prepare('SELECT id,no_quotation,tipe,cabang,cs_name,customer,tanggal,grand_total,created_at FROM quotations WHERE cabang=? ORDER BY created_at DESC LIMIT 200').all(cabang)
       : db.prepare('SELECT id,no_quotation,tipe,cabang,cs_name,customer,tanggal,grand_total,created_at FROM quotations ORDER BY created_at DESC LIMIT 200').all();
   } else {
-    // CS: dipaksa hanya cabang miliknya
     rows = db.prepare('SELECT id,no_quotation,tipe,cabang,cs_name,customer,tanggal,grand_total,created_at FROM quotations WHERE cabang=? ORDER BY created_at DESC LIMIT 200').all(req.user.cabang);
   }
   res.json(rows);
@@ -171,17 +223,15 @@ app.get('/api/quotations', auth, (req, res) => {
 
 app.post('/api/quotations', auth, (req, res) => {
   const e = req.body;
-  // CS: cabang & cs_name dipaksa dari token (tidak percaya input klien)
   const cabang  = isAdmin(req.user) ? (e.cabang || '-') : req.user.cabang;
-  const cs_name = isAdmin(req.user) ? (e.cs_name || '-') : (req.user.name || e.cs_name || '-');
+  const cs_name = isAdmin(req.user) ? (e.cs_name || '-') : (e.cs_name || req.user.name || '-');
   db.prepare(`
     INSERT INTO quotations (id,no_quotation,tipe,cabang,cs_name,customer,tanggal,grand_total,data_json,updated_at)
     VALUES (@id,@no_quotation,@tipe,@cabang,@cs_name,@customer,@tanggal,@grand_total,@data_json,CURRENT_TIMESTAMP)
     ON CONFLICT(id) DO UPDATE SET
       no_quotation=excluded.no_quotation, tipe=excluded.tipe, cabang=excluded.cabang,
       cs_name=excluded.cs_name, customer=excluded.customer, tanggal=excluded.tanggal,
-      grand_total=excluded.grand_total, data_json=excluded.data_json,
-      updated_at=CURRENT_TIMESTAMP
+      grand_total=excluded.grand_total, data_json=excluded.data_json, updated_at=CURRENT_TIMESTAMP
   `).run({
     id: e.id, no_quotation: e.no_quotation, tipe: e.tipe || 'P',
     cabang, cs_name, customer: e.customer, tanggal: e.tanggal,
@@ -190,10 +240,7 @@ app.post('/api/quotations', auth, (req, res) => {
   res.json({ ok: true });
 });
 
-// Helper: cek akses 1 quotation
-function canAccess(user, row) {
-  return row && (isAdmin(user) || row.cabang === user.cabang);
-}
+function canAccess(user, row) { return row && (isAdmin(user) || row.cabang === user.cabang); }
 
 app.get('/api/quotations/:id/data', auth, (req, res) => {
   const row = db.prepare('SELECT cabang, data_json FROM quotations WHERE id=?').get(req.params.id);
@@ -214,7 +261,6 @@ app.delete('/api/quotations', auth, (req, res) => {
     if (cabang && cabang !== 'semua') db.prepare('DELETE FROM quotations WHERE cabang=?').run(cabang);
     else db.prepare('DELETE FROM quotations').run();
   } else {
-    // CS hanya boleh hapus cabang sendiri
     db.prepare('DELETE FROM quotations WHERE cabang=?').run(req.user.cabang);
   }
   res.json({ ok: true });
