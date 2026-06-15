@@ -53,8 +53,8 @@ function saveCabangPref() {
   localStorage.setItem('rp_cs_name', document.getElementById('cs_name').value);
 }
 function showLoginOverlay() {
-  document.getElementById('loginOverlay').style.display = 'flex';
-  document.getElementById('brandUserEmail').textContent = '';
+  // Login terpusat di index.html
+  location.href = 'index.html';
 }
 </script>
 <meta charset="UTF-8">
@@ -472,28 +472,38 @@ input[type=checkbox]{width:auto;accent-color:var(--gold)}
 // Kelola user via SSH: node /opt/ruangprint-api/setup-user.js add email password "Nama" CABANG
 
 async function initAuth() {
-  if (!_authToken) { showLoginOverlay(); return; }
+  // Login terpusat di index.html — kalau belum login, balik ke halaman depan
+  if (!_authToken) { location.href = 'index.html'; return; }
   const user = await apiCall('GET', '/auth/me');
   if (user) {
     applyAuthUser(user);
-    document.getElementById('loginOverlay').style.display = 'none';
+    const ov = document.getElementById('loginOverlay');
+    if (ov) ov.style.display = 'none';
   } else {
     _authToken = '';
     localStorage.removeItem('rp_auth_token');
-    showLoginOverlay();
+    location.href = 'index.html';
   }
 }
 
 function applyAuthUser(user) {
-  if (user.cabang) {
-    document.getElementById('cs_cabang').value = user.cabang;
+  const cabSelEl = document.getElementById('cs_cabang');
+  if (user.cabang && cabSelEl) {
+    // Kalau kode cabang belum ada di dropdown (kode dinamis), tambahkan
+    if (![...cabSelEl.options].some(o => o.value === user.cabang)) {
+      const opt = document.createElement('option');
+      opt.value = user.cabang;
+      opt.textContent = user.name ? (user.name + ' (' + user.cabang + ')') : user.cabang;
+      cabSelEl.appendChild(opt);
+    }
+    cabSelEl.value = user.cabang;
     localStorage.setItem('rp_cabang', user.cabang);
   }
   if (user.name) {
     document.getElementById('cs_name').value = user.name;
     localStorage.setItem('rp_cs_name', user.name);
   }
-  document.getElementById('brandUserEmail').textContent = user.email || '';
+  document.getElementById('brandUserEmail').textContent = user.username || user.email || '';
 
   // Superadmin: tampilkan link ke Admin Panel. CS: kunci pilihan cabang.
   const adminLink = document.getElementById('adminLink');
