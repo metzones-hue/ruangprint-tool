@@ -1,0 +1,42 @@
+name: Reset Password Superadmin
+
+# Jalankan MANUAL dari tab Actions (Run workflow) bila superadmin terkunci.
+# Akan mengeset ulang password superadmin & username 'admin', lalu
+# menampilkan password baru di log.
+on:
+  workflow_dispatch:
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reset superadmin via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host:     ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key:      ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            cd /opt/ruangprint-api
+            NEWPASS=$(openssl rand -hex 6)
+            sudo -u www-data DB_PATH=/var/lib/ruangprint/ruangprint.db node -e '
+              const b=require("bcryptjs");
+              const D=require("better-sqlite3");
+              const db=new D(process.env.DB_PATH);
+              const hash=b.hashSync(process.argv[1],10);
+              const r=db.prepare("UPDATE users SET password_hash=?, username=COALESCE(NULLIF(username,\"\"),\"admin\") WHERE role=\"superadmin\"").run(hash);
+              if(r.changes===0){
+                db.prepare("INSERT INTO users (email,username,password_hash,name,cabang,role) VALUES (?,?,?,?,?,?)")
+                  .run("admin@ruangprint.co.id","admin",hash,"Super Admin","HO","superadmin");
+                console.log("Superadmin dibuat baru.");
+              } else {
+                console.log("Superadmin diupdate:", r.changes);
+              }
+            ' "$NEWPASS"
+            echo "=================================================="
+            echo "  PASSWORD SUPERADMIN DIRESET"
+            echo "  Username : admin"
+            echo "  Password : $NEWPASS"
+            echo "  Login di /admin.html — segera ganti di Pengaturan"
+            echo "=================================================="
