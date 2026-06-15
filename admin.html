@@ -100,6 +100,7 @@ input:focus,select:focus{border-color:var(--gold);background:#fff}
     <div class="h">LOGIN SUPERADMIN</div>
     <input id="loginUser" type="text" placeholder="Username" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('loginPwd').focus()">
     <input id="loginPwd" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:#888;cursor:pointer;margin-top:-4px"><input type="checkbox" style="width:auto;accent-color:var(--gold)" onclick="document.getElementById('loginPwd').type=this.checked?'text':'password'"> Lihat password</label>
     <button id="loginBtn" onclick="doLogin()">Masuk</button>
     <div id="loginErr"></div>
   </div>

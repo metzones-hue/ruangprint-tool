@@ -594,7 +594,7 @@ function clearSig(who){
   }
   rp();
 }
-let items = [{nama:'Brosur A4',ukuran:'29.7x21 cm',bahan:'Duplex Board 300 gsm',kategori:'A3+',cetak:'4/0',finishing:'Biaya Potong',qty:1000,harga:1292.09,imgSrc:''}];
+let items = [{nama:'Brosur A4',ukuran:'29.7x21 cm',bahan:'Duplex Board 300 gsm',kategori:'A3+',cetak:'4/0',finishing:'Biaya Potong',custom:'',qty:1000,harga:1292.09,imgSrc:''}];
 
 const gv = id => document.getElementById(id)?.value || '';
 
@@ -615,7 +615,7 @@ function toast(msg, dur=2600){
 
 // ── Items ──
 function addItem(){
-  items.push({nama:'',ukuran:'',bahan:'',kategori:'',cetak:'',finishing:'',qty:1,harga:0,imgSrc:''});
+  items.push({nama:'',ukuran:'',bahan:'',kategori:'',cetak:'',finishing:'',custom:'',qty:1,harga:0,imgSrc:''});
   renderCards(); rp();
 }
 function removeItem(i){ items.splice(i,1); renderCards(); rp(); }
@@ -649,6 +649,7 @@ function renderCards(){
         <div class="fc"><label>Kategori</label><select onchange="items[${i}].kategori=this.value;rp()">${kOpts}</select></div>
         <div class="fc"><label>Warna / Layer</label><select onchange="items[${i}].cetak=this.value;rp()">${cOpts}</select></div>
         <div class="fc ifl"><label>Finishing</label><input type="text" value="${it.finishing}" oninput="items[${i}].finishing=this.value;rp()"></div>
+        <div class="fc ifl"><label>Material / Custom</label><input type="text" value="${it.custom||''}" placeholder="cth: Material : Holow 3 x 3" oninput="items[${i}].custom=this.value;rp()"></div>
         <div class="fc"><label>Qty</label><input type="number" value="${it.qty}" min="1" oninput="items[${i}].qty=+this.value;rp()"></div>
         <div class="fc"><label>Harga / pcs (Rp)</label><input type="number" value="${it.harga}" step="0.01" oninput="items[${i}].harga=+this.value;rp()"></div>
         <div class="fc ifl">
@@ -719,7 +720,8 @@ function rp(){
           ${it.bahan?'Bahan : '+it.bahan+'<br>':''}
           ${it.kategori?'Kategori : '+it.kategori+'<br>':''}
           ${it.cetak?'Warna/Layer : '+it.cetak+'<br>':''}
-          ${it.finishing?'Finishing : '+it.finishing:''}
+          ${it.finishing?'Finishing : '+it.finishing+'<br>':''}
+          ${it.custom?it.custom:''}
         </div>
       </td>
       ${pcell}
@@ -1088,7 +1090,7 @@ function newQuotation(){
   ['p_ongkir','p_diskon','p_dp'].forEach(id=>document.getElementById(id).value='0');
   document.getElementById('ppn_on').checked=false;
   document.getElementById('q_catatan').value='';
-  items=[{nama:'',ukuran:'',bahan:'',kategori:'A3+',cetak:'4/0',finishing:'',qty:1,harga:0,imgSrc:''}];
+  items=[{nama:'',ukuran:'',bahan:'',kategori:'A3+',cetak:'4/0',finishing:'',custom:'',qty:1,harga:0,imgSrc:''}];
   renderCards(); rp();
   setTimeout(()=>{ const el=document.getElementById('pdf-syarat-txt'); if(el) el.innerText=DEF_SYARAT; },120);
   switchTab('info');
