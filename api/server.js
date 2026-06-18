@@ -56,6 +56,34 @@ function ensureColumn(col, ddl) {
 ensureColumn('role',     "role TEXT DEFAULT 'cabang'");
 ensureColumn('username', "username TEXT");
 
+// Migrasi: DB lama punya kolom email NOT NULL, sehingga akun cabang tanpa email
+// gagal dibuat ("NOT NULL constraint failed: users.email"). Bangun ulang tabel
+// agar email opsional (nullable) dan username unik, tanpa kehilangan data.
+try {
+  const emailCol = db.prepare('PRAGMA table_info(users)').all().find(c => c.name === 'email');
+  if (emailCol && emailCol.notnull === 1) {
+    db.transaction(() => {
+      db.exec(`
+        CREATE TABLE users_new (
+          id            INTEGER PRIMARY KEY AUTOINCREMENT,
+          email         TEXT    UNIQUE,
+          username      TEXT    UNIQUE,
+          password_hash TEXT    NOT NULL,
+          name          TEXT    DEFAULT '',
+          cabang        TEXT    DEFAULT 'HO',
+          role          TEXT    DEFAULT 'cabang',
+          created_at    DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+        INSERT INTO users_new (id,email,username,password_hash,name,cabang,role,created_at)
+          SELECT id,email,username,password_hash,name,cabang,role,created_at FROM users;
+        DROP TABLE users;
+        ALTER TABLE users_new RENAME TO users;
+      `);
+    })();
+    console.log('[Migrasi] Kolom email diubah menjadi opsional (nullable).');
+  }
+} catch (e) { console.error('[Migrasi email] gagal:', e.message); }
+
 // Superadmin lama (sebelum ada kolom username) → set username 'admin'
 try { db.prepare("UPDATE users SET username='admin' WHERE role='superadmin' AND (username IS NULL OR username='')").run(); }
 catch (e) {}
@@ -140,7 +168,11 @@ app.post('/api/admin/users', auth, adminOnly, (req, res) => {
     try {
       db.prepare('UPDATE users SET username=?, password_hash=?, name=?, cabang=?, role=? WHERE id=?')
         .run(username, hash, name, role === 'superadmin' ? (u.cabang || 'HO') : code, role, id);
-    } catch { return res.status(400).json({ error: 'Username sudah dipakai.' }); }
+    } catch (e) {
+      if (/UNIQUE constraint/i.test(e.message)) return res.status(400).json({ error: 'Username sudah dipakai.' });
+      console.error('Gagal update user:', e.message);
+      return res.status(400).json({ error: 'Gagal menyimpan: ' + e.message });
+    }
     return res.json({ ok: true });
   }
 
@@ -149,7 +181,11 @@ app.post('/api/admin/users', auth, adminOnly, (req, res) => {
     db.prepare('INSERT INTO users (username,password_hash,name,cabang,role) VALUES (?,?,?,?,?)')
       .run(username, bcrypt.hashSync(password, 10), name, role === 'superadmin' ? 'HO' : code, role);
     res.json({ ok: true });
-  } catch { res.status(400).json({ error: 'Username sudah terdaftar.' }); }
+  } catch (e) {
+    if (/UNIQUE constraint/i.test(e.message)) return res.status(400).json({ error: 'Username sudah terdaftar.' });
+    console.error('Gagal membuat user:', e.message);
+    res.status(400).json({ error: 'Gagal menyimpan: ' + e.message });
+  }
 });
 
 app.delete('/api/admin/users/:id', auth, adminOnly, (req, res) => {
