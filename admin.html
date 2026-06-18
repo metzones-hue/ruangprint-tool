@@ -156,7 +156,7 @@ input:focus,select:focus{border-color:var(--gold);background:#fff}
           <div class="fc"><label>Role</label><select id="u_role"><option value="cabang">Cabang</option><option value="superadmin">Superadmin</option></select></div>
         </div>
         <div class="frm-actions">
-          <button class="btn" onclick="saveUser()">Simpan</button>
+          <button class="btn" id="saveUserBtn" onclick="saveUser()">Simpan</button>
           <button class="btn sec" id="cancelBtn" style="display:none" onclick="resetForm()">Batal</button>
           <span id="formMsg"></span>
         </div>
@@ -293,6 +293,8 @@ async function loadUsers(){
     </tr>`).join('');
 }
 async function saveUser(){
+  const btn=document.getElementById('saveUserBtn');
+  if(btn.disabled)return;
   const id=document.getElementById('u_id').value;
   const body={id:id?Number(id):undefined,name:document.getElementById('u_name').value.trim(),
     username:document.getElementById('u_username').value.trim(),password:document.getElementById('u_pwd').value,
@@ -301,11 +303,16 @@ async function saveUser(){
   if(!body.name){msg.style.color='#c00';msg.textContent='Nama cabang wajib.';return;}
   if(!body.username){msg.style.color='#c00';msg.textContent='Username wajib.';return;}
   if(!id&&!body.password){msg.style.color='#c00';msg.textContent='Password wajib untuk cabang baru.';return;}
-  const r=await api('POST','/admin/users',body);
-  if(!r.ok){msg.style.color='#c00';msg.textContent=(r.data&&r.data.error)||'Gagal simpan.';return;}
-  msg.style.color='#2a8';msg.textContent='✓ Tersimpan.';
-  toast(id?'✓ Cabang diupdate.':'✓ Cabang baru ditambahkan.');
-  resetForm();loadUsers();
+  btn.disabled=true;btn.textContent='Menyimpan...';
+  try{
+    const r=await api('POST','/admin/users',body);
+    if(!r.ok){msg.style.color='#c00';msg.textContent=(r.data&&r.data.error)||'Gagal simpan.';return;}
+    msg.style.color='#2a8';msg.textContent='✓ Tersimpan.';
+    toast(id?'✓ Cabang diupdate.':'✓ Cabang baru ditambahkan.');
+    resetForm();loadUsers();
+  }finally{
+    btn.disabled=false;btn.textContent='Simpan';
+  }
 }
 function editUser(u){
   document.getElementById('u_id').value=u.id;
