@@ -185,7 +185,13 @@ app.get('/api/admin/stats', auth, adminOnly, (req, res) => {
     FROM quotations GROUP BY ym ORDER BY ym DESC LIMIT 6
   `).all().reverse();
 
-  res.json({ totalBranches, totalQuotations, totalValue, perBranch, recent, byMonth });
+  const topCS = db.prepare(`
+    SELECT cs_name, cabang, COUNT(*) AS count, COALESCE(SUM(grand_total),0) AS value
+    FROM quotations WHERE cs_name IS NOT NULL AND cs_name != '-'
+    GROUP BY cs_name, cabang ORDER BY value DESC LIMIT 5
+  `).all();
+
+  res.json({ totalBranches, totalQuotations, totalValue, perBranch, recent, byMonth, topCS });
 });
 
 // ── ADMIN: settings ──────────────────────────────────────────
@@ -209,15 +215,21 @@ app.get('/api/settings/public', auth, (req, res) => {
 
 // ── QUOTATIONS (CS/cabang hanya cabang sendiri) ──────────────
 app.get('/api/quotations', auth, (req, res) => {
-  let rows;
+  const { cabang, from, to } = req.query;
+  const conds = [];
+  const params = [];
   if (isAdmin(req.user)) {
-    const { cabang } = req.query;
-    rows = (cabang && cabang !== 'semua')
-      ? db.prepare('SELECT id,no_quotation,tipe,cabang,cs_name,customer,tanggal,grand_total,created_at FROM quotations WHERE cabang=? ORDER BY created_at DESC LIMIT 200').all(cabang)
-      : db.prepare('SELECT id,no_quotation,tipe,cabang,cs_name,customer,tanggal,grand_total,created_at FROM quotations ORDER BY created_at DESC LIMIT 200').all();
+    if (cabang && cabang !== 'semua') { conds.push('cabang=?'); params.push(cabang); }
   } else {
-    rows = db.prepare('SELECT id,no_quotation,tipe,cabang,cs_name,customer,tanggal,grand_total,created_at FROM quotations WHERE cabang=? ORDER BY created_at DESC LIMIT 200').all(req.user.cabang);
+    conds.push('cabang=?'); params.push(req.user.cabang);
   }
+  if (from) { conds.push('tanggal>=?'); params.push(from); }
+  if (to)   { conds.push('tanggal<=?'); params.push(to); }
+  const where = conds.length ? 'WHERE ' + conds.join(' AND ') : '';
+  const rows = db.prepare(`
+    SELECT id,no_quotation,tipe,cabang,cs_name,customer,tanggal,grand_total,created_at
+    FROM quotations ${where} ORDER BY created_at DESC LIMIT 1000
+  `).all(...params);
   res.json(rows);
 });
 
