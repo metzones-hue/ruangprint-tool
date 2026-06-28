@@ -263,14 +263,15 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 .btool{padding:10px 14px!important;font-size:12px!important;border-radius:8px!important}
 .bsm{padding:7px 12px!important;font-size:11.5px!important;border-radius:7px!important}
 /* ── tombol brand-bar diperbesar & seragam ── */
-.brand-bar a,.brand-bar button{font-size:12px!important;padding:8px 13px!important;border-radius:8px!important;font-weight:600!important;min-height:38px;display:inline-flex!important;align-items:center;gap:5px;line-height:1}
+.brand-bar a,.brand-bar button,.nav-actions a,.nav-actions button{font-size:12px!important;padding:8px 13px!important;border-radius:8px!important;font-weight:600!important;min-height:38px;display:inline-flex!important;align-items:center;gap:5px;line-height:1}
+.nav-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
 .brand-bar .cs-label{font-size:12px!important;font-weight:600}
 .brand-bar .cs-field,#cs_cabang{font-size:12.5px!important;padding:8px 11px!important;min-height:38px;border-radius:8px!important}
 .brand-bar h1{font-size:16px!important}
 .brand-bar #brandUserEmail{font-size:11px!important}
 .cs-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 20px;border-bottom:1px solid var(--border);background:var(--panel)}
-.brand-bar a,.brand-bar button{background:var(--surf-el)!important;border:1px solid var(--border)!important;color:var(--text)!important;text-decoration:none}
-.brand-bar a#adminLink{background:rgba(245,168,0,.14)!important;border-color:rgba(245,168,0,.3)!important;color:var(--gold)!important}
+.brand-bar a,.brand-bar button,.nav-actions a,.nav-actions button{background:var(--surf-el)!important;border:1px solid var(--border)!important;color:var(--text)!important;text-decoration:none}
+.brand-bar a#adminLink,.nav-actions a#adminLink{background:rgba(245,168,0,.14)!important;border-color:rgba(245,168,0,.3)!important;color:var(--gold)!important}
 </style>
 </head>
 <body>
@@ -309,11 +310,6 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
       <em style="margin:0;font-size:10px;color:var(--muted)">QUOTATION MAKER</em>
     </div>
     <span id="brandUserEmail" style="font-size:10px;color:var(--muted);margin-left:8px;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-style:normal"></span>
-    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0">
-      <a href="index.html">← Beranda</a>
-      <a id="adminLink" href="admin.html" style="display:none">⚙ Admin</a>
-      <button onclick="doLogout()" onmouseover="this.style.color='#e05050';this.style.borderColor='#e05050'" onmouseout="this.style.color='';this.style.borderColor=''">⇥ Keluar</button>
-    </div>
   </div>
   <div class="cs-bar">
     <span class="cs-label">Cabang:</span>
@@ -463,6 +459,11 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
     <button class="btool" id="btnHist" onclick="toggleHistory()">🕘 Riwayat</button>
     <button class="btool baru" onclick="newQuotation()">✦ Baru</button>
     <span class="thint">Ctrl+P → Save as PDF · A4</span>
+    <div class="nav-actions">
+      <a href="index.html">← Beranda</a>
+      <a id="adminLink" href="admin.html" style="display:none">⚙ Admin</a>
+      <button onclick="doLogout()" onmouseover="this.style.color='#e05050';this.style.borderColor='#e05050'" onmouseout="this.style.color='';this.style.borderColor=''">⇥ Keluar</button>
+    </div>
   </div>
 
   <!-- HISTORY PANEL -->
