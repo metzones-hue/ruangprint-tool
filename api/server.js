@@ -46,6 +46,17 @@ db.exec(`
     key   TEXT PRIMARY KEY,
     value TEXT
   );
+  CREATE TABLE IF NOT EXISTS calc_saves (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    tool        TEXT    NOT NULL,
+    name        TEXT    NOT NULL,
+    cabang      TEXT    DEFAULT '-',
+    cs_name     TEXT    DEFAULT '-',
+    summary     TEXT    DEFAULT '',
+    data_json   TEXT,
+    created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
 `);
 
 // Migrasi kolom untuk DB lama
@@ -275,6 +286,68 @@ app.delete('/api/quotations', auth, (req, res) => {
   } else {
     db.prepare('DELETE FROM quotations WHERE cabang=?').run(req.user.cabang);
   }
+  res.json({ ok: true });
+});
+
+// ── CALC SAVES (hitungan kalkulator Offset/Booklet) ──────────
+// Akses sama seperti quotations: cabang hanya melihat miliknya, superadmin semua.
+const CALC_TOOLS = ['offset', 'booklet'];
+
+app.get('/api/calc-saves', auth, (req, res) => {
+  const { tool, cabang } = req.query;
+  const conds = [];
+  const params = [];
+  if (tool) {
+    if (!CALC_TOOLS.includes(tool)) return res.status(400).json({ error: 'Tool tidak dikenal.' });
+    conds.push('tool=?'); params.push(tool);
+  }
+  if (isAdmin(req.user)) {
+    if (cabang && cabang !== 'semua') { conds.push('cabang=?'); params.push(cabang); }
+  } else {
+    conds.push('cabang=?'); params.push(req.user.cabang);
+  }
+  const where = conds.length ? 'WHERE ' + conds.join(' AND ') : '';
+  const rows = db.prepare(`
+    SELECT id,tool,name,cabang,cs_name,summary,created_at,updated_at
+    FROM calc_saves ${where} ORDER BY updated_at DESC LIMIT 1000
+  `).all(...params);
+  res.json(rows);
+});
+
+app.post('/api/calc-saves', auth, (req, res) => {
+  const e = req.body || {};
+  const tool = e.tool;
+  if (!CALC_TOOLS.includes(tool)) return res.status(400).json({ error: 'Tool tidak dikenal.' });
+  const name = (e.name || '').trim();
+  if (!name) return res.status(400).json({ error: 'Nama simpanan wajib diisi.' });
+  const cabang  = isAdmin(req.user) ? (e.cabang || '-') : req.user.cabang;
+  const cs_name = isAdmin(req.user) ? (e.cs_name || '-') : (req.user.name || '-');
+
+  if (e.id) {
+    const row = db.prepare('SELECT cabang FROM calc_saves WHERE id=?').get(e.id);
+    if (!canAccess(req.user, row)) return res.status(404).json({ error: 'Tidak ditemukan.' });
+    db.prepare(`UPDATE calc_saves SET name=?, summary=?, data_json=?, updated_at=CURRENT_TIMESTAMP WHERE id=?`)
+      .run(name, e.summary || '', e.data_json, e.id);
+    return res.json({ ok: true, id: e.id });
+  }
+
+  const info = db.prepare(`
+    INSERT INTO calc_saves (tool,name,cabang,cs_name,summary,data_json)
+    VALUES (?,?,?,?,?,?)
+  `).run(tool, name, cabang, cs_name, e.summary || '', e.data_json);
+  res.json({ ok: true, id: info.lastInsertRowid });
+});
+
+app.get('/api/calc-saves/:id/data', auth, (req, res) => {
+  const row = db.prepare('SELECT cabang, data_json FROM calc_saves WHERE id=?').get(req.params.id);
+  if (!canAccess(req.user, row)) return res.status(404).json({ error: 'Tidak ditemukan.' });
+  res.json({ data_json: row.data_json });
+});
+
+app.delete('/api/calc-saves/:id', auth, (req, res) => {
+  const row = db.prepare('SELECT cabang FROM calc_saves WHERE id=?').get(req.params.id);
+  if (!canAccess(req.user, row)) return res.status(404).json({ error: 'Tidak ditemukan.' });
+  db.prepare('DELETE FROM calc_saves WHERE id=?').run(req.params.id);
   res.json({ ok: true });
 });
 
