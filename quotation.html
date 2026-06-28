@@ -63,9 +63,9 @@ function showLoginOverlay() {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Quotation Maker — RuangPrint</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@500;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--gold:#F5A800;--dark:#181818;--white:#fff;--bg:#f6f4ef;--bg2:#eeebe3;--border:#ddd9ce;--muted:#8a8478;--text:#2a2620;--panel:#fff}
+:root{--gold:#F5A800;--dark:#18181B;--white:#FAFAFA;--surf-el:#1B1B20;--bg:#0A0A0B;--bg2:#131316;--border:rgba(255,255,255,.09);--muted:#A1A1AA;--text:#FAFAFA;--panel:#131316}
 html,body{height:100%;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--bg)}
 .app{display:grid;grid-template-columns:420px 1fr;height:100vh;overflow:hidden}
 
@@ -90,7 +90,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;font-size:13px;color:var(
 .fc{display:flex;flex-direction:column;gap:3px;margin-bottom:7px}
 label{font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
 input[type=text],input[type=number],input[type=date],input[type=email],select,textarea{width:100%;border:1px solid var(--border);border-radius:5px;padding:6px 8px;font-size:12px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);outline:none;transition:border .15s,background .15s}
-input:focus,select:focus,textarea:focus{border-color:var(--gold);background:var(--white);box-shadow:0 0 0 3px rgba(245,168,0,.08)}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);background:var(--surf-el);box-shadow:0 0 0 3px rgba(245,168,0,.08)}
 textarea{resize:vertical;min-height:48px}
 select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238a8478'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px}
 input[type=checkbox]{width:auto;accent-color:var(--gold)}
@@ -103,14 +103,14 @@ input[type=checkbox]{width:auto;accent-color:var(--gold)}
 .ifl{grid-column:1/-1}
 .bdel{position:absolute;top:9px;right:9px;background:none;border:none;cursor:pointer;color:#ccc;font-size:13px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:3px;transition:all .15s}
 .bdel:hover{background:#fee;color:#c00}
-.iupload{border:1.5px dashed var(--border);border-radius:5px;padding:7px;text-align:center;cursor:pointer;background:var(--white);transition:border .15s;min-height:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
-.iupload:hover{border-color:var(--gold);background:#fffdf5}
+.iupload{border:1.5px dashed var(--border);border-radius:5px;padding:7px;text-align:center;cursor:pointer;background:var(--surf-el);transition:border .15s;min-height:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.iupload:hover{border-color:var(--gold);background:#232329}
 .iupload input[type=file]{display:none}
 .iupload img{max-width:100%;max-height:52px;object-fit:contain;border-radius:3px}
 .iuplbl{font-size:10px;color:var(--muted)}
 .bhapus{margin-top:3px;font-size:10px;padding:2px 7px;background:none;border:1px solid var(--border);border-radius:3px;cursor:pointer;color:var(--muted);transition:all .15s}
 .bhapus:hover{border-color:#c00;color:#c00}
-.sig-upload{border:1.5px dashed var(--border);border-radius:5px;padding:6px;text-align:center;cursor:pointer;background:var(--white);transition:border .15s;min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;margin-top:4px;}
+.sig-upload{border:1.5px dashed var(--border);border-radius:5px;padding:6px;text-align:center;cursor:pointer;background:var(--surf-el);transition:border .15s;min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;margin-top:4px;}
 .sig-upload:hover{border-color:var(--gold);}
 .sig-upload img{max-width:100%;max-height:44px;object-fit:contain;}
 .sig-upload input[type=file]{display:none;}
@@ -134,14 +134,14 @@ input[type=checkbox]{width:auto;accent-color:var(--gold)}
 
 /* TOOL BUTTONS */
 .btn-print{padding:7px 14px;background:var(--gold);color:var(--dark);border:none;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;letter-spacing:.05em;transition:all .15s;white-space:nowrap}
-.btn-print:hover{background:var(--white);color:var(--dark)}
+.btn-print:hover{background:#FFC04D;color:#18181B}
 .btool{padding:6px 10px;background:rgba(255,255,255,.08);color:#bbb;border:1px solid #3a3a3a;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;letter-spacing:.04em;transition:all .15s;white-space:nowrap}
 .btool:hover{background:rgba(255,255,255,.14);color:var(--white);border-color:#555}
 .btool.baru{color:#f5c060;border-color:#5a4000}
 .btool.baru:hover{background:rgba(245,168,0,.15);color:var(--gold)}
 .btool.active-btn{color:var(--gold);border-color:var(--gold)}
 .bsm{padding:4px 9px;background:var(--bg);color:var(--muted);border:1px solid var(--border);border-radius:4px;font-size:10px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
-.bsm:hover{border-color:var(--gold);color:var(--gold);background:var(--white)}
+.bsm:hover{border-color:var(--gold);color:var(--gold);background:var(--surf-el)}
 
 /* RIGHT */
 .right{display:flex;flex-direction:column;overflow:hidden;background:var(--bg2)}
@@ -175,7 +175,7 @@ input[type=checkbox]{width:auto;accent-color:var(--gold)}
 .rscroll::-webkit-scrollbar-thumb{background:#ccc;border-radius:2px}
 
 /* PDF */
-.pdf-paper{width:794px;min-height:1123px;background:var(--white);padding:34px 40px;font-size:11px;color:var(--dark);box-shadow:0 4px 32px rgba(0,0,0,.12);border-radius:2px;font-family:'DM Sans',sans-serif}
+.pdf-paper{width:794px;min-height:1123px;background:#fff;padding:34px 40px;font-size:11px;color:#18181B;box-shadow:0 4px 32px rgba(0,0,0,.12);border-radius:2px;font-family:'DM Sans',sans-serif}
 .pdf-header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:12px;border-bottom:2.5px solid var(--gold)}
 .pdf-logo-area{display:flex;align-items:center;gap:12px}
 .pdf-logo{width:80px;height:80px;object-fit:contain}
@@ -248,6 +248,9 @@ input[type=checkbox]{width:auto;accent-color:var(--gold)}
   .pdf-syarat-hint{display:none}
   @page{size:A4;margin:0}
 }
+/* ── V2 polish (additive) ── */
+.brand-bar{backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.rscroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18)}
 </style>
 </head>
 <body>
@@ -341,7 +344,7 @@ input[type=checkbox]{width:auto;accent-color:var(--gold)}
         <div style="display:flex;gap:5px;align-items:center;margin-bottom:6px">
           <div style="position:relative;flex:1">
             <input type="text" id="custSearch" placeholder="🔍  Cari atau pilih customer tersimpan..." oninput="filterCustList()" onfocus="showCustDrop()" style="font-size:11px;padding:6px 8px;width:100%">
-            <div id="custDrop" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--white);border:1px solid var(--border);border-radius:0 0 5px 5px;max-height:180px;overflow-y:auto;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,.1)"></div>
+            <div id="custDrop" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surf-el);border:1px solid var(--border);border-radius:0 0 5px 5px;max-height:180px;overflow-y:auto;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,.1)"></div>
           </div>
           <button class="bsm" onclick="saveCust()" title="Simpan customer aktif ke daftar">+ Simpan</button>
         </div>
