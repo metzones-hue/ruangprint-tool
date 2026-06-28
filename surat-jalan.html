@@ -123,6 +123,10 @@ input[readonly]{color:var(--muted);background:var(--surf-el)}
 }
 #toast{position:fixed;bottom:22px;right:22px;background:var(--dark);color:#fff;padding:11px 18px;border-radius:8px;font-size:12px;opacity:0;transition:opacity .3s;pointer-events:none;border-left:3px solid var(--gold);z-index:9999}
 #toast.show{opacity:1}
+.lupload{border:1.5px dashed var(--border);border-radius:8px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;background:var(--surf-el)}
+.lupload:hover{border-color:var(--gold)}
+.lupload img{max-height:46px;max-width:160px;border-radius:6px;object-fit:contain;background:#fff;padding:3px}
+.it-row2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px}
 </style>
 </head>
 <body>
@@ -157,6 +161,19 @@ input[readonly]{color:var(--muted);background:var(--surf-el)}
     </div>
 
     <div class="lscroll">
+      <div class="st">Perusahaan &amp; Logo</div>
+      <div class="fc"><label>Logo (opsional)</label>
+        <div class="lupload" onclick="document.getElementById('logoFile').click()">
+          <img id="logoPrev" alt="logo">
+          <span style="font-size:10px;color:var(--muted)">Klik untuk ganti logo · <a onclick="event.stopPropagation();resetLogo()" style="color:var(--gold);cursor:pointer">reset ke default</a></span>
+          <input type="file" id="logoFile" accept="image/*" style="display:none" onchange="onLogo(event)">
+        </div>
+      </div>
+      <div class="fc"><label>Nama Perusahaan</label><input id="comp_name" placeholder="Ruangprint (cabang)" oninput="render()"></div>
+      <div class="fr">
+        <div class="fc"><label>Telepon</label><input id="comp_phone" value="0812 8816 1119" oninput="render()"></div>
+        <div class="fc"><label>Alamat</label><input id="comp_addr" value="Jl. Gilimanuk No 60 Kalideres, Jakarta Barat" oninput="render()"></div>
+      </div>
       <div class="st">Nomor &amp; Tanggal</div>
       <div class="fr">
         <div class="fc"><label>No. Urut</label><input type="number" id="f_seq" value="1" oninput="genNo();render()"></div>
@@ -175,7 +192,7 @@ input[readonly]{color:var(--muted);background:var(--surf-el)}
 
       <div class="st">Barang Dikirim</div>
       <div class="toggle-row">
-        <input type="checkbox" id="f_showharga" onchange="render()">
+        <input type="checkbox" id="f_showharga" onchange="renderItems();render()">
         <label for="f_showharga">Tampilkan harga &amp; total di surat jalan</label>
       </div>
       <div id="itemList"></div>
@@ -225,8 +242,11 @@ const API='/api', LOGO='__LOGO__';
 let _tok=localStorage.getItem('rp_auth_token')||'';
 let items=[];
 let _editId=null;
+let customLogo=null;
 
 document.getElementById('brandLogo').src=LOGO;
+function onLogo(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{customLogo=e.target.result;document.getElementById('logoPrev').src=customLogo;render();};r.readAsDataURL(f);}
+function resetLogo(){customLogo=null;document.getElementById('logoPrev').src=LOGO;render();}
 
 async function api(method,path,body){
   const o={method,headers:{'Content-Type':'application/json'}};
@@ -262,11 +282,12 @@ function renderItems(){
       <div class="it-head"><span class="it-no">Barang ${i+1}</span><button class="it-del" onclick="delItem(${i})">🗑</button></div>
       <div class="fc"><input placeholder="Nama barang/produk" value="${esc(it.nama)}" oninput="updItem(${i},'nama',this.value)"></div>
       <div class="fc"><input placeholder="Spesifikasi (mis. A4, AP150, 4/4)" value="${esc(it.spec)}" oninput="updItem(${i},'spec',this.value)"></div>
-      <div class="it-grid">
+      <div class="it-row2">
         <input type="number" placeholder="Qty" value="${esc(it.qty)}" oninput="updItem(${i},'qty',this.value)">
         <input placeholder="Satuan" value="${esc(it.satuan)}" oninput="updItem(${i},'satuan',this.value)">
-        ${showH?`<input type="number" placeholder="Harga" value="${esc(it.harga)}" oninput="updItem(${i},'harga',this.value)">`:`<input placeholder="Ket." value="${esc(it.ket)}" oninput="updItem(${i},'ket',this.value)">`}
       </div>
+      <div class="fc"><input placeholder="Keterangan (mis. jumlah koli, kondisi)" value="${esc(it.ket)}" oninput="updItem(${i},'ket',this.value)"></div>
+      ${showH?`<div class="fc"><input type="number" placeholder="Harga satuan (Rp)" value="${esc(it.harga)}" oninput="updItem(${i},'harga',this.value)"></div>`:''}
     </div>`).join('') || '<div style="font-size:11px;color:var(--muted);padding:6px 0">Belum ada barang. Klik "Tambah Barang".</div>';
 }
 
@@ -277,12 +298,15 @@ function render(){
   const dt=g('f_date')?new Date(g('f_date')+'T00:00:00'):new Date();
   const tgl=dt.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
   const cab=g('cs_cabang'), cabTxt=document.querySelector('#cs_cabang option:checked').textContent;
+  const lg=customLogo||LOGO;
+  const compName=g('comp_name')||('Ruangprint '+cabTxt);
   let total=0;
   const rows=items.map((it,i)=>{
     const sub=(Number(it.qty)||0)*(Number(it.harga)||0); total+=sub;
+    const ketUnder=(showH && it.ket)?`<div class="sp">Ket: ${esc(it.ket)}</div>`:'';
     return `<tr>
       <td class="c">${i+1}</td>
-      <td><b>${esc(it.nama)||'-'}</b>${it.spec?`<div class="sp">${esc(it.spec)}</div>`:''}</td>
+      <td><b>${esc(it.nama)||'-'}</b>${it.spec?`<div class="sp">${esc(it.spec)}</div>`:''}${ketUnder}</td>
       <td class="c">${esc(it.qty)||0} ${esc(it.satuan)||''}</td>
       ${showH?`<td class="r">${rp(it.harga)}</td><td class="r">${rp(sub)}</td>`:`<td>${esc(it.ket)||''}</td>`}
     </tr>`;}).join('') || `<tr><td colspan="${showH?5:4}" style="text-align:center;color:#999;padding:14px">Belum ada barang</td></tr>`;
@@ -293,9 +317,9 @@ function render(){
 
   document.getElementById('paper').innerHTML=`
     <div class="p-head">
-      <div class="p-brand"><img src="${LOGO}"><div>
-        <div class="p-co">Ruangprint ${esc(cabTxt)}</div>
-        <div class="p-co-sub">Jl. Gilimanuk No 60 Kalideres, Jakarta Barat<br>0812 8816 1119 · ruangprint@gmail.com · www.ruangprint.com</div>
+      <div class="p-brand"><img src="${lg}"><div>
+        <div class="p-co">${esc(compName)}</div>
+        <div class="p-co-sub">${esc(g('comp_addr')).replace(/\n/g,'<br>')}${g('comp_phone')?'<br>'+esc(g('comp_phone')):''}</div>
       </div></div>
       <div class="p-title"><h2>Surat Jalan</h2>
         <div class="no">${esc(g('f_no'))}</div>
@@ -311,7 +335,7 @@ function render(){
         ${g('f_telp')?`<div>${esc(g('f_telp'))}</div>`:''}
       </div>
       <div class="p-to-blk" style="text-align:right"><b>Pengirim</b>
-        <div class="nm">Ruangprint ${esc(cabTxt)}</div>
+        <div class="nm">${esc(compName)}</div>
         ${g('cs_name')?`<div>Petugas: ${esc(g('cs_name'))}</div>`:''}
       </div>
     </div>
@@ -336,6 +360,7 @@ function collect(){
   return {no_sj:g('f_no'),tanggal:g('f_date'),ref_quotation:g('f_ref'),
     cust:{nama:g('f_cust'),pic:g('f_pic'),telp:g('f_telp'),alamat:g('f_alamat')},
     showHarga:document.getElementById('f_showharga').checked,
+    comp:{name:g('comp_name'),phone:g('comp_phone'),addr:g('comp_addr')}, logo:customLogo,
     seq:g('f_seq'),items,
     kirim:{eksp:g('f_eksp'),driver:g('f_driver'),nopol:g('f_nopol')},
     note:g('f_note'),ttd:{terima:g('f_ttd_terima'),kirim:g('f_ttd_kirim')}};
@@ -384,6 +409,8 @@ function applyData(d,id){
   s('f_seq',d.seq||1);s('f_date',d.tanggal);s('f_ref',d.ref_quotation);
   s('f_cust',d.cust&&d.cust.nama);s('f_pic',d.cust&&d.cust.pic);s('f_telp',d.cust&&d.cust.telp);s('f_alamat',d.cust&&d.cust.alamat);
   document.getElementById('f_showharga').checked=!!d.showHarga;
+  s('comp_name',d.comp&&d.comp.name);s('comp_phone',(d.comp&&d.comp.phone)||'0812 8816 1119');s('comp_addr',(d.comp&&d.comp.addr)||'Jl. Gilimanuk No 60 Kalideres, Jakarta Barat');
+  customLogo=d.logo||null;document.getElementById('logoPrev').src=customLogo||LOGO;
   s('f_eksp',d.kirim&&d.kirim.eksp);s('f_driver',d.kirim&&d.kirim.driver);s('f_nopol',d.kirim&&d.kirim.nopol);
   s('f_note',d.note);s('f_ttd_terima',d.ttd&&d.ttd.terima);s('f_ttd_kirim',d.ttd&&d.ttd.kirim);
   items=Array.isArray(d.items)?d.items:[];
@@ -404,6 +431,7 @@ async function init(){
   if(!r.ok){localStorage.removeItem('rp_auth_token');location.href='index.html';return;}
   const u=r.data;
   document.getElementById('f_date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('logoPrev').src=LOGO;
   // cabang / petugas defaults
   const savedCab=localStorage.getItem('rp_cabang'), savedCs=localStorage.getItem('rp_csname');
   if(u.role==='superadmin'){document.getElementById('adminLink').style.display='inline-flex';}
