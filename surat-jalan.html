@@ -140,11 +140,6 @@ input[readonly]{color:var(--muted);background:var(--surf-el)}
         <h1>RUANGPRINT</h1>
         <em>SURAT JALAN</em>
       </div>
-      <div class="nav-actions">
-        <a href="index.html">← Beranda</a>
-        <a id="adminLink" href="admin.html" style="display:none">⚙ Admin</a>
-        <button onclick="doLogout()">⇥ Keluar</button>
-      </div>
     </div>
     <div class="cs-bar">
       <span class="cs-label">Cabang:</span>
@@ -223,7 +218,11 @@ input[readonly]{color:var(--muted);background:var(--surf-el)}
       <button class="btool" onclick="saveDoc()">💾 Simpan</button>
       <button class="btool" id="btnHist" onclick="toggleHistory()">🕘 Riwayat</button>
       <button class="btool baru" onclick="newDoc()">✦ Baru</button>
-      <span class="thint">Ctrl+P → Save as PDF · A4</span>
+      <div class="nav-actions">
+        <a href="index.html">← Beranda</a>
+        <a id="adminLink" href="admin.html" style="display:none">⚙ Admin</a>
+        <button onclick="doLogout()">⇥ Keluar</button>
+      </div>
     </div>
     <div class="hpanel" id="hpanel">
       <div class="hpanel-title">Riwayat Surat Jalan</div>
