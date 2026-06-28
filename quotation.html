@@ -251,6 +251,8 @@ input[type=checkbox]{width:auto;accent-color:var(--gold)}
 /* ── V2 polish (additive) ── */
 .brand-bar{backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
 .rscroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18)}
+/* autofill fix */
+input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,textarea:-webkit-autofill,select:-webkit-autofill{-webkit-text-fill-color:var(--text)!important;-webkit-box-shadow:0 0 0 1000px var(--surf-el) inset!important;caret-color:var(--text);transition:background-color 9999s ease 0s}
 </style>
 </head>
 <body>
