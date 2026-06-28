@@ -225,6 +225,8 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
   <div class="hdr-actions" style="gap:.4rem">
     <span id="saveIndicator" style="font-size:.62rem;color:var(--txt2);white-space:nowrap;display:none">💾 <span id="saveTime"></span></span>
     <a href="index.html" class="btn btn-ghost btn-sm" style="font-size:.7rem;text-decoration:none">← Beranda</a>
+    <button class="btn btn-primary btn-sm" onclick="saveCalcServer()" title="Simpan hitungan ke server" style="font-size:.7rem">💾 Simpan</button>
+    <button class="btn btn-ghost btn-sm" onclick="openCalcRiwayat()" title="Buka hitungan tersimpan" style="font-size:.7rem">🕘 Riwayat</button>
     <button class="btn btn-ghost btn-sm" onclick="exportData()" title="Export semua data ke file JSON" style="font-size:.7rem">⬇ Export</button>
     <label class="btn btn-ghost btn-sm" style="cursor:pointer;font-size:.7rem" title="Import data dari file JSON">⬆ Import<input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)"></label>
     <button class="btn btn-ghost btn-sm" id="themeBtn" onclick="toggleTheme()" title="Ganti tema">🌙</button>
@@ -1506,6 +1508,109 @@ document.addEventListener('DOMContentLoaded',function(){
   var allFields=FORM_FIELDS.concat(QUOTE_FIELDS);
   allFields.forEach(function(id){var e=$(id);if(e){e.addEventListener('change',autoSaveSession);e.addEventListener('input',autoSaveSession);}});
 });
+
+/* ── SIMPAN & RIWAYAT (server) ─────────────────────────────── */
+var _calcCurrentId=null;
+function calcEsc(s){return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function calcApi(method,path,body){
+  var o={method:method,headers:{'Content-Type':'application/json'}};
+  var t=localStorage.getItem('rp_auth_token');if(t)o.headers['Authorization']='Bearer '+t;
+  if(body)o.body=JSON.stringify(body);
+  return fetch('/api'+path,o).then(function(r){
+    return r.json().then(function(d){return {ok:r.ok,status:r.status,data:d};},function(){return {ok:r.ok,status:r.status,data:null};});
+  });
+}
+function buildOffsetSnapshot(){
+  var data={v:2,form:{},quoteItems:state.quoteItems,quoteForm:{}};
+  FORM_FIELDS.forEach(function(id){var e=$(id);if(e)data.form[id]=e.value;});
+  QUOTE_FIELDS.forEach(function(id){var e=$(id);if(e)data.quoteForm[id]=e.value;});
+  return data;
+}
+function applyOffsetSnapshot(data){
+  if(!data)return;
+  if(data.form){
+    if(data.form.fJenisKertas){var jkEl=$('fJenisKertas');if(jkEl){jkEl.value=data.form.fJenisKertas;onJenisKertasChange();}}
+    FORM_FIELDS.forEach(function(id){if(id==='fJenisKertas')return;var e=$(id);if(e&&data.form[id]!==undefined)e.value=data.form[id];});
+    onFinishingChange();updateFieldHarga(G('fJenisKertas'));
+  }
+  if(data.quoteItems){state.quoteItems=data.quoteItems;renderQuoteTable();refreshTotals();var b=$('badge');if(b)b.textContent=state.quoteItems.length;}
+  if(data.quoteForm){QUOTE_FIELDS.forEach(function(id){var e=$(id);if(e&&data.quoteForm[id]!==undefined)e.value=data.quoteForm[id];});genQuoteNo();renderPrintSection();}
+  autoSaveSession();
+}
+function offsetSummary(){
+  var cust=(G('qCustName')||'').trim();
+  var n=(state.quoteItems||[]).length;
+  return (cust||'Tanpa customer')+' · '+n+' item';
+}
+function saveCalcServer(){
+  var def=(G('qCustName')||G('fNama')||'').trim();
+  var name=prompt('Simpan hitungan sebagai (nama):', def||('Hitungan '+new Date().toLocaleDateString('id-ID')));
+  if(name===null)return; name=(name||'').trim(); if(!name){alert('Nama tidak boleh kosong.');return;}
+  var body={tool:'offset',name:name,summary:offsetSummary(),data_json:JSON.stringify(buildOffsetSnapshot())};
+  if(_calcCurrentId&&confirm('Timpa simpanan yang sedang terbuka? (OK = timpa, Cancel = simpan sebagai baru)'))body.id=_calcCurrentId;
+  calcApi('POST','/calc-saves',body).then(function(r){
+    if(!r.ok){alert((r.data&&r.data.error)||'Gagal menyimpan.');return;}
+    _calcCurrentId=r.data.id; showSaveToast('✓ Hitungan tersimpan ke server!');
+  }).catch(function(){alert('Gagal terhubung ke server.');});
+}
+function openCalcRiwayat(){
+  var m=$('calcRiwModal');m.style.display='flex';
+  var list=$('calcRiwList');list.innerHTML='<div style="padding:20px;text-align:center;color:var(--txt2)">Memuat…</div>';
+  calcApi('GET','/calc-saves?tool=offset').then(function(r){
+    if(!r.ok){list.innerHTML='<div style="padding:20px;text-align:center;color:#e05050">Gagal memuat.</div>';return;}
+    renderCalcRiw(r.data||[]);
+  }).catch(function(){list.innerHTML='<div style="padding:20px;text-align:center;color:#e05050">Gagal terhubung ke server.</div>';});
+}
+function closeCalcRiwayat(){$('calcRiwModal').style.display='none';}
+function renderCalcRiw(rows){
+  var list=$('calcRiwList');
+  if(!rows.length){list.innerHTML='<div style="padding:26px;text-align:center;color:var(--txt2)">Belum ada hitungan tersimpan.</div>';return;}
+  list.innerHTML=rows.map(function(x){
+    var d=new Date((x.updated_at||'').replace(' ','T')+'Z');var tgl=isNaN(d.getTime())?(x.updated_at||''):d.toLocaleString('id-ID');
+    return '<div class="calc-riw-row">'+
+      '<div style="min-width:0;flex:1"><div class="crr-name">'+calcEsc(x.name)+'</div>'+
+      '<div class="crr-sub">'+calcEsc(x.summary||'')+' · '+calcEsc(x.cs_name||'-')+' · '+tgl+'</div></div>'+
+      '<div style="display:flex;gap:.4rem;flex-shrink:0">'+
+      '<button class="btn btn-primary btn-sm" onclick="bukaCalc('+x.id+')" style="font-size:.7rem">Buka</button>'+
+      '<button class="btn btn-ghost btn-sm" onclick="hapusCalc('+x.id+')" style="font-size:.7rem;color:#e05050">Hapus</button>'+
+      '</div></div>';
+  }).join('');
+}
+function bukaCalc(id){
+  calcApi('GET','/calc-saves/'+id+'/data').then(function(r){
+    if(!r.ok){alert((r.data&&r.data.error)||'Gagal memuat.');return;}
+    try{applyOffsetSnapshot(JSON.parse(r.data.data_json));}catch(e){alert('Data rusak: '+e.message);return;}
+    _calcCurrentId=id;closeCalcRiwayat();showSaveToast('✓ Hitungan dibuka.');
+  }).catch(function(){alert('Gagal terhubung ke server.');});
+}
+function hapusCalc(id){
+  if(!confirm('Hapus hitungan tersimpan ini?'))return;
+  calcApi('DELETE','/calc-saves/'+id).then(function(r){
+    if(!r.ok){alert((r.data&&r.data.error)||'Gagal hapus.');return;}
+    if(_calcCurrentId===id)_calcCurrentId=null;
+    openCalcRiwayat();
+  });
+}
 </script>
+
+<!-- MODAL RIWAYAT HITUNGAN -->
+<style>
+#calcRiwModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;padding:16px}
+#calcRiwModal .crm-box{background:var(--bg,#15151a);border:1px solid var(--border,#2a2a30);border-radius:14px;width:100%;max-width:560px;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+#calcRiwModal .crm-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border,#2a2a30)}
+#calcRiwModal .crm-head h3{font-size:.95rem;font-weight:700;margin:0}
+#calcRiwModal .crm-x{background:none;border:none;color:var(--txt2,#999);font-size:1.3rem;cursor:pointer;line-height:1}
+#calcRiwList{overflow-y:auto;padding:8px}
+.calc-riw-row{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:9px}
+.calc-riw-row:hover{background:rgba(255,255,255,.04)}
+.crr-name{font-size:.85rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crr-sub{font-size:.68rem;color:var(--txt2,#999);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+</style>
+<div id="calcRiwModal" onclick="if(event.target===this)closeCalcRiwayat()">
+  <div class="crm-box">
+    <div class="crm-head"><h3>🕘 Riwayat Hitungan Tersimpan</h3><button class="crm-x" onclick="closeCalcRiwayat()">×</button></div>
+    <div id="calcRiwList"></div>
+  </div>
+</div>
 </body>
 </html>

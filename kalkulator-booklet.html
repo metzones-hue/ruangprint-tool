@@ -223,6 +223,8 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
   </div>
   <div style="display:flex;gap:.5rem;align-items:center">
     <a href="index.html" style="display:inline-flex;align-items:center;gap:.3rem;padding:.3rem .7rem;font-size:.75rem;font-weight:600;border:1px solid var(--bdr);border-radius:6px;color:var(--txt2);text-decoration:none;background:var(--surf2);transition:all .15s" onmouseover="this.style.borderColor='var(--pri)';this.style.color='var(--txt)'" onmouseout="this.style.borderColor='var(--bdr)';this.style.color='var(--txt2)'">← Beranda</a>
+    <button onclick="saveCalcServer()" title="Simpan hitungan ke server" style="display:inline-flex;align-items:center;gap:.3rem;padding:.3rem .7rem;font-size:.75rem;font-weight:700;border:1px solid var(--pri);border-radius:6px;color:#1C1A14;background:var(--pri);cursor:pointer">💾 Simpan</button>
+    <button onclick="openCalcRiwayat()" title="Buka hitungan tersimpan" style="display:inline-flex;align-items:center;gap:.3rem;padding:.3rem .7rem;font-size:.75rem;font-weight:600;border:1px solid var(--bdr);border-radius:6px;color:var(--txt2);background:var(--surf2);cursor:pointer" onmouseover="this.style.borderColor='var(--pri)';this.style.color='var(--txt)'" onmouseout="this.style.borderColor='var(--bdr)';this.style.color='var(--txt2)'">🕘 Riwayat</button>
     <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
   </div>
 </header>
@@ -1145,6 +1147,104 @@ function printHasil(){
   try{var th=localStorage.getItem('rp_bl3_th');if(th){document.documentElement.setAttribute('data-theme',th);$('themeBtn').textContent=th==='dark'?'☀️':'🌙';}}catch(e){}
   onSpecChange();
 })();
+
+/* ── SIMPAN & RIWAYAT (server) ─────────────────────────────── */
+var CALC_FIELDS=['fNama','fQty','fWaste','fHalaman','fUkuran','fPanjang','fLebar','fKertasIsi','fModeIsi','fKertasCover','fModeCover','fFinCover','fJilid','fPotong','fMargin','fBulat'];
+var _calcCurrentId=null;
+function calcEsc(s){return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function calcApi(method,path,body){
+  var o={method:method,headers:{'Content-Type':'application/json'}};
+  var t=localStorage.getItem('rp_auth_token');if(t)o.headers['Authorization']='Bearer '+t;
+  if(body)o.body=JSON.stringify(body);
+  return fetch('/api'+path,o).then(function(r){
+    return r.json().then(function(d){return {ok:r.ok,status:r.status,data:d};},function(){return {ok:r.ok,status:r.status,data:null};});
+  });
+}
+function buildBookletSnapshot(){
+  var f={};CALC_FIELDS.forEach(function(id){var e=$(id);if(e)f[id]=e.value;});
+  return {v:1,fields:f};
+}
+function applyBookletSnapshot(data){
+  if(!data||!data.fields)return;
+  buildSelects();
+  CALC_FIELDS.forEach(function(id){var e=$(id);if(e&&data.fields[id]!==undefined)e.value=data.fields[id];});
+  buildSelects();
+  CALC_FIELDS.forEach(function(id){var e=$(id);if(e&&data.fields[id]!==undefined)e.value=data.fields[id];});
+  onSpecChange();
+}
+function bookletSummary(){
+  var nm=(G('fNama')||'').trim();
+  return (nm||'Tanpa nama')+' · '+(N('fQty')||0)+' eks · '+(G('fHalaman')||'?')+' hal';
+}
+function saveCalcServer(){
+  var def=(G('fNama')||'').trim();
+  var name=prompt('Simpan hitungan sebagai (nama):', def||('Booklet '+new Date().toLocaleDateString('id-ID')));
+  if(name===null)return; name=(name||'').trim(); if(!name){alert('Nama tidak boleh kosong.');return;}
+  var body={tool:'booklet',name:name,summary:bookletSummary(),data_json:JSON.stringify(buildBookletSnapshot())};
+  if(_calcCurrentId&&confirm('Timpa simpanan yang sedang terbuka? (OK = timpa, Cancel = simpan sebagai baru)'))body.id=_calcCurrentId;
+  calcApi('POST','/calc-saves',body).then(function(r){
+    if(!r.ok){alert((r.data&&r.data.error)||'Gagal menyimpan.');return;}
+    _calcCurrentId=r.data.id; showToast('✓ Hitungan tersimpan ke server!');
+  }).catch(function(){alert('Gagal terhubung ke server.');});
+}
+function openCalcRiwayat(){
+  var m=$('calcRiwModal');m.style.display='flex';
+  var list=$('calcRiwList');list.innerHTML='<div style="padding:20px;text-align:center;color:var(--txt2)">Memuat…</div>';
+  calcApi('GET','/calc-saves?tool=booklet').then(function(r){
+    if(!r.ok){list.innerHTML='<div style="padding:20px;text-align:center;color:#e05050">Gagal memuat.</div>';return;}
+    renderCalcRiw(r.data||[]);
+  }).catch(function(){list.innerHTML='<div style="padding:20px;text-align:center;color:#e05050">Gagal terhubung ke server.</div>';});
+}
+function closeCalcRiwayat(){$('calcRiwModal').style.display='none';}
+function renderCalcRiw(rows){
+  var list=$('calcRiwList');
+  if(!rows.length){list.innerHTML='<div style="padding:26px;text-align:center;color:var(--txt2)">Belum ada hitungan tersimpan.</div>';return;}
+  list.innerHTML=rows.map(function(x){
+    var d=new Date((x.updated_at||'').replace(' ','T')+'Z');var tgl=isNaN(d.getTime())?(x.updated_at||''):d.toLocaleString('id-ID');
+    return '<div class="calc-riw-row">'+
+      '<div style="min-width:0;flex:1"><div class="crr-name">'+calcEsc(x.name)+'</div>'+
+      '<div class="crr-sub">'+calcEsc(x.summary||'')+' · '+calcEsc(x.cs_name||'-')+' · '+tgl+'</div></div>'+
+      '<div style="display:flex;gap:.4rem;flex-shrink:0">'+
+      '<button onclick="bukaCalc('+x.id+')" style="padding:.3rem .7rem;font-size:.72rem;font-weight:700;border:1px solid var(--pri);border-radius:6px;color:#1C1A14;background:var(--pri);cursor:pointer">Buka</button>'+
+      '<button onclick="hapusCalc('+x.id+')" style="padding:.3rem .7rem;font-size:.72rem;border:1px solid var(--bdr);border-radius:6px;color:#e05050;background:transparent;cursor:pointer">Hapus</button>'+
+      '</div></div>';
+  }).join('');
+}
+function bukaCalc(id){
+  calcApi('GET','/calc-saves/'+id+'/data').then(function(r){
+    if(!r.ok){alert((r.data&&r.data.error)||'Gagal memuat.');return;}
+    try{applyBookletSnapshot(JSON.parse(r.data.data_json));}catch(e){alert('Data rusak: '+e.message);return;}
+    _calcCurrentId=id;closeCalcRiwayat();showToast('✓ Hitungan dibuka.');
+  }).catch(function(){alert('Gagal terhubung ke server.');});
+}
+function hapusCalc(id){
+  if(!confirm('Hapus hitungan tersimpan ini?'))return;
+  calcApi('DELETE','/calc-saves/'+id).then(function(r){
+    if(!r.ok){alert((r.data&&r.data.error)||'Gagal hapus.');return;}
+    if(_calcCurrentId===id)_calcCurrentId=null;
+    openCalcRiwayat();
+  });
+}
 </script>
+
+<!-- MODAL RIWAYAT HITUNGAN -->
+<style>
+#calcRiwModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;padding:16px}
+#calcRiwModal .crm-box{background:var(--surf,#15151a);border:1px solid var(--bdr,#2a2a30);border-radius:14px;width:100%;max-width:560px;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+#calcRiwModal .crm-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--bdr,#2a2a30)}
+#calcRiwModal .crm-head h3{font-size:.95rem;font-weight:700;margin:0;color:var(--txt)}
+#calcRiwModal .crm-x{background:none;border:none;color:var(--txt2,#999);font-size:1.3rem;cursor:pointer;line-height:1}
+#calcRiwList{overflow-y:auto;padding:8px}
+.calc-riw-row{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:9px}
+.calc-riw-row:hover{background:rgba(255,255,255,.04)}
+.crr-name{font-size:.85rem;font-weight:700;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crr-sub{font-size:.68rem;color:var(--txt2,#999);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+</style>
+<div id="calcRiwModal" onclick="if(event.target===this)closeCalcRiwayat()">
+  <div class="crm-box">
+    <div class="crm-head"><h3>🕘 Riwayat Hitungan Tersimpan</h3><button class="crm-x" onclick="closeCalcRiwayat()">×</button></div>
+    <div id="calcRiwList"></div>
+  </div>
+</div>
 </body>
 </html>
