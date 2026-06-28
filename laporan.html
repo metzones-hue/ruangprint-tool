@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<link rel="icon" type="image/svg+xml" href="__FAVICON__">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Laporan — RuangPrint</title>
+<script>if(!localStorage.getItem('rp_auth_token'))location.href='index.html';</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:wght@0,400;0,500;0,600&family=JetBrains+Mono:wght@500;700&display=swap');
+:root{--gold:#F5A800;--dark:#131316;--surf-el:#1B1B20;--bg:#0A0A0B;--bg2:#131316;--border:rgba(255,255,255,.09);--muted:#A1A1AA;--text:#FAFAFA;--panel:#131316;--green:#22C55E;--blue:#60A5FA}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit','DM Sans',sans-serif;font-size:13px;background:var(--bg);color:var(--text);min-height:100vh}
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:14px 24px;background:rgba(10,10,11,.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.topbar img{width:34px;height:34px;border-radius:50%;object-fit:cover}
+.topbar h1{font-family:'Outfit';font-size:16px;font-weight:800;letter-spacing:.04em}
+.topbar em{font-size:10px;color:var(--muted);font-style:normal}
+.nav-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.nav-actions a,.nav-actions button{font-size:12px;padding:8px 13px;border-radius:8px;font-weight:600;background:var(--surf-el);border:1px solid var(--border);color:var(--text);text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.nav-actions a:hover,.nav-actions button:hover{border-color:var(--gold)}
+.nav-actions a#adminLink{background:rgba(245,168,0,.14);border-color:rgba(245,168,0,.3);color:var(--gold)}
+.wrap{max-width:1200px;margin:0 auto;padding:22px 24px 60px}
+.filter{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:20px}
+.fc{display:flex;flex-direction:column;gap:5px}
+label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+input,select{border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;font-family:'DM Sans';background:var(--bg);color:var(--text);outline:none;min-height:38px}
+input:focus,select:focus{border-color:var(--gold)}
+.btn{padding:10px 18px;background:var(--gold);color:#18181B;border:none;border-radius:8px;font-size:13px;font-weight:700;font-family:'Outfit';cursor:pointer;min-height:38px}
+.btn.sec{background:var(--surf-el);color:var(--text);border:1px solid var(--border)}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+@media(max-width:780px){.stat-grid{grid-template-columns:1fr 1fr}}
+.stat{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px}
+.stat.gold{background:linear-gradient(135deg,rgba(245,168,0,.14),var(--panel));border-color:rgba(245,168,0,.3)}
+.stat .l{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;margin-bottom:7px}
+.stat .v{font-family:'Outfit';font-size:24px;font-weight:800;line-height:1}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px}
+.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+.panel-head h2{font-family:'Outfit';font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-family:'Outfit';font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:9px 10px;border-bottom:2px solid var(--border);white-space:nowrap}
+th.r,td.r{text-align:right}
+td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:hover td{background:var(--bg)}
+.mono{font-family:'JetBrains Mono';font-variant-numeric:tabular-nums}
+.cab{font-family:'Outfit';font-weight:600;font-size:11px;color:var(--gold)}
+.empty{text-align:center;color:var(--muted);padding:20px;font-size:13px}
+.tbl-wrap{overflow-x:auto}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:18px}
+.tab{padding:10px 16px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.page{display:none}.page.active{display:block}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <img id="hdrLogo" alt="ruangprint">
+  <div style="display:flex;flex-direction:column;line-height:1.15"><h1>RUANGPRINT</h1><em>LAPORAN</em></div>
+  <div class="nav-actions">
+    <a href="index.html">← Beranda</a>
+    <a id="adminLink" href="admin.html" style="display:none">⚙ Admin</a>
+    <button onclick="doLogout()">⇥ Keluar</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="filter">
+    <div class="fc" id="cabFilterWrap" style="display:none"><label>Cabang</label>
+      <select id="f_cabang"><option value="semua">Semua Cabang</option></select>
+    </div>
+    <div class="fc"><label>Dari Tanggal</label><input type="date" id="f_from"></div>
+    <div class="fc"><label>Sampai Tanggal</label><input type="date" id="f_to"></div>
+    <button class="btn" onclick="loadReport()">Terapkan</button>
+    <span id="scopeInfo" style="font-size:11px;color:var(--muted);margin-left:auto;align-self:center"></span>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat gold"><div class="l">Jumlah Quotation</div><div class="v" id="s_qcount">0</div></div>
+    <div class="stat"><div class="l">Total Nilai Quotation</div><div class="v" id="s_qvalue">Rp 0</div></div>
+    <div class="stat"><div class="l">Jumlah Surat Jalan</div><div class="v" id="s_scount">0</div></div>
+    <div class="stat"><div class="l">Periode</div><div class="v" id="s_period" style="font-size:15px">Semua</div></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" id="tab-quot" onclick="showTab('quot')">📄 Quotation</div>
+    <div class="tab" id="tab-sj" onclick="showTab('sj')">🚚 Surat Jalan</div>
+  </div>
+
+  <div class="page active" id="page-quot">
+    <div class="panel">
+      <div class="panel-head"><h2>📄 Daftar Quotation</h2><button class="btn sec" onclick="exportCSV('quot')">⬇ Export CSV</button></div>
+      <div class="tbl-wrap"><table><thead><tr>
+        <th>No. Quotation</th><th>Tanggal</th><th>Cabang</th><th>CS</th><th>Customer</th><th class="r">Nilai</th>
+      </tr></thead><tbody id="quotBody"></tbody></table></div>
+      <div class="empty" id="quotEmpty" style="display:none">Tidak ada data.</div>
+    </div>
+  </div>
+
+  <div class="page" id="page-sj">
+    <div class="panel">
+      <div class="panel-head"><h2>🚚 Daftar Surat Jalan</h2><button class="btn sec" onclick="exportCSV('sj')">⬇ Export CSV</button></div>
+      <div class="tbl-wrap"><table><thead><tr>
+        <th>No. Surat Jalan</th><th>Tanggal</th><th>Cabang</th><th>Petugas</th><th>Customer</th><th>Ref</th>
+      </tr></thead><tbody id="sjBody"></tbody></table></div>
+      <div class="empty" id="sjEmpty" style="display:none">Tidak ada data.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API='/api', LOGO='__LOGO__';
+let _tok=localStorage.getItem('rp_auth_token')||'';
+let _isAdmin=false, _quot=[], _sj=[];
+document.getElementById('hdrLogo').src=LOGO;
+
+async function api(method,path){
+  const o={method,headers:{'Content-Type':'application/json'}};
+  if(_tok)o.headers['Authorization']='Bearer '+_tok;
+  const r=await fetch(API+path,o);let d=null;try{d=await r.json();}catch(e){}
+  return{ok:r.ok,status:r.status,data:d};
+}
+function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function rp(n){return 'Rp '+(Number(n)||0).toLocaleString('id-ID');}
+function doLogout(){localStorage.removeItem('rp_auth_token');location.href='index.html';}
+function showTab(t){
+  ['quot','sj'].forEach(x=>{document.getElementById('page-'+x).classList.toggle('active',x===t);document.getElementById('tab-'+x).classList.toggle('active',x===t);});
+}
+
+function qs(){
+  const p=new URLSearchParams();
+  const from=document.getElementById('f_from').value, to=document.getElementById('f_to').value;
+  if(_isAdmin){const cab=document.getElementById('f_cabang').value;if(cab&&cab!=='semua')p.set('cabang',cab);}
+  if(from)p.set('from',from);
+  if(to)p.set('to',to);
+  const s=p.toString();return s?'?'+s:'';
+}
+async function loadReport(){
+  const query=qs();
+  const [rq,rs]=await Promise.all([api('GET','/quotations'+query),api('GET','/delivery-notes'+query)]);
+  _quot=rq.ok?rq.data:[];
+  _sj=rs.ok?rs.data:[];
+  // summary
+  const qval=_quot.reduce((a,x)=>a+(x.grand_total||0),0);
+  document.getElementById('s_qcount').textContent=_quot.length;
+  document.getElementById('s_qvalue').textContent=rp(qval);
+  document.getElementById('s_scount').textContent=_sj.length;
+  const from=document.getElementById('f_from').value, to=document.getElementById('f_to').value;
+  document.getElementById('s_period').textContent=(from||to)?((from||'…')+' s/d '+(to||'…')):'Semua';
+  // quotation table
+  const qb=document.getElementById('quotBody');
+  document.getElementById('quotEmpty').style.display=_quot.length?'none':'block';
+  qb.innerHTML=_quot.map(x=>`<tr>
+    <td><b>${esc(x.no_quotation)||'-'}</b></td><td>${esc((x.tanggal||x.created_at||'').slice(0,10))}</td>
+    <td><span class="cab">${esc(x.cabang)}</span></td><td>${esc(x.cs_name)}</td><td>${esc(x.customer)}</td>
+    <td class="r mono">${rp(x.grand_total)}</td></tr>`).join('');
+  // surat jalan table
+  const sb=document.getElementById('sjBody');
+  document.getElementById('sjEmpty').style.display=_sj.length?'none':'block';
+  sb.innerHTML=_sj.map(x=>`<tr>
+    <td><b>${esc(x.no_sj)||'-'}</b></td><td>${esc((x.tanggal||x.created_at||'').slice(0,10))}</td>
+    <td><span class="cab">${esc(x.cabang)}</span></td><td>${esc(x.cs_name)}</td><td>${esc(x.customer)}</td>
+    <td>${esc(x.ref_quotation)||'-'}</td></tr>`).join('');
+}
+function exportCSV(which){
+  let head,rows,name;
+  if(which==='quot'){
+    if(!_quot.length){alert('Tidak ada data quotation.');return;}
+    head=['No. Quotation','Tanggal','Cabang','CS','Customer','Nilai'];
+    rows=_quot.map(x=>[x.no_quotation,(x.tanggal||'').slice(0,10),x.cabang,x.cs_name,'"'+(x.customer||'').replace(/"/g,'""')+'"',x.grand_total]);
+    name='laporan-quotation';
+  }else{
+    if(!_sj.length){alert('Tidak ada data surat jalan.');return;}
+    head=['No. Surat Jalan','Tanggal','Cabang','Petugas','Customer','Ref'];
+    rows=_sj.map(x=>[x.no_sj,(x.tanggal||'').slice(0,10),x.cabang,x.cs_name,'"'+(x.customer||'').replace(/"/g,'""')+'"',x.ref_quotation]);
+    name='laporan-surat-jalan';
+  }
+  const csv=[head.join(',')].concat(rows.map(r=>r.join(','))).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=name+'-'+(document.getElementById('f_from').value||'semua')+'.csv';a.click();
+}
+
+async function init(){
+  const r=await api('GET','/auth/me');
+  if(!r.ok){localStorage.removeItem('rp_auth_token');location.href='index.html';return;}
+  const u=r.data;_isAdmin=u.role==='superadmin';
+  if(_isAdmin){
+    document.getElementById('adminLink').style.display='inline-flex';
+    document.getElementById('cabFilterWrap').style.display='flex';
+    document.getElementById('scopeInfo').textContent='Mode superadmin — semua cabang';
+    const ru=await api('GET','/admin/users');
+    if(ru.ok){
+      const sel=document.getElementById('f_cabang');
+      sel.insertAdjacentHTML('beforeend', ru.data.filter(x=>x.role!=='superadmin').map(x=>`<option value="${esc(x.cabang)}">${esc(x.name)} (${esc(x.cabang)})</option>`).join(''));
+    }
+  }else{
+    document.getElementById('scopeInfo').textContent='Cabang: '+(u.cabang||'-');
+  }
+  loadReport();
+}
+init();
+</script>
+</body>
+</html>
