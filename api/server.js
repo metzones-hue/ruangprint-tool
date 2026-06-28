@@ -57,6 +57,18 @@ db.exec(`
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+  CREATE TABLE IF NOT EXISTS delivery_notes (
+    id            INTEGER PRIMARY KEY,
+    no_sj         TEXT,
+    cabang        TEXT    DEFAULT '-',
+    cs_name       TEXT    DEFAULT '-',
+    customer      TEXT,
+    tanggal       TEXT,
+    ref_quotation TEXT    DEFAULT '',
+    data_json     TEXT,
+    created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
 `);
 
 // Migrasi kolom untuk DB lama
@@ -285,6 +297,69 @@ app.delete('/api/quotations', auth, (req, res) => {
     else db.prepare('DELETE FROM quotations').run();
   } else {
     db.prepare('DELETE FROM quotations WHERE cabang=?').run(req.user.cabang);
+  }
+  res.json({ ok: true });
+});
+
+// ── SURAT JALAN (delivery notes) — pola sama dgn quotations ───
+app.get('/api/delivery-notes', auth, (req, res) => {
+  const { cabang, from, to } = req.query;
+  const conds = [];
+  const params = [];
+  if (isAdmin(req.user)) {
+    if (cabang && cabang !== 'semua') { conds.push('cabang=?'); params.push(cabang); }
+  } else {
+    conds.push('cabang=?'); params.push(req.user.cabang);
+  }
+  if (from) { conds.push('tanggal>=?'); params.push(from); }
+  if (to)   { conds.push('tanggal<=?'); params.push(to); }
+  const where = conds.length ? 'WHERE ' + conds.join(' AND ') : '';
+  const rows = db.prepare(`
+    SELECT id,no_sj,cabang,cs_name,customer,tanggal,ref_quotation,created_at
+    FROM delivery_notes ${where} ORDER BY created_at DESC LIMIT 1000
+  `).all(...params);
+  res.json(rows);
+});
+
+app.post('/api/delivery-notes', auth, (req, res) => {
+  const e = req.body;
+  const cabang  = isAdmin(req.user) ? (e.cabang || '-') : req.user.cabang;
+  const cs_name = isAdmin(req.user) ? (e.cs_name || '-') : (e.cs_name || req.user.name || '-');
+  db.prepare(`
+    INSERT INTO delivery_notes (id,no_sj,cabang,cs_name,customer,tanggal,ref_quotation,data_json,updated_at)
+    VALUES (@id,@no_sj,@cabang,@cs_name,@customer,@tanggal,@ref_quotation,@data_json,CURRENT_TIMESTAMP)
+    ON CONFLICT(id) DO UPDATE SET
+      no_sj=excluded.no_sj, cabang=excluded.cabang, cs_name=excluded.cs_name,
+      customer=excluded.customer, tanggal=excluded.tanggal, ref_quotation=excluded.ref_quotation,
+      data_json=excluded.data_json, updated_at=CURRENT_TIMESTAMP
+  `).run({
+    id: e.id, no_sj: e.no_sj, cabang, cs_name,
+    customer: e.customer, tanggal: e.tanggal,
+    ref_quotation: e.ref_quotation || '', data_json: e.data_json
+  });
+  res.json({ ok: true });
+});
+
+app.get('/api/delivery-notes/:id/data', auth, (req, res) => {
+  const row = db.prepare('SELECT cabang, data_json FROM delivery_notes WHERE id=?').get(req.params.id);
+  if (!canAccess(req.user, row)) return res.status(404).json({ error: 'Tidak ditemukan.' });
+  res.json({ data_json: row.data_json });
+});
+
+app.delete('/api/delivery-notes/:id', auth, (req, res) => {
+  const row = db.prepare('SELECT cabang FROM delivery_notes WHERE id=?').get(req.params.id);
+  if (!canAccess(req.user, row)) return res.status(404).json({ error: 'Tidak ditemukan.' });
+  db.prepare('DELETE FROM delivery_notes WHERE id=?').run(req.params.id);
+  res.json({ ok: true });
+});
+
+app.delete('/api/delivery-notes', auth, (req, res) => {
+  if (isAdmin(req.user)) {
+    const { cabang } = req.query;
+    if (cabang && cabang !== 'semua') db.prepare('DELETE FROM delivery_notes WHERE cabang=?').run(cabang);
+    else db.prepare('DELETE FROM delivery_notes').run();
+  } else {
+    db.prepare('DELETE FROM delivery_notes WHERE cabang=?').run(req.user.cabang);
   }
   res.json({ ok: true });
 });
