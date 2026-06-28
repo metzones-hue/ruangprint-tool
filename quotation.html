@@ -268,6 +268,9 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 .brand-bar .cs-field,#cs_cabang{font-size:12.5px!important;padding:8px 11px!important;min-height:38px;border-radius:8px!important}
 .brand-bar h1{font-size:16px!important}
 .brand-bar #brandUserEmail{font-size:11px!important}
+.cs-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 20px;border-bottom:1px solid var(--border);background:var(--panel)}
+.brand-bar a,.brand-bar button{background:var(--surf-el)!important;border:1px solid var(--border)!important;color:var(--text)!important;text-decoration:none}
+.brand-bar a#adminLink{background:rgba(245,168,0,.14)!important;border-color:rgba(245,168,0,.3)!important;color:var(--gold)!important}
 </style>
 </head>
 <body>
@@ -299,27 +302,31 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 
 <!-- LEFT -->
 <div class="left">
-  <div class="brand-bar" style="gap:8px;flex-wrap:wrap;">
-    <img id="brandLogo" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0">
-    <h1>RUANGPRINT</h1>
-    <em>QUOTATION MAKER</em>
-    <span id="brandUserEmail" style="font-size:9px;color:#555;margin-left:4px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-style:normal"></span>
-    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-      <a href="index.html" style="padding:3px 9px;background:rgba(255,255,255,.06);border:1px solid #3a3a3a;border-radius:4px;color:#888;font-size:10px;text-decoration:none;font-family:'DM Sans',sans-serif">← Beranda</a>
-      <a id="adminLink" href="admin.html" style="display:none;padding:3px 9px;background:rgba(245,168,0,.12);border:1px solid rgba(245,168,0,.3);border-radius:4px;color:var(--gold);font-size:10px;text-decoration:none;font-family:'DM Sans',sans-serif">⚙ Admin</a>
-      <button onclick="doLogout()" style="padding:3px 9px;background:none;border:1px solid #3a3a3a;border-radius:4px;color:#666;font-size:10px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s" onmouseover="this.style.color='#e05050';this.style.borderColor='#e05050'" onmouseout="this.style.color='#666';this.style.borderColor='#3a3a3a'">⇥ Keluar</button>
-      <span class="cs-label">Cabang:</span>
-      <select id="cs_cabang" class="cs-field" onchange="saveCabangPref()">
-        <option value="HO">Head Office</option>
-        <option value="DMB">Daan Mogot</option>
-        <option value="CTR">Citra Raya</option>
-        <option value="GDS">Gading Serpong</option>
-        <option value="CGK">Cengkareng</option>
-        <option value="BKS">Bekasi</option>
-      </select>
-      <span class="cs-label">Nama CS:</span>
-      <input id="cs_name" class="cs-field" type="text" placeholder="Nama kamu..." style="width:110px;" onchange="saveCabangPref()">
+  <div class="brand-bar" style="gap:10px;">
+    <img id="brandLogo" style="width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0">
+    <div style="display:flex;flex-direction:column;line-height:1.15;min-width:0">
+      <h1 style="margin:0">RUANGPRINT</h1>
+      <em style="margin:0;font-size:10px;color:var(--muted)">QUOTATION MAKER</em>
     </div>
+    <span id="brandUserEmail" style="font-size:10px;color:var(--muted);margin-left:8px;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-style:normal"></span>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <a href="index.html">← Beranda</a>
+      <a id="adminLink" href="admin.html" style="display:none">⚙ Admin</a>
+      <button onclick="doLogout()" onmouseover="this.style.color='#e05050';this.style.borderColor='#e05050'" onmouseout="this.style.color='';this.style.borderColor=''">⇥ Keluar</button>
+    </div>
+  </div>
+  <div class="cs-bar">
+    <span class="cs-label">Cabang:</span>
+    <select id="cs_cabang" class="cs-field" onchange="saveCabangPref()">
+      <option value="HO">Head Office</option>
+      <option value="DMB">Daan Mogot</option>
+      <option value="CTR">Citra Raya</option>
+      <option value="GDS">Gading Serpong</option>
+      <option value="CGK">Cengkareng</option>
+      <option value="BKS">Bekasi</option>
+    </select>
+    <span class="cs-label">Nama CS:</span>
+    <input id="cs_name" class="cs-field" type="text" placeholder="Nama kamu..." style="width:150px;" onchange="saveCabangPref()">
   </div>
   <div class="tabs">
     <div class="tab active" onclick="switchTab('info')">Info</div>
