@@ -94,6 +94,9 @@ input:focus,select:focus{border-color:var(--gold);background:#232329}
 .stat{transition:border-color .2s,box-shadow .2s}
 .stat:hover,.panel:hover{border-color:rgba(255,255,255,.14)}
 .main{background:var(--bg)}
+/* autofill fix */
+input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,select:-webkit-autofill{-webkit-text-fill-color:var(--text)!important;-webkit-box-shadow:0 0 0 1000px #232329 inset!important;caret-color:var(--text);transition:background-color 9999s ease 0s}
+.lbox input:-webkit-autofill,.lbox input:-webkit-autofill:focus{-webkit-text-fill-color:#fff!important;-webkit-box-shadow:0 0 0 1000px #111 inset!important}
 </style>
 </head>
 <body>
