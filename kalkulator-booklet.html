@@ -1067,8 +1067,8 @@ function printHasil(){
   var css=
     '*{box-sizing:border-box;margin:0;padding:0}'+
     'body{font-family:"Plus Jakarta Sans",Arial,sans-serif;background:#fff;color:#1C1A14;font-size:12px;padding:20px 28px}'+
-    '.logo{display:inline-flex;align-items:center;gap:6px;background:#FFBF00;border-radius:99px;padding:3px 10px 3px 7px;margin-bottom:10px}'+
-    '.logo span{font-size:.72rem;font-weight:800;color:#1C1A14}'+
+    '.logo{display:inline-flex;align-items:center;margin-bottom:10px}'+
+    '.logo img{width:46px;height:46px;object-fit:contain}'+
     'h1{font-size:1rem;font-weight:800;margin-bottom:2px}'+
     '.sub{font-size:.7rem;color:#6B6557;margin-bottom:16px;border-bottom:1px solid #E2DDD4;padding-bottom:10px}'+
     '.cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:14px}'+
@@ -1119,7 +1119,7 @@ function printHasil(){
   var body=
     '<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">'+
     '<style>'+css+'</style>'+
-    '<div class="logo"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="13" rx="2" fill="#1C1A14"/><rect x="5" y="6" width="14" height="2" rx="1" fill="#FFBF00"/><rect x="5" y="9" width="10" height="1.5" rx=".75" fill="#FFBF00" opacity=".6"/></svg><span>Ruangprint</span></div>'+
+    '<div class="logo"><img src="'+(document.querySelector(".hdr-brand img")?document.querySelector(".hdr-brand img").src:"")+'" alt="Ruangprint"></div>'+
     '<h1>Kalkulator Booklet A3+</h1>'+
     '<div class="sub">Dicetak: '+new Date().toLocaleString('id-ID')+'</div>'+
     '<div class="cols">'+
