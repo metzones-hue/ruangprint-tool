@@ -458,6 +458,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
     <input type="file" id="loadInp" accept=".json" style="display:none" onchange="loadJSON(this)">
     <button class="btool" id="btnHist" onclick="toggleHistory()">🕘 Riwayat</button>
     <button class="btool baru" onclick="newQuotation()">✦ Baru</button>
+    <button class="btool" onclick="toSuratJalan()" title="Buat surat jalan dari quotation ini" style="color:#5fd38a;border-color:rgba(34,197,94,.4)">🚚 Surat Jalan</button>
     <span class="thint">Ctrl+P → Save as PDF · A4</span>
     <div class="nav-actions">
       <a href="index.html">← Beranda</a>
@@ -1099,6 +1100,20 @@ async function clearHistory(){
 }
 
 // ── Duplikat quotation aktif ──
+function toSuratJalan(){
+  const gv=id=>{const e=document.getElementById(id);return e?e.value:'';};
+  const sjItems=(items||[]).map(it=>({
+    nama: it.nama||'',
+    spec: [it.ukuran,it.bahan,it.cetak,it.finishing,it.custom].filter(Boolean).join(' \u00b7 '),
+    qty: it.qty||1, satuan:'pcs', harga: it.harga||0
+  }));
+  const payload={
+    customer: gv('cust_name'), pic: gv('cust_pic'), telp: gv('cust_phone'),
+    alamat: gv('cust_addr'), ref: gv('q_no'), items: sjItems
+  };
+  try{ localStorage.setItem('rp_sj_handoff', JSON.stringify(payload)); }catch(e){}
+  location.href='surat-jalan.html';
+}
 function dupQuotation(){
   const d=JSON.parse(JSON.stringify(getSnap()));
   d.quot.no=String(nextNo());
