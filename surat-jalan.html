@@ -84,7 +84,7 @@ input[readonly]{color:var(--muted);background:var(--surf-el)}
 .hempty{font-size:11px;color:var(--muted);text-align:center;padding:12px}
 
 /* PAPER (PDF) */
-.paper{width:794px;min-height:1123px;background:#fff;color:#1a1a1a;padding:36px 42px;font-size:11px;font-family:'DM Sans',Arial,sans-serif;box-shadow:0 8px 40px rgba(0,0,0,.4);border-radius:2px}
+.paper{width:210mm;min-height:148mm;background:#fff;color:#1a1a1a;padding:10mm 12mm;font-size:11px;font-family:'DM Sans',Arial,sans-serif;box-shadow:0 8px 40px rgba(0,0,0,.4);border-radius:2px}
 .p-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2.5px solid var(--gold);padding-bottom:12px;margin-bottom:16px}
 .p-brand{display:flex;gap:12px;align-items:center}
 .p-brand img{width:54px;height:54px;border-radius:50%;object-fit:cover}
@@ -118,8 +118,8 @@ input[readonly]{color:var(--muted);background:var(--surf-el)}
   body *{visibility:hidden}
   .rscroll,.rscroll *{visibility:visible}
   .rscroll{position:absolute;left:0;top:0;padding:0;display:block}
-  .paper{box-shadow:none;border-radius:0;width:100%;min-height:auto;padding:10mm}
-  @page{size:A4;margin:0}
+  .paper{box-shadow:none;border-radius:0;width:100%;min-height:auto;padding:8mm 10mm}
+  @page{size:A5 landscape;margin:0}
 }
 #toast{position:fixed;bottom:22px;right:22px;background:var(--dark);color:#fff;padding:11px 18px;border-radius:8px;font-size:12px;opacity:0;transition:opacity .3s;pointer-events:none;border-left:3px solid var(--gold);z-index:9999}
 #toast.show{opacity:1}
