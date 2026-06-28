@@ -1,161 +1,282 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="dark">
 <head>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjU1NSAxMTAgOTQ2IDEzNjgiIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiI+PHBhdGggZmlsbD0icmdiKDE5Nyw2Nyw1MykiIGQ9Ik0gMTAyMC4zMyAxMzMuMjE5IEMgMTA0OS44NiAxMjkuNzc4IDEwNjAuOTMgMTQzLjU3NCAxMDgwLjM0IDE2Mi4xNzMgTCAxMTE4LjY0IDE5OC44OTkgTCAxMTU4LjM4IDIzNi41NjQgQyAxMTcwLjQ0IDI0Ny45ODYgMTE4Ni40NyAyNjAuMDIzIDExOTAuMTcgMjc2LjQ1MSBDIDExOTIuNSAyODYuODEyIDExOTAuMzIgMzAwLjkyMiAxMTgzLjYgMzA5LjI3OCBDIDExNjMuODYgMzMyLjA1OSAxMTM4LjMzIDM1My44NTYgMTExNS4yNyAzNzMuNTA2IEMgMTA5My42NiAzOTEuOTE1IDEwNjMuNDggNDI1LjI1IDEwMzYuMjIgNDMwLjg0NyBDIDEwMjUuMTcgNDMxLjk3MiAxMDEwLjAxIDQzMC4yMjggMTAwMC45NyA0MjMuNTkyIEMgOTc3Ljg1OSA0MDYuNjI4IDk1NS4wOTcgMzg1LjUzNiA5MzMuNCAzNjYuNTM2IEMgOTEzLjc5NyAzNDkuMzY5IDg5Mi42MDQgMzMxLjMxNSA4NzQuODE0IDMxMi41MjQgQyA4NzAuMjg0IDMwNy4wNjcgODY3LjU3IDMwMC4zMiA4NjYuMDA4IDI5My42IEMgODU5Ljg2NCAyNjcuMTcgODgzLjk4NCAyNTAuMDA0IDkwMSAyMzMuOTQyIEwgOTQyLjg4NSAxOTQuMjcgTCA5NzYuNTQ1IDE2Mi4wODggQyA5OTEuODMgMTQ3LjM4NCA5OTguNjk5IDEzNy40NDMgMTAyMC4zMyAxMzMuMjE5IHoiLz48cGF0aCBmaWxsPSJyZ2IoMjQwLDIwMiw3NykiIGQ9Ik0gMTAxOS43NyAxMTU5LjE3IEMgMTAzMS42NiAxMTU4LjI4IDEwNDMuMDQgMTE1OS4wNiAxMDUzLjczIDExNjQuODcgQyAxMDY5LjE4IDExNzMuMjcgMTE2NS43MiAxMjU4Ljc3IDExODAuNTYgMTI3NS45OSBDIDExODQuODcgMTI4MC45IDExODguMDcgMTI4Ni42OSAxMTg5Ljk0IDEyOTIuOTYgQyAxMTkyLjg1IDEzMDMuMTkgMTE5MS41NSAxMzE0LjE3IDExODYuMzIgMTMyMy40MyBDIDExNzMuNTkgMTM0NS44MyAxMTI3LjY5IDEzNzkuMzIgMTEwOC45NiAxNDAwLjE5IEMgMTA5NS42OCAxNDE0Ljk5IDEwNzYuNzUgMTQzMS4xNCAxMDYyLjE3IDE0NDQuODkgQyAxMDU2LjA0IDE0NTAuNjggMTA0NS4zNCAxNDU0LjQ5IDEwMzcuMjMgMTQ1Ni44IEMgMTAyNS4zNiAxNDU3LjkxIDEwMTMuNzEgMTQ1Ni42MyAxMDAzLjE0IDE0NTAuNzUgQyA5OTQuNjkzIDE0NDYuMDUgODg2Ljc3MyAxMzQzLjUyIDg3Ni4zOTggMTMzMS42OSBDIDg3Mi4xMTQgMTMyNi44MSA4NjguODc3IDEzMjEuMzYgODY3LjEzOSAxMzE1LjA2IEMgODY0LjI3NCAxMzA0LjYgODY1Ljc2NyAxMjkzLjQzIDg3MS4yNzcgMTI4NC4xIEMgODg0LjAzMSAxMjYyLjEyIDkyNi42NDYgMTIzMS45MiA5NDUuODc2IDEyMTIuNTIgQyA5NjAuMDk5IDExOTguMTcgOTgwLjM5NiAxMTgzLjA4IDk5NS44MjcgMTE2OS43NCBDIDEwMDEuNjggMTE2NC42OCAxMDEyLjI2IDExNjEuMTEgMTAxOS43NyAxMTU5LjE3IHoiLz48cGF0aCBmaWxsPSJyZ2IoMjE4LDEzOSw2NikiIGQ9Ik0gMTE5Ni4zOSAxMDIwLjMgQyAxMjE2LjExIDEwMTguOTEgMTIyNy40IDEwMjIuODYgMTI0My4yMSAxMDM0LjkxIEMgMTI3Ny45OCAxMDYxLjM4IDEzMTEuMzEgMTA5MC4xMyAxMzQ0LjIgMTExOC44MiBDIDEzNjQuMSAxMTM2LjE2IDEzNzUuMjQgMTE1Ny42NyAxMzUxLjQ1IDExNzcuOCBDIDEzMjYuNTUgMTE5OS41IDEzMDEuMjcgMTIyMC44MSAxMjc3LjE1IDEyNDMuMzkgQyAxMjYzLjA3IDEyNTYuNTggMTI1Ny4wNCAxMjYyLjkyIDEyMzguMTEgMTI2Ny4xMSBDIDEyMDUuNzkgMTI2Ny42NyAxMTk0LjM4IDEyNTEuNTcgMTE3MS44MiAxMjMxLjMgQyAxMTU3LjUyIDEyMTguNDcgMTE0My4xNCAxMjA1Ljc0IDExMjguNjcgMTE5My4xMSBDIDExMTUuNzIgMTE4MS43MyAxMDg2LjQ3IDExNTguMjIgMTA3Ni42MiAxMTQ3LjM3IEMgMTA3Mi42NyAxMTQzLjA5IDEwNjkuOSAxMTM3Ljg2IDEwNjguNTkgMTEzMi4xOSBDIDEwNjYuNjIgMTEyNC4wNiAxMDY3Ljc5IDExMTYuNDkgMTA3Mi4zIDExMDkuNDQgQyAxMDgxLjgyIDEwOTQuNTMgMTE2MC4xOCAxMDM4LjIzIDExODAuMjIgMTAyNi43NyBDIDExODUuNTcgMTAyMy43MSAxMTkwLjM5IDEwMjEuNjggMTE5Ni4zOSAxMDIwLjMgeiIvPjxwYXRoIGZpbGw9InJnYigyMTgsMTM5LDY2KSIgZD0iTSA4NTIuNTUgMTAyMC40IEMgODYxLjM3NSAxMDIwLjIzIDg2Ny40ODUgMTAyMS42OSA4NzUuMTU0IDEwMjYuMjkgQyA4OTQuMjM5IDEwMzguMyA5MTUuMDY3IDEwNTIuNTEgOTMyLjc3NyAxMDY2LjM3IEMgOTQ3LjM0MyAxMDc3Ljc2IDk4My4wODYgMTA5OS41OCA5ODcuODcgMTExNi44NyBDIDk5MC4xNTggMTEyNS4wNCA5ODkuMDI3IDExMzMuNzkgOTg0LjczOSAxMTQxLjEgQyA5NzcuOTczIDExNTIuNjYgOTYxLjA1NCAxMTY0LjkgOTUwLjUxOSAxMTczLjk2IEwgOTA1LjkyMyAxMjEyLjg5IEMgODg4Ljk2NiAxMjI3LjgzIDg3MS43MDEgMTI0NC42NSA4NTQuMDA5IDEyNTguNDIgQyA4NDguNzA4IDEyNjIuNTQgODM3LjY2MiAxMjY1LjQ3IDgzMS4yNDUgMTI2Ny4xMSBDIDgxOS4yMDIgMTI2Ny42OCA4MDYuMzYzIDEyNjYuNyA3OTYuOTQ1IDEyNTguMjcgQyA3NjMuODkgMTIyOC42OCA3MjkuMzMzIDEyMDAgNjk3LjE5MyAxMTY5LjUxIEMgNjg3LjI5MiAxMTYwLjEyIDY5Mi43NzcgMTEzOC40MyA3MDIuMDI2IDExMjkuODIgQyA3NDAuOTE3IDEwOTMuNjMgNzgyLjU4MiAxMDU3LjMyIDgyNi4wMTQgMTAyNi42OSBDIDgzMS44OTUgMTAyMi41NSA4NDUuNjM1IDEwMjAuOTggODUyLjU1IDEwMjAuNCB6Ii8+PHBhdGggZmlsbD0icmdiKDE1Niw2NywxMTgpIiBkPSJNIDEyMzEuMDcgMzIyLjM3MyBDIDEyNDAuOTQgMzIyLjUgMTI1MS44MyAzMjQuNDIgMTI1OS40NSAzMzEuMTU4IEMgMTI5Mi44IDM2MC42MzQgMTMyNi45MyAzODkuNzE5IDEzNTkuNTQgNDE5Ljk1MyBDIDEzNjIuMzggNDIyLjU4MyAxMzY0LjM4IDQyOC4xMjkgMTM2NC43NiA0MzEuOTMzIEMgMTM2Ni40MiA0NDguNjE1IDEzNTQuODIgNDYxLjE3IDEzNDMuMjIgNDcxLjQxNCBDIDEzMTYuOTcgNDk0LjU5NCAxMjkwLjUzIDUxNi45NzYgMTI2My4zMyA1MzguOTExIEMgMTI0Mi4zMiA1NTUuODU0IDEyMzEuMzcgNTY3LjY0NSAxMjAzLjM2IDU2OS44OTMgQyAxMTkwLjc4IDU2OC42NzggMTE4Mi45IDU2NS42OCAxMTcyLjQgNTU4LjAxNSBDIDExNDAuOCA1MzQuOTU2IDExMDYuNzIgNTEyLjcxMiAxMDc3LjQ4IDQ4Ni44OTMgQyAxMDYzLjY4IDQ3NC43MDggMTA2NS4zMSA0NTMuMzIxIDEwNzcuODEgNDQxLjEyNyBDIDEwODUuMzEgNDMzLjgxNiAxMDkzLjE5IDQyNy4wMDggMTEwMS40MyA0MTkuOTg3IEMgMTExMy45NyA0MDkuMzc0IDExMjYuNDEgMzk4LjY0NSAxMTM4Ljc1IDM4Ny44MDIgQyAxMTUyLjAzIDM3Ni4xMDkgMTE2NS4yMyAzNjQuMzExIDExNzguMzMgMzUyLjQxIEMgMTE5Ny4xMyAzMzUuNDIyIDEyMDQuNjYgMzI1LjE4NiAxMjMxLjA3IDMyMi4zNzMgeiIvPjxwYXRoIGZpbGw9InJnYigxNTYsNjcsMTE4KSIgZD0iTSA4MTcuMTA4IDMyMy4yMTIgQyA4MjUuNTI1IDMyMi4yMjggODQxLjk3MiAzMjMuNjExIDg0OC44OTggMzI4LjY3NyBDIDg4Mi42NDggMzUzLjM2MSA5MTIuMjQzIDM4NC43OSA5NDQuOTE3IDQxMS4yMjYgQyA5NTUuMjk0IDQxOS42MjIgOTY5LjU0MyA0MzEuMTc5IDk3OC43NTMgNDQwLjYzNSBDIDk4Mi42OSA0NDQuNjgyIDk4NS42NjMgNDQ5LjU2NSA5ODcuNDUgNDU0LjkyMSBDIDk4OS45OTIgNDYyLjY1NSA5ODkuNjc0IDQ3MC43NiA5ODUuODYyIDQ3Ny45OTUgQyA5ODMuODc3IDQ4MS43NjMgOTc4Ljc4MyA0ODguMTkxIDk3NS42ODIgNDkwLjU2NCBDIDk1NC41OTYgNTA2LjY5OSA4ODUuMzc5IDU2MS45NzggODY0LjMwMiA1NjguNyBDIDgzNC4xODQgNTc1LjMyNCA4MTMuNTQxIDU1NS4zOTQgNzkyLjE3NyA1MzguMDU2IEMgNzc2LjU3NiA1MjUuNDMxIDc2MS4xMzkgNTEyLjYwNCA3NDUuODcyIDQ5OS41NzggQyA3MzEuNzk4IDQ4Ny41ODYgNzE2LjYyIDQ3NS4yMjIgNzAzLjc2MyA0NjIuMDg1IEMgNjk2LjIzNiA0NTQuMzk0IDY4OS4wNTIgNDM5Ljk5NCA2OTIuNjY2IDQyOS4zMzUgQyA2OTQuNDMyIDQyNC4xMjcgNjk5LjU0IDQxNy4zNTkgNzAzLjY4NiA0MTMuNjgzIEMgNzI3LjU5OCAzOTIuNDg0IDc1Mi4yMzQgMzcyLjE2NyA3NzUuNTM4IDM1MC4yNjkgQyA3ODIuNTczIDM0My42NTkgNzg5LjkzMSAzMzYuODc4IDc5Ny43MjIgMzMxLjIwNSBDIDgwNC4zNSAzMjYuMzY1IDgwOS4yMDMgMzI0LjkyOCA4MTcuMTA4IDMyMy4yMTIgeiIvPjxwYXRoIGZpbGw9InJnYigxOTcsNjcsNTMpIiBkPSJNIDEzMjYuMzUgOTQ4LjIyOCBDIDEzMzUuMTMgOTQ4LjEyOCAxMzQ4LjIxIDk1Mi4xMTEgMTM1NS40IDk1Ny4xNjIgQyAxMzk0LjY0IDk4NC43MTIgMTQzMS4xMSAxMDE3LjgzIDE0NjYuODQgMTA0OS43NyBDIDE0NzIuNzUgMTA1NS4wNSAxNDgwLjk0IDEwNjUuODMgMTQ4MC45MSAxMDczLjk0IEMgMTQ3Ni42IDEwODEuNjYgMTQzMy42OSAxMTA2LjM0IDE0MjQuODcgMTExNi40MSBDIDE0MTkuMTUgMTEyMi45NCAxNDA2LjYxIDExMjUuMTUgMTM5Ny44MSAxMTI0Ljk3IEMgMTM5My4wMSAxMTIzLjk3IDEzODMuNzkgMTEyMS43MSAxMzc5LjYgMTExOS4xMiBDIDEzNTQuODkgMTEwMy44OCAxMzMxLjYyIDEwNzkuNjUgMTMwOC4zNiAxMDYxLjIxIEMgMTI4OS42NSAxMDQ1LjE2IDEyNjkuMjIgMTAzMC4zOSAxMjUxLjEgMTAxMy43MiBDIDEyNDUuMjEgMTAwOC4zIDEyMzguNjYgOTk0LjQ1MSAxMjQ0LjI3IDk4OC4zMDIgQyAxMjYwLjEyIDk3MC45NiAxMzA0LjQ4IDk1My4yMDUgMTMyNi4zNSA5NDguMjI4IHoiLz48cGF0aCBmaWxsPSJyZ2IoMTA0LDc0LDEzMykiIGQ9Ik0gNjQ2LjA4OCA0NjUuMjA0IEMgNjU1LjUzNiA0NjQuNDg2IDY2OC40NjkgNDY1LjMzMyA2NzYuNjY3IDQ3MC4zOTYgQyA3MDIuMzAyIDQ4Ni4yMjcgNzI2LjUzMSA1MTEuNTU1IDc1MC42ODEgNTMwLjU2NSBDIDc2OC41MDEgNTQ1LjUyNyA3ODcuNjIzIDU1OS41MiA4MDQuODI1IDU3NS4xNDYgQyA4MTAuNjI2IDU4MC40MTYgODE3Ljc0NyA1OTUuNTMzIDgxMi43MzggNjAxLjI3MSBDIDc5OC41IDYxNy41ODUgNzYxLjg0NCA2MzEuNDA3IDc0Mi4wMTUgNjM4LjQ3IEMgNzMyLjQyNyA2NDEuNTY0IDcyNS42NTIgNjQyLjUwMSA3MTUuOTQzIDYzOS4zNjYgQyA3MDcuMzE3IDYzNi41ODIgNjk4LjgyNyA2MzEuMTAyIDY5MS40NTIgNjI1LjkyNiBDIDY3MC43OSA2MTEuNDI2IDU4Ny4xMjEgNTQyLjY0OCA1NzguMDUzIDUyNC4xNTEgQyA1NzYuNTQ0IDUyMS4wNzMgNTc1LjQ2MiA1MTguMDc5IDU3Ni41OTUgNTE0Ljc4NCBDIDU4Mi44MDIgNTA4LjY5MiA2MzguNzYyIDQ2OC4yOCA2NDYuMDg4IDQ2NS4yMDQgeiIvPjxwYXRoIGZpbGw9InJnYigxOTcsNjcsNTMpIiBkPSJNIDcyMi44NiA5NDkuMTY1IEMgNzQzLjIxIDk0Ni41NzQgNzc2LjE5NiA5NjcuMzY5IDc5NC43MDYgOTc0Ljg1NCBDIDgxNy4zOTQgOTg0LjAyOCA4MjAuODE4IDEwMDIuNCA4MDEuMTggMTAxOC4yOCBDIDc2Mi4xMjMgMTA0OS44NyA3MjQuMDI3IDEwODIuMjYgNjg1LjY0IDExMTQuNjEgQyA2ODAuNzc3IDExMTguNzEgNjcxLjE4NSAxMTIyLjE4IDY2NS4yMDYgMTEyNC4xMyBDIDY0MS40NjQgMTEyOS40MyA2MzIuMjUzIDExMTYuOCA2MTQuMzE0IDExMDIuOTIgQyA2MDUuNzIxIDEwOTYuMjggNTgwLjkyNiAxMDgxLjk4IDU3NS45NjEgMTA3NC42NiBDIDU3NS44NTMgMTA3MC4wNCA1NzcuNTc2IDEwNjYuMzMgNTgwLjAxMSAxMDYyLjUgQyA1OTEuODY4IDEwNDMuODcgNjc1LjYyNSA5NzQuNzA4IDY5NS40MTIgOTYxLjY0NCBDIDcwNC4xMDYgOTU1LjkwNSA3MTIuNjkyIDk1MS41MTQgNzIyLjg2IDk0OS4xNjUgeiIvPjxwYXRoIGZpbGw9InJnYigxMDQsNzQsMTMzKSIgZD0iTSAxNDAwLjk3IDQ2NC4zMjIgQyAxNDExLjY4IDQ2My41MiAxNDI0LjI1IDQ3MC40ODggMTQzMS4xMiA0NzcuODUyIEMgMTQzOC43NiA0ODYuMDM2IDE0NzkuOTIgNTA5Ljk0MSAxNDgxLjA1IDUxNi40ODIgQyAxNDc4LjExIDU0MC4yNyAxMzg5LjU0IDYwMy45NjggMTM2Ny45NSA2MjMuNDY5IEMgMTM1OC4yIDYzMi4yNzcgMTMzOC42NiA2NDIuMDM3IDEzMjQuNzQgNjQwLjg3NiBDIDEzMDMuNDggNjM1LjkyNyAxMjc0Ljg1IDYyMS42ODQgMTI1NS43NyA2MTEuMzgxIEMgMTIyMS4yMyA1OTIuNzM4IDEyNjIuMiA1NjUuOTU3IDEyNzguNDYgNTUyLjg3MyBDIDEyOTAuOTggNTQyLjgyNSAxMzAzLjM4IDUzMi42MTggMTMxNS42NCA1MjIuMjU2IEMgMTMzMy45MSA1MDYuODg1IDEzNTEuODEgNDkwLjcwMSAxMzcwLjQ4IDQ3NS44NDMgQyAxMzc5LjQyIDQ2OC43MyAxMzg5LjgzIDQ2NS45MDkgMTQwMC45NyA0NjQuMzIyIHoiLz48L3N2Zz4K">
-
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>RuangPrint Tools</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
-:root{--gold:#F5A800;--gold-light:#FFD166;--dark:#111010;--dark2:#1A1918;--dark3:#242220;--white:#fff;--gray:#888480;--gray-light:#C8C4BC}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--dark);color:var(--white);min-height:100vh;overflow-x:hidden}
-.bg-grid{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(245,168,0,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(245,168,0,.03) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
-.bg-glow{position:fixed;z-index:0;pointer-events:none;border-radius:50%;filter:blur(120px);opacity:.18}
-.bg-glow-1{width:600px;height:600px;background:var(--gold);top:-200px;right:-100px}
-.bg-glow-2{width:400px;height:400px;background:#FF6B35;bottom:0;left:-100px;opacity:.1}
+:root[data-theme="dark"]{
+  --bg:#0A0A0B; --surface:#131316; --surface-2:#1B1B20; --surface-3:#26262D;
+  --border:rgba(255,255,255,.06); --border-strong:rgba(255,255,255,.12);
+  --text:#FAFAFA; --text-dim:#A1A1AA; --text-muted:#71717A;
+  --gold:#F5A800; --gold-soft:rgba(245,168,0,.12); --gold-border:rgba(245,168,0,.25);
+  --green:#22C55E; --blue:#3B82F6; --red:#EF4444; --purple:#A855F7; --cyan:#06B6D4;
+  --shadow:0 20px 60px rgba(0,0,0,.4); --shadow-sm:0 4px 12px rgba(0,0,0,.25);
+}
+:root[data-theme="light"]{
+  --bg:#FAFAFA; --surface:#FFFFFF; --surface-2:#F4F4F5; --surface-3:#E4E4E7;
+  --border:rgba(0,0,0,.06); --border-strong:rgba(0,0,0,.12);
+  --text:#09090B; --text-dim:#52525B; --text-muted:#71717A;
+  --gold:#D97706; --gold-soft:rgba(217,119,6,.10); --gold-border:rgba(217,119,6,.30);
+  --green:#16A34A; --blue:#2563EB; --red:#DC2626; --purple:#9333EA; --cyan:#0891B2;
+  --shadow:0 20px 50px rgba(0,0,0,.08); --shadow-sm:0 2px 8px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s}
+
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse at center,#000 30%,transparent 75%);pointer-events:none;z-index:0}
+.bg-glow{position:fixed;border-radius:50%;filter:blur(120px);opacity:.18;pointer-events:none;z-index:0}
+.bg-glow-1{width:600px;height:600px;background:var(--gold);top:-200px;right:-150px}
+.bg-glow-2{width:500px;height:500px;background:var(--purple);bottom:-200px;left:-150px;opacity:.10}
 
 /* LOGIN */
-#login{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;flex-direction:column;background:var(--dark)}
-#login .logo-img{width:92px;height:92px;border-radius:50%;object-fit:cover;margin-bottom:18px;box-shadow:0 0 0 3px rgba(245,168,0,.3)}
-#login .brand{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:3px}
-#login .brand span{color:var(--gold)}
-#login .sub{font-size:11px;color:#555;letter-spacing:3px;text-transform:uppercase;margin-bottom:26px}
-.lbox{background:var(--dark2);border:1px solid #2a2a2a;border-radius:14px;padding:28px 30px;width:330px;display:flex;flex-direction:column;gap:12px}
-.lbox .h{font-size:11px;font-weight:700;color:#777;text-align:center;letter-spacing:.1em;margin-bottom:4px}
-.lbox input{width:100%;border:1px solid #2a2a2a;border-radius:7px;padding:11px 13px;font-size:14px;background:var(--dark);color:#fff;outline:none;font-family:'Plus Jakarta Sans',sans-serif}
-.lbox input:focus{border-color:var(--gold)}
-.lbox button{width:100%;padding:12px;background:var(--gold);color:var(--dark);border:none;border-radius:7px;font-size:14px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;letter-spacing:.04em;transition:filter .15s}
-.lbox button:hover{filter:brightness(1.06)}
-#loginErr{font-size:12px;color:#e05050;text-align:center;min-height:16px}
-#login .foot{font-size:10px;color:#2a2a2a;margin-top:22px}
+#login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;z-index:10;background:var(--bg)}
+.login-card{position:relative;width:100%;max-width:420px;background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:40px 36px;box-shadow:var(--shadow);animation:rise .6s cubic-bezier(.16,1,.3,1)}
+@keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.login-logo{width:72px;height:72px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 18px;box-shadow:0 0 0 3px var(--gold-border)}
+.login-brand{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:3px;text-align:center;line-height:1}
+.login-brand span{color:var(--gold)}
+.login-sub{font-size:11px;letter-spacing:3px;color:var(--text-muted);text-align:center;margin-top:6px;text-transform:uppercase}
+.login-divider{display:flex;align-items:center;gap:12px;margin:28px 0 22px}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.login-divider span{font-size:10px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.field-wrap{position:relative}
+.field input{width:100%;height:46px;padding:0 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:inherit;font-size:14px;transition:border-color .2s,background .2s}
+.field input:focus{outline:none;border-color:var(--gold);background:var(--surface)}
+.field-wrap .toggle-pwd{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;padding:4px 8px;border-radius:6px}
+.field-wrap .toggle-pwd:hover{color:var(--text);background:var(--surface-3)}
+.btn-primary{width:100%;height:48px;border-radius:12px;border:none;background:var(--gold);color:#0A0A0B;font-family:inherit;font-size:14px;font-weight:700;letter-spacing:.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,box-shadow .2s,opacity .2s;margin-top:4px}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(245,168,0,.35)}
+.alert{display:none;align-items:center;gap:10px;padding:12px 14px;background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.25);border-radius:10px;color:var(--red);font-size:13px;margin-bottom:14px}
+.alert.show{display:flex}
+.login-foot{text-align:center;font-size:11px;color:var(--text-muted);margin-top:24px;letter-spacing:1px}
 
-/* APP (after login) */
-#app{display:none;position:relative;z-index:1}
-header{position:sticky;top:0;z-index:10;padding:16px 48px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.06);backdrop-filter:blur(10px);background:rgba(17,16,16,.7)}
-.hleft{display:flex;align-items:center;gap:12px}
-.hleft img{width:38px;height:38px;border-radius:50%;object-fit:cover}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px}
-.logo span{color:var(--gold)}
-.logo-sub{font-size:10px;color:var(--gray);letter-spacing:2px;text-transform:uppercase;margin-top:1px}
-.hright{display:flex;align-items:center;gap:12px}
-.chip{display:flex;flex-direction:column;align-items:flex-end;line-height:1.3}
-.chip .nm{font-size:13px;font-weight:600}
-.chip .cb{font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:.06em}
-.hbtn{padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:none;color:var(--gray-light);font-size:12px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .2s}
-.hbtn:hover{border-color:var(--gold);color:var(--gold)}
-.hbtn.admin{background:rgba(245,168,0,.12);border-color:rgba(245,168,0,.3);color:var(--gold)}
+/* APP */
+#app{display:none;position:relative;z-index:1;min-height:100vh;flex-direction:column}
+#app.active{display:flex}
+header.topbar{position:sticky;top:0;z-index:20;background:rgba(10,10,11,.7);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+[data-theme="light"] header.topbar{background:rgba(250,250,250,.75)}
+.topbar-left{display:flex;align-items:center;gap:14px;min-width:0}
+.topbar-logo{width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;box-shadow:0 0 0 1px var(--gold-border)}
+.topbar-brand{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;line-height:1}
+.topbar-brand span{color:var(--gold)}
+.topbar-sub{font-size:10px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.iconbtn{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text-dim);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.iconbtn:hover{color:var(--text);border-color:var(--border-strong);background:var(--surface-2)}
+.iconbtn svg{width:16px;height:16px}
+.user-chip{display:flex;align-items:center;gap:10px;padding:6px 12px 6px 6px;background:var(--surface);border:1px solid var(--border);border-radius:999px}
+.avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#FF6B35);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#0A0A0B}
+.user-meta{display:flex;flex-direction:column;line-height:1.2}
+.user-name{font-size:13px;font-weight:600}
+.user-role{font-size:10px;color:var(--text-muted);letter-spacing:.5px}
+.btn-ghost{height:38px;padding:0 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text-dim);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s;text-decoration:none}
+.btn-ghost:hover{color:var(--text);border-color:var(--border-strong)}
+.btn-ghost.gold{background:var(--gold-soft);border-color:var(--gold-border);color:var(--gold)}
+.btn-ghost.gold:hover{background:var(--gold);color:#0A0A0B}
 
-.hero{position:relative;z-index:1;padding:70px 48px 36px;max-width:1200px;margin:0 auto}
-.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,7vw,76px);font-weight:400;line-height:.95;letter-spacing:2px;margin-bottom:16px}
-.hero h1 .g{color:var(--gold)}
-.hero p{font-size:16px;color:var(--gray-light);line-height:1.7;max-width:520px}
-.divider{position:relative;z-index:1;max-width:1200px;margin:0 auto 40px;padding:0 48px;display:flex;align-items:center;gap:16px}
-.divider-line{flex:1;height:1px;background:rgba(255,255,255,.07)}
-.divider-label{font-size:11px;color:var(--gray);letter-spacing:2px;text-transform:uppercase;white-space:nowrap}
+.hero{max-width:1240px;margin:0 auto;padding:56px 32px 24px;width:100%}
+.hero-row{display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,60px);letter-spacing:2px;line-height:1;margin-bottom:14px}
+.hero h1 span{color:var(--gold)}
+.hero p{color:var(--text-dim);font-size:15px;max-width:520px;line-height:1.6}
+.hero-time{text-align:right;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text-muted)}
+.hero-time strong{display:block;font-size:24px;color:var(--text);font-weight:500;letter-spacing:1px}
 
-.tools{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 48px 90px}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.card{background:var(--dark2);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:32px;text-decoration:none;color:inherit;display:flex;flex-direction:column;position:relative;overflow:hidden;transition:transform .3s,border-color .3s,box-shadow .3s;cursor:pointer}
-.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:opacity .3s}
-.card:hover{transform:translateY(-6px);border-color:rgba(245,168,0,.25);box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.toolbar{max-width:1240px;margin:0 auto;padding:36px 32px 18px;width:100%;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.search{position:relative;flex:1;min-width:260px}
+.search input{width:100%;height:46px;padding:0 16px 0 44px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:inherit;font-size:14px;transition:border-color .2s}
+.search input:focus{outline:none;border-color:var(--gold)}
+.search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--text-muted)}
+.search kbd{position:absolute;right:12px;top:50%;transform:translateY(-50%);padding:3px 7px;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text-muted)}
+.filter-chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{height:46px;padding:0 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text-dim);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s}
+.chip:hover{color:var(--text);border-color:var(--border-strong)}
+.chip.active{background:var(--gold);color:#0A0A0B;border-color:var(--gold);font-weight:600}
+
+.tools{max-width:1240px;margin:0 auto;padding:18px 32px 80px;width:100%}
+.section-label{display:flex;align-items:center;gap:10px;margin-bottom:18px;font-size:11px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;font-weight:600}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:26px;text-decoration:none;color:inherit;display:flex;flex-direction:column;overflow:hidden;cursor:pointer;transition:transform .25s cubic-bezier(.16,1,.3,1),border-color .25s,box-shadow .25s}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent,var(--gold)),transparent);opacity:0;transition:opacity .3s}
+.card:hover{transform:translateY(-4px);border-color:var(--border-strong);box-shadow:var(--shadow)}
 .card:hover::before{opacity:1}
-.ic{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:22px}
-.ic.offset{background:rgba(245,168,0,.12)}.ic.booklet{background:rgba(52,199,89,.12)}.ic.quotation{background:rgba(10,132,255,.12)}
-.tag{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;margin-bottom:10px}
-.tag.offset{color:var(--gold)}.tag.booklet{color:#34C759}.tag.quotation{color:#0A84FF}
-.nm2{font-family:'Outfit',sans-serif;font-size:20px;font-weight:700;margin-bottom:10px;line-height:1.2}
-.ds{font-size:13px;color:var(--gray);line-height:1.7;flex:1;margin-bottom:24px}
-.cta{display:flex;align-items:center;justify-content:space-between;padding-top:20px;border-top:1px solid rgba(255,255,255,.06)}
-.cta-text{font-size:13px;font-weight:600;color:var(--gold)}
-.cta-arrow{width:34px;height:34px;background:rgba(245,168,0,.1);border:1px solid rgba(245,168,0,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .25s}
-.card:hover .cta-arrow{background:var(--gold);color:var(--dark);transform:translateX(4px)}
-footer{position:relative;z-index:1;border-top:1px solid rgba(255,255,255,.06);padding:28px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px}
-.footer-logo span{color:var(--gold)}
-.footer-copy{font-size:12px;color:var(--gray)}
-@media(max-width:900px){.grid{grid-template-columns:1fr}header{padding:14px 20px}.hero{padding:48px 20px 28px}.tools{padding:0 20px 50px}.divider{padding:0 20px}}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
+.card-ic{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent)}
+.card-ic svg{width:22px;height:22px}
+.card-tag{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 10px;border-radius:6px;background:var(--accent-soft);color:var(--accent)}
+.card-title{font-size:18px;font-weight:700;margin-bottom:8px;line-height:1.3}
+.card-desc{font-size:13px;color:var(--text-dim);line-height:1.6;flex:1;margin-bottom:22px}
+.card-foot{display:flex;align-items:center;justify-content:space-between;padding-top:16px;border-top:1px solid var(--border)}
+.card-cta{font-size:12px;font-weight:600;color:var(--accent);display:flex;align-items:center;gap:6px}
+.card-arrow{width:32px;height:32px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;color:var(--accent);transition:all .25s}
+.card:hover .card-arrow{background:var(--accent);color:#0A0A0B;transform:translateX(3px)}
+.card.soon{cursor:not-allowed;opacity:.55}
+.card.soon:hover{transform:none;box-shadow:none}
+.acc-gold{--accent:#F5A800;--accent-soft:rgba(245,168,0,.12)}
+.acc-green{--accent:#22C55E;--accent-soft:rgba(34,197,94,.12)}
+.acc-blue{--accent:#3B82F6;--accent-soft:rgba(59,130,246,.12)}
+.acc-purple{--accent:#A855F7;--accent-soft:rgba(168,85,247,.12)}
+.acc-cyan{--accent:#06B6D4;--accent-soft:rgba(6,182,212,.12)}
+.acc-red{--accent:#EF4444;--accent-soft:rgba(239,68,68,.12)}
+
+footer.bottom{border-top:1px solid var(--border);padding:24px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-top:auto;background:var(--surface)}
+footer .ft-brand{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px}
+footer .ft-brand span{color:var(--gold)}
+footer .ft-copy{font-size:12px;color:var(--text-muted)}
+
+@media(max-width:900px){
+  .grid{grid-template-columns:1fr}
+  header.topbar{padding:12px 16px}
+  .hero,.toolbar,.tools{padding-left:16px;padding-right:16px}
+  .user-meta{display:none}
+  .btn-ghost span{display:none}
+}
 </style>
 </head>
 <body>
+
 <div class="bg-grid"></div>
 <div class="bg-glow bg-glow-1"></div>
 <div class="bg-glow bg-glow-2"></div>
 
-<!-- LOGIN -->
+<!-- ============== LOGIN ============== -->
 <div id="login">
-  <img class="logo-img" id="loginLogo">
-  <div class="brand">RUANG<span>PRINT</span></div>
-  <div class="sub">Tools & Kalkulator</div>
-  <div class="lbox">
-    <div class="h">LOGIN CABANG</div>
-    <input id="loginUser" type="text" placeholder="Username" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('loginPwd').focus()">
-    <input id="loginPwd" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
-    <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:#888;cursor:pointer;margin-top:-4px"><input type="checkbox" style="width:auto;accent-color:var(--gold)" onclick="document.getElementById('loginPwd').type=this.checked?'text':'password'"> Lihat password</label>
-    <button id="loginBtn" onclick="doLogin()">Masuk</button>
-    <div id="loginErr"></div>
-  </div>
-  <div class="foot">Akses khusus internal RuangPrint</div>
-</div>
+  <form class="login-card" onsubmit="event.preventDefault();doLogin()">
+    <img class="login-logo" id="loginLogo" alt="RuangPrint">
+    <div class="login-brand">RUANG<span>PRINT</span></div>
+    <div class="login-sub">Tools &amp; Kalkulator</div>
 
-<!-- APP -->
-<div id="app">
-  <header>
-    <div class="hleft">
-      <img id="hdrLogo">
-      <div>
-        <div class="logo">RUANG<span>PRINT</span></div>
-        <div class="logo-sub">Tools & Kalkulator</div>
+    <div class="login-divider"><span>Login Cabang</span></div>
+
+    <div id="alert" class="alert">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      <span id="loginErr">Username atau password salah.</span>
+    </div>
+
+    <div class="field">
+      <label for="loginUser">Username</label>
+      <div class="field-wrap">
+        <input id="loginUser" type="text" placeholder="cabang.bekasi" autocomplete="username">
       </div>
     </div>
-    <div class="hright">
-      <div class="chip">
-        <span class="nm" id="chipName"></span>
-        <span class="cb" id="chipCabang"></span>
+    <div class="field">
+      <label for="loginPwd">Password</label>
+      <div class="field-wrap">
+        <input id="loginPwd" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter'){event.preventDefault();doLogin()}">
+        <button type="button" class="toggle-pwd" onclick="togglePwd()">Lihat</button>
       </div>
-      <a id="adminBtn" href="admin.html" class="hbtn admin" style="display:none">⚙ Dashboard Admin</a>
-      <button class="hbtn" onclick="doLogout()">⇥ Keluar</button>
+    </div>
+
+    <button id="loginBtn" type="submit" class="btn-primary"><span id="loginLabel">Masuk</span></button>
+
+    <div class="login-foot">AKSES KHUSUS INTERNAL · v2.0</div>
+  </form>
+</div>
+
+<!-- ============== APP ============== -->
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-left">
+      <img class="topbar-logo" id="hdrLogo" alt="RuangPrint">
+      <div>
+        <div class="topbar-brand">RUANG<span>PRINT</span></div>
+        <div class="topbar-sub">Tools &amp; Kalkulator</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="iconbtn" id="themeBtn" title="Theme" onclick="toggleTheme()">
+        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      </button>
+      <div class="user-chip">
+        <div class="avatar" id="chipAvatar">RP</div>
+        <div class="user-meta">
+          <div class="user-name" id="chipName"></div>
+          <div class="user-role" id="chipCabang"></div>
+        </div>
+      </div>
+      <a id="adminBtn" href="admin.html" class="btn-ghost gold" style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33h0a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v0a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>Dashboard Admin</span></a>
+      <button class="btn-ghost" onclick="doLogout()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg><span>Keluar</span></button>
     </div>
   </header>
 
   <section class="hero">
-    <h1>SEMUA TOOLS<br><span class="g">RUANGPRINT</span><br>DALAM SATU TEMPAT</h1>
-    <p>Kalkulator harga cetak, booklet, dan quotation maker — dirancang khusus untuk tim RuangPrint.</p>
-  </section>
-
-  <div class="divider"><div class="divider-line"></div><div class="divider-label">Pilih Tools</div><div class="divider-line"></div></div>
-
-  <section class="tools">
-    <div class="grid">
-      <a class="card" href="kalkulator-offseta.html">
-        <div class="ic offset">🖨️</div>
-        <div class="tag offset">Cetak Offset</div>
-        <div class="nm2">Kalkulator Offset</div>
-        <div class="ds">Hitung estimasi harga cetak offset dengan cepat dan akurat. Cocok untuk order jumlah besar.</div>
-        <div class="cta"><span class="cta-text">Buka Kalkulator →</span><div class="cta-arrow">→</div></div>
-      </a>
-      <a class="card" href="kalkulator-booklet.html">
-        <div class="ic booklet">📖</div>
-        <div class="tag booklet">Booklet & Majalah</div>
-        <div class="nm2">Kalkulator Booklet A3+</div>
-        <div class="ds">Kalkulasi harga cetak booklet, katalog, dan majalah format A3+ dengan detail lengkap.</div>
-        <div class="cta"><span class="cta-text">Buka Kalkulator →</span><div class="cta-arrow">→</div></div>
-      </a>
-      <a class="card" href="quotation.html">
-        <div class="ic quotation">📋</div>
-        <div class="tag quotation">Penawaran Harga</div>
-        <div class="nm2">Quotation Maker</div>
-        <div class="ds">Buat surat penawaran harga profesional untuk customer dalam hitungan menit. Langsung bisa di-print.</div>
-        <div class="cta"><span class="cta-text">Buka Quotation →</span><div class="cta-arrow">→</div></div>
-      </a>
+    <div class="hero-row">
+      <div>
+        <h1>Selamat datang, <span id="heroName">Tim</span></h1>
+        <p>Pilih kalkulator atau tool yang ingin kamu gunakan. Semua data tersinkron otomatis ke cabang Anda.</p>
+      </div>
+      <div class="hero-time">
+        <span id="heroDate"></span>
+        <strong id="clock">00:00:00</strong>
+      </div>
     </div>
   </section>
 
-  <footer>
-    <div class="footer-logo">RUANG<span>PRINT</span></div>
-    <div class="footer-copy">© 2026 RuangPrint · Digital Printing Jabodetabek</div>
+  <section class="toolbar">
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input id="searchInput" type="text" placeholder="Cari tool atau kalkulator..." oninput="filterTools()">
+      <kbd>/</kbd>
+    </div>
+    <div class="filter-chips" id="chips">
+      <button class="chip active" data-cat="all">Semua</button>
+      <button class="chip" data-cat="kalkulator">Kalkulator</button>
+      <button class="chip" data-cat="dokumen">Dokumen</button>
+    </div>
+  </section>
+
+  <section class="tools">
+    <div class="section-label">Tools Tersedia</div>
+    <div class="grid" id="toolsGrid">
+
+      <a class="card acc-gold" href="kalkulator-offseta.html" data-name="offset cetak kalkulator brosur flyer" data-cat="kalkulator">
+        <div class="card-head"><div class="card-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></div><div class="card-tag">Offset</div></div>
+        <div class="card-title">Kalkulator Offset</div>
+        <div class="card-desc">Hitung estimasi harga cetak offset berdasarkan kertas, plat, jumlah warna, dan ukuran. Cocok untuk order jumlah besar.</div>
+        <div class="card-foot"><span class="card-cta">Buka tool</span><div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></div></div>
+      </a>
+
+      <a class="card acc-green" href="kalkulator-booklet.html" data-name="booklet jilid kalkulator katalog majalah" data-cat="kalkulator">
+        <div class="card-head"><div class="card-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div><div class="card-tag">Booklet</div></div>
+        <div class="card-title">Kalkulator Booklet</div>
+        <div class="card-desc">Estimasi harga buku, brosur, atau katalog termasuk jilid dan finishing. Format A3+ dengan detail lengkap.</div>
+        <div class="card-foot"><span class="card-cta">Buka tool</span><div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></div></div>
+      </a>
+
+      <a class="card acc-blue" href="quotation.html" data-name="quotation penawaran dokumen pdf" data-cat="dokumen">
+        <div class="card-head"><div class="card-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div><div class="card-tag">Dokumen</div></div>
+        <div class="card-title">Quotation Generator</div>
+        <div class="card-desc">Buat penawaran resmi lengkap dengan logo, terms, dan export PDF. Tersimpan otomatis ke database cabang.</div>
+        <div class="card-foot"><span class="card-cta">Buka tool</span><div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></div></div>
+      </a>
+
+      <div class="card acc-purple soon" data-name="banner spanduk kalkulator" data-cat="kalkulator">
+        <div class="card-head"><div class="card-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 4h16v12H4z"/><path d="M4 20h16M8 4v12M16 4v12"/></svg></div><div class="card-tag">Coming Soon</div></div>
+        <div class="card-title">Kalkulator Banner</div>
+        <div class="card-desc">Hitung harga spanduk/banner per meter persegi dengan opsi mata ayam &amp; finishing. Segera hadir.</div>
+        <div class="card-foot"><span class="card-cta">Coming soon</span><div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div></div>
+      </div>
+
+      <div class="card acc-cyan soon" data-name="stiker label kalkulator" data-cat="kalkulator">
+        <div class="card-head"><div class="card-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h10z"/><path d="M21 15l-6 6v-4a2 2 0 012-2z"/></svg></div><div class="card-tag">Coming Soon</div></div>
+        <div class="card-title">Kalkulator Stiker</div>
+        <div class="card-desc">Hitung biaya cetak stiker custom dengan opsi cutting, laminasi, dan kuantitas. Segera hadir.</div>
+        <div class="card-foot"><span class="card-cta">Coming soon</span><div class="card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div></div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="bottom">
+    <div class="ft-brand">RUANG<span>PRINT</span></div>
+    <div class="ft-copy">© 2026 RuangPrint · Tools &amp; Kalkulator Internal</div>
   </footer>
 </div>
 
@@ -166,6 +287,28 @@ let _token=localStorage.getItem('rp_auth_token')||'';
 document.getElementById('loginLogo').src=LOGO;
 document.getElementById('hdrLogo').src=LOGO;
 
+/* THEME */
+function applyThemeIcon(t){
+  document.getElementById('themeIcon').innerHTML = t==='dark'
+    ? '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>'
+    : '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+}
+function toggleTheme(){
+  const r=document.documentElement;
+  const next=r.getAttribute('data-theme')==='dark'?'light':'dark';
+  r.setAttribute('data-theme',next);
+  localStorage.setItem('rp_theme',next);
+  applyThemeIcon(next);
+}
+(function(){const s=localStorage.getItem('rp_theme')||'dark';document.documentElement.setAttribute('data-theme',s);applyThemeIcon(s);})();
+
+function togglePwd(){
+  const i=document.getElementById('loginPwd');
+  const b=event.target;
+  if(i.type==='password'){i.type='text';b.textContent='Tutup';}
+  else{i.type='password';b.textContent='Lihat';}
+}
+
 async function api(method,path,body){
   const o={method,headers:{'Content-Type':'application/json'}};
   if(_token)o.headers['Authorization']='Bearer '+_token;
@@ -174,12 +317,19 @@ async function api(method,path,body){
   let d=null;try{d=await r.json();}catch(e){}
   return{ok:r.ok,status:r.status,data:d};
 }
-function showLogin(){document.getElementById('login').style.display='flex';document.getElementById('app').style.display='none';}
+function initials(s){return (s||'RP').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();}
+function showLogin(){
+  document.getElementById('login').style.display='flex';
+  document.getElementById('app').classList.remove('active');
+}
 function showApp(u){
   document.getElementById('login').style.display='none';
-  document.getElementById('app').style.display='block';
-  document.getElementById('chipName').textContent=u.name||u.username||'';
+  document.getElementById('app').classList.add('active');
+  const nm=u.name||u.username||'';
+  document.getElementById('chipName').textContent=nm;
   document.getElementById('chipCabang').textContent=(u.role==='superadmin')?'Superadmin':('Cabang '+(u.cabang||''));
+  document.getElementById('chipAvatar').textContent=initials(nm);
+  document.getElementById('heroName').textContent=(nm.split(/\s+/)[0])||'Tim';
   document.getElementById('adminBtn').style.display=(u.role==='superadmin')?'inline-flex':'none';
 }
 async function init(){
@@ -192,14 +342,54 @@ async function doLogin(){
   const username=document.getElementById('loginUser').value.trim();
   const password=document.getElementById('loginPwd').value;
   const err=document.getElementById('loginErr');
-  if(!username||!password){err.textContent='Isi username dan password.';return;}
-  err.textContent='';
+  const alert=document.getElementById('alert');
+  if(!username||!password){err.textContent='Isi username dan password.';alert.classList.add('show');return;}
+  alert.classList.remove('show');
   const r=await api('POST','/auth/login',{username,password});
-  if(!r.ok){err.textContent=(r.data&&r.data.error)||'Login gagal.';return;}
+  if(!r.ok){err.textContent=(r.data&&r.data.error)||'Login gagal.';alert.classList.add('show');return;}
   _token=r.data.token;localStorage.setItem('rp_auth_token',_token);
   showApp(r.data.user);
 }
 function doLogout(){_token='';localStorage.removeItem('rp_auth_token');showLogin();}
+
+/* CLOCK */
+function tick(){
+  const d=new Date();
+  const c=document.getElementById('clock');
+  if(c)c.textContent=d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const dt=document.getElementById('heroDate');
+  if(dt)dt.textContent=d.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+setInterval(tick,1000);tick();
+
+/* SEARCH + FILTER */
+let currentCat='all';
+document.querySelectorAll('#chips .chip').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('#chips .chip').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    currentCat=b.dataset.cat;
+    filterTools();
+  });
+});
+function filterTools(){
+  const q=(document.getElementById('searchInput').value||'').toLowerCase();
+  document.querySelectorAll('#toolsGrid .card').forEach(c=>{
+    const name=c.dataset.name||'';
+    const cat=c.dataset.cat||'';
+    const matchQ=!q||name.includes(q)||c.textContent.toLowerCase().includes(q);
+    const matchC=currentCat==='all'||cat===currentCat;
+    c.style.display=(matchQ&&matchC)?'flex':'none';
+  });
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){
+    e.preventDefault();
+    const s=document.getElementById('searchInput');
+    if(s)s.focus();
+  }
+});
+
 init();
 </script>
 </body>
