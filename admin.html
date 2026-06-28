@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Dashboard — RuangPrint</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:wght@0,400;0,500;0,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:wght@0,400;0,500;0,600&family=JetBrains+Mono:wght@500;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--gold:#F5A800;--dark:#181818;--dark2:#1f1e1d;--bg:#f6f4ef;--bg2:#eeebe3;--border:#e2ded4;--muted:#8a8478;--text:#2a2620;--panel:#fff;--green:#34a853;--blue:#1a73e8}
+:root{--gold:#F5A800;--dark:#131316;--dark2:#1B1B20;--bg:#0A0A0B;--bg2:#1B1B20;--border:rgba(255,255,255,.08);--muted:#A1A1AA;--text:#FAFAFA;--panel:#131316;--green:#22C55E;--blue:#60A5FA}
 body{font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--bg)}
 
 /* LOGIN */
@@ -51,7 +51,7 @@ body{font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);backgroun
 .stat .l{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;margin-bottom:8px}
 .stat .v{font-family:'Outfit',sans-serif;font-size:28px;font-weight:800;line-height:1}
 .stat .s{font-size:11px;color:var(--muted);margin-top:6px}
-.stat.gold{background:linear-gradient(135deg,#fff7e6,#fff);border-color:#f0dca8}
+.stat.gold{background:linear-gradient(135deg,rgba(245,168,0,.14),var(--panel));border-color:rgba(245,168,0,.3)}
 
 .panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:20px}
 .panel h2{font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
@@ -70,7 +70,7 @@ th{text-align:left;font-family:'Outfit',sans-serif;font-size:10px;text-transform
 td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
 tr:hover td{background:var(--bg)}
 .badge{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600}
-.badge.cabang{background:#e8f0fe;color:#1a56c4}.badge.superadmin{background:#fff0d6;color:#9a6b00}
+.badge.cabang{background:rgba(96,165,250,.16);color:#60A5FA}.badge.superadmin{background:rgba(245,168,0,.16);color:#F5A800}
 .cab{font-family:'Outfit',sans-serif;font-weight:600;font-size:11px;color:var(--muted)}
 .tbtn{padding:4px 9px;font-size:11px;border:1px solid var(--border);background:none;border-radius:4px;cursor:pointer;color:var(--muted);font-family:'DM Sans',sans-serif}
 .tbtn:hover{border-color:var(--gold);color:var(--gold)}.tbtn.del:hover{border-color:#c00;color:#c00}
@@ -81,7 +81,7 @@ tr:hover td{background:var(--bg)}
 .fc{display:flex;flex-direction:column;gap:4px}
 label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
 input,select{width:100%;border:1px solid var(--border);border-radius:6px;padding:9px 11px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);outline:none}
-input:focus,select:focus{border-color:var(--gold);background:#fff}
+input:focus,select:focus{border-color:var(--gold);background:#232329}
 .btn{padding:10px 18px;background:var(--gold);color:var(--dark);border:none;border-radius:7px;font-size:13px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer}
 .btn.sec{background:var(--bg2);color:var(--text);border:1px solid var(--border)}
 .frm-actions{display:flex;gap:8px;margin-top:14px;align-items:center}
@@ -89,6 +89,11 @@ input:focus,select:focus{border-color:var(--gold);background:#fff}
 .page{display:none}.page.active{display:block}
 #toast{position:fixed;bottom:22px;right:22px;background:var(--dark);color:#fff;padding:10px 18px;border-radius:6px;font-size:12px;opacity:0;transition:opacity .3s;pointer-events:none;border-left:3px solid var(--gold);z-index:9999}
 @media(max-width:820px){.shell{grid-template-columns:1fr}.side{position:static;height:auto}.nav{flex-direction:row;flex-wrap:wrap}.stat-grid{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}.bar-row{grid-template-columns:100px 1fr 90px}}
+/* ── V2 polish (additive) ── */
+.stat .v,.bar-val{font-family:'Outfit',sans-serif}
+.stat{transition:border-color .2s,box-shadow .2s}
+.stat:hover,.panel:hover{border-color:rgba(255,255,255,.14)}
+.main{background:var(--bg)}
 </style>
 </head>
 <body>
