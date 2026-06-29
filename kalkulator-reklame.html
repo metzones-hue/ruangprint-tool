@@ -375,13 +375,26 @@ nav.tabs .tab.active{color:var(--gold);border-bottom-color:var(--gold)}
         <span style="font-size:11px;color:var(--text-muted)">Step 2 dari 4</span>
       </div>
       <div class="card-body">
-        <div class="grid-2">
+        <div class="grid-2" id="bahanPapanWrap">
           <div class="field full">
             <label>Bahan Visual <span class="req">*</span> <span class="hint" id="bahanHint">Rp 450.000 / m²</span></label>
             <select id="inBahan" onchange="hitung()">
               <!-- diisi dinamis -->
             </select>
           </div>
+        </div>
+        <div id="bahanHurufWrap" style="display:none">
+          <div class="grid-2">
+            <div class="field">
+              <label>Bahan Muka <span class="req">*</span></label>
+              <select id="inBahanMuka" onchange="hitung()"></select>
+            </div>
+            <div class="field">
+              <label>Bahan Samping <span class="hint">opsional</span></label>
+              <select id="inBahanSamping" onchange="hitung()"></select>
+            </div>
+          </div>
+          <div id="bahanHintHuruf" style="font-size:12px;color:var(--text-muted);margin-top:8px"></div>
         </div>
       </div>
     </div>
@@ -639,7 +652,7 @@ async function checkRole(){
 }
 let PRICE_DB = {
   visualPerM2: { "Acrylic":450000, "Flexy Backlite":150000, "Stainless":550000, "Galvanis":300000 },
-  hurufTimbulPerCm: { "Acrylic":12000, "Stainless":15000 },
+  hurufTimbulPerCm: { "Acrylic":12000, "Stainless":15000, "Galvanis":14000 },
   rangkaPerM2:250000, elektrikalPerM2:200000, tiangPerMeter:600000, pasangDasar:500000,
   pengaliKetinggian: { "Lantai 1":1.0, "Lantai 2":1.2, "Lantai 3+":1.4 },
   _meta: { visual_m2:[], huruf_cm:[], komponen:[], pengali:[] }
@@ -652,6 +665,7 @@ let state = {
   panjang: 2, tinggi: 1, sisi: 1,
   tinggiHuruf: 30, jumlahHuruf: 8,
   bahan: "Acrylic",
+  bahanMuka: "Acrylic", bahanSamping: "",
   led: true,
   tiang: 0,
   ketinggian: "Lantai 1",
@@ -689,17 +703,30 @@ function switchJenis(el){
   const isHuruf = state.jenis === 'Huruf Timbul';
   document.getElementById('groupPapan').style.display = isHuruf ? 'none' : 'grid';
   document.getElementById('groupHuruf').style.display = isHuruf ? 'grid' : 'none';
+  document.getElementById('bahanPapanWrap').style.display = isHuruf ? 'none' : 'grid';
+  document.getElementById('bahanHurufWrap').style.display = isHuruf ? 'block' : 'none';
   populateBahanOptions();
   hitung();
 }
 
 function populateBahanOptions(){
-  const sel = document.getElementById('inBahan');
   const isHuruf = state.jenis === 'Huruf Timbul';
-  const opts = isHuruf ? Object.keys(PRICE_DB.hurufTimbulPerCm) : Object.keys(PRICE_DB.visualPerM2);
-  sel.innerHTML = opts.map(o => `<option value="${o}">${o}</option>`).join('');
-  if(!opts.includes(state.bahan)) state.bahan = opts[0];
-  sel.value = state.bahan;
+  if(isHuruf){
+    const opts = Object.keys(PRICE_DB.hurufTimbulPerCm);
+    const muka = document.getElementById('inBahanMuka');
+    const samp = document.getElementById('inBahanSamping');
+    muka.innerHTML = opts.map(o => `<option value="${o}">${o}</option>`).join('');
+    samp.innerHTML = `<option value="">— Tanpa —</option>` + opts.map(o => `<option value="${o}">${o}</option>`).join('');
+    if(!opts.includes(state.bahanMuka)) state.bahanMuka = opts[0];
+    muka.value = state.bahanMuka;
+    samp.value = opts.includes(state.bahanSamping) ? state.bahanSamping : '';
+  } else {
+    const sel = document.getElementById('inBahan');
+    const opts = Object.keys(PRICE_DB.visualPerM2);
+    sel.innerHTML = opts.map(o => `<option value="${o}">${o}</option>`).join('');
+    if(!opts.includes(state.bahan)) state.bahan = opts[0];
+    sel.value = state.bahan;
+  }
 }
 populateBahanOptions();
 
@@ -716,7 +743,13 @@ function readState(){
   state.sisi    = +document.querySelector('input[name="sisi"]:checked').value || 1;
   state.tinggiHuruf = +document.getElementById('inTinggiHuruf').value || 0;
   state.jumlahHuruf = +document.getElementById('inJumlahHuruf').value || 0;
-  state.bahan       = document.getElementById('inBahan').value;
+  if(state.jenis === 'Huruf Timbul'){
+    state.bahanMuka    = document.getElementById('inBahanMuka').value;
+    state.bahanSamping = document.getElementById('inBahanSamping').value;
+    state.bahan        = state.bahanSamping ? (state.bahanMuka + ' + ' + state.bahanSamping) : state.bahanMuka;
+  } else {
+    state.bahan        = document.getElementById('inBahan').value;
+  }
   state.led         = document.getElementById('inLED').checked;
   state.tiang       = +document.getElementById('inTiang').value || 0;
   state.ketinggian  = document.getElementById('inKetinggian').value;
@@ -753,11 +786,16 @@ function hitung(){
   let satuanInfo = '';
 
   if(isHuruf){
-    const hargaCm = PRICE_DB.hurufTimbulPerCm[state.bahan] || 0;
+    const hMuka = PRICE_DB.hurufTimbulPerCm[state.bahanMuka] || 0;
+    const hSamp = state.bahanSamping ? (PRICE_DB.hurufTimbulPerCm[state.bahanSamping] || 0) : 0;
+    const hargaCm = hMuka + hSamp;
     visual = state.tinggiHuruf * state.jumlahHuruf * hargaCm;
     if(state.led) led = state.jumlahHuruf * 0.05 * PRICE_DB.elektrikalPerM2;
-    satuanInfo = `${state.tinggiHuruf}cm × ${state.jumlahHuruf} huruf`;
-    document.getElementById('bahanHint').textContent = rp(hargaCm) + ' / cm tinggi huruf';
+    satuanInfo = `${state.tinggiHuruf}cm × ${state.jumlahHuruf} huruf · ${state.bahan}`;
+    const hintEl = document.getElementById('bahanHintHuruf');
+    if(hintEl) hintEl.textContent = state.bahanSamping
+      ? `${state.bahanMuka} (${rp(hMuka)}) + ${state.bahanSamping} (${rp(hSamp)}) = ${rp(hargaCm)} / cm tinggi huruf`
+      : `${rp(hargaCm)} / cm tinggi huruf`;
   } else {
     const luas = state.panjang * state.tinggi * state.sisi;
     const hargaM2 = PRICE_DB.visualPerM2[state.bahan] || 0;
