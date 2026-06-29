@@ -384,6 +384,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
 
       <div class="row-btns">
         <button class="btn btn-primary btn-lg" onclick="doCalc()">⚡ HITUNG</button>
+        <button class="btn btn-outline" style="border-color:var(--grn);color:var(--grn)" onclick="kirimKePenawaran()" title="Kirim hasil hitung ke Quotation Maker">📋 Kirim ke Penawaran</button>
         <button class="btn btn-outline" onclick="doCalc();setTimeout(function(){switchTab('print');},100)">🖨️ Hitung &amp; Print</button>
         <button class="btn btn-ghost" onclick="resetForm()">↺ Reset</button>
       </div>
@@ -1265,6 +1266,18 @@ function clearInvalid(){document.querySelectorAll('.invalid').forEach(function(e
 function markInvalid(id){var e=$(id);if(e){var p=e.closest('.field');if(p)p.classList.add('invalid');}}
 
 /* ══ QUOTE ══ */
+function kirimKePenawaran(){
+  var r=state.item;
+  if(!r){$('statusBox').innerHTML='<strong>⚠ Hitung item dulu sebelum kirim ke penawaran!</strong>';return;}
+  var item={nama:r.nama||'Cetak Offset',
+    ukuran:(r.panjang&&r.lebar)?(r.panjang+'\u00d7'+r.lebar+' cm'):'',
+    bahan:[r.jenisKertasLabel,r.gramasi?r.gramasi+'gr':''].filter(Boolean).join(' '),
+    kategori:'',cetak:r.warna||'',
+    finishing:Array.isArray(r.fins)?r.fins.filter(Boolean).join(', '):(r.fins||''),
+    custom:'',qty:r.qty||1,harga:Math.round(r.perPcs||0),imgSrc:''};
+  try{localStorage.setItem('rp_quot_additem',JSON.stringify([item]));}catch(e){}
+  location.href='quotation.html';
+}
 function addToQuote(){if(!state.item){$('statusBox').innerHTML='<strong>⚠ Hitung item dulu!</strong>';return;}state.quoteItems.push(Object.assign({},state.item,{id:Date.now()}));renderQuoteTable();refreshTotals();var b=$('badge');if(b)b.textContent=state.quoteItems.length;$('statusBox').innerHTML='<strong>✓ Ditambahkan!</strong> Total '+state.quoteItems.length+' item.';autoSaveSession();}
 function renderQuoteTable(){
   var b=$('badge');if(b)b.textContent=state.quoteItems.length;

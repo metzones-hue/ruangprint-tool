@@ -366,6 +366,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
   <button class="btn btn-primary btn-lg no-print" style="width:100%;justify-content:center;margin-bottom:1rem" onclick="doCalc()">
     🖩 Hitung Sekarang
   </button>
+  <button class="btn btn-outline btn-lg no-print" style="width:100%;justify-content:center;margin-bottom:1rem;border-color:var(--grn);color:var(--grn)" onclick="kirimKePenawaran()">📋 Kirim ke Penawaran</button>
   <div id="statusBox"></div>
 </div>
 
@@ -705,12 +706,24 @@ function calcCore(qty, waste, margin, bulatVal){
     hpp:hpp,hj:hj,hjEks:hjEks};
 }
 
+function kirimKePenawaran(){
+  var d=window._rkBooklet;
+  if(!d){showStat('Hitung dulu sebelum kirim ke penawaran','err');return;}
+  var jm={steples:'Steples',lem_panas:'Lem panas',ring:'Ring',jahit_benang:'Jahit benang'};
+  var item={nama:d.nama||'Booklet',
+    ukuran:[d.uk,(d.hal?d.hal+' hal':''),(jm[d.jilid]||d.jilid||'')].filter(Boolean).join(' \u00b7 '),
+    bahan:'',kategori:'',cetak:'',finishing:'',custom:'',
+    qty:d.qty||1,harga:Math.round(d.hjEks||0),imgSrc:''};
+  try{localStorage.setItem('rp_quot_additem',JSON.stringify([item]));}catch(e){}
+  location.href='quotation.html';
+}
 function doCalc(){
   var nama=G('fNama').trim();
   if(!nama){markErr('fNama');showStat('Nama produk wajib diisi','err');return;}
   var qty=N('fQty'); if(!qty){markErr('fQty');showStat('Quantity tidak valid','err');return;}
   var waste=N('fWaste'), margin=N('fMargin'), bulatVal=parseInt(G('fBulat'))||1;
   var c=calcCore(qty,waste,margin,bulatVal);
+  window._rkBooklet={nama:nama,uk:c.uk,hal:c.hal,qty:qty,jilid:G('fJilid'),hjEks:c.hjEks};
 
   var kIsiLabel = TARIF.kertas[c.kIsi]?TARIF.kertas[c.kIsi].label:'';
   var kCovLabel = TARIF.kertas[c.kCov]?TARIF.kertas[c.kCov].label:'';

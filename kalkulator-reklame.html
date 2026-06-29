@@ -515,10 +515,10 @@ nav.tabs .tab.active{color:var(--gold);border-bottom-color:var(--gold)}
       </div>
 
       <div class="kpi-actions">
-        <a id="btnWA" href="#" target="_blank" rel="noopener" class="btn success">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.52 3.48A11.93 11.93 0 0 0 12.06 0C5.5 0 .17 5.33.17 11.9c0 2.1.55 4.15 1.6 5.96L0 24l6.3-1.65a11.9 11.9 0 0 0 5.76 1.47h.01c6.55 0 11.88-5.33 11.88-11.9 0-3.18-1.24-6.17-3.43-8.44ZM12.07 21.8a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.27c0-5.46 4.44-9.9 9.9-9.9 2.64 0 5.13 1.03 7 2.9a9.84 9.84 0 0 1 2.9 7c0 5.46-4.44 9.9-9.9 9.9Z"/></svg>
-          Kirim via WhatsApp
-        </a>
+        <button class="btn success" onclick="kirimKePenawaran()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h3"/></svg>
+          Kirim ke Penawaran
+        </button>
         <button class="btn primary" onclick="window.print()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
           Cetak Penawaran
@@ -583,6 +583,16 @@ const API = '';
 const _tok = localStorage.getItem('rp_auth_token') || '';
 function afetch(u, o){ o = o || {}; o.headers = Object.assign({'Content-Type':'application/json'}, o.headers||{}, _tok?{'Authorization':'Bearer '+_tok}:{}); return fetch(u, o); }
 function doLogout(){ localStorage.removeItem('rp_auth_token'); location.href='index.html'; }
+function kirimKePenawaran(){
+  readState();
+  const t=(window._rkReklame&&window._rkReklame.total)||0;
+  if(!t){showToast('Hitung dulu sebelum kirim ke penawaran');return;}
+  const isHuruf=state.jenis==='Huruf Timbul';
+  const spec=isHuruf?(state.tinggiHuruf+'cm \u00d7 '+state.jumlahHuruf+' huruf'):(state.panjang+'\u00d7'+state.tinggi+'m \u00b7 '+state.sisi+' sisi');
+  const item={nama:state.jenis+' \u2014 '+state.bahan,ukuran:spec,bahan:state.bahan,kategori:'Reklame',cetak:'',finishing:state.led?'+ LED':'',custom:state.lokasi||'',qty:1,harga:Math.round(t),imgSrc:''};
+  try{localStorage.setItem('rp_quot_additem',JSON.stringify([item]));}catch(e){}
+  location.href='quotation.html';
+}
 async function checkRole(){
   try{
     const r = await afetch('/api/auth/me');
@@ -714,6 +724,7 @@ function hitung(){
   const marginRp = hpp * (state.margin / 100);
   let total = hpp + marginRp;
   if(state.pembulatan > 0) total = Math.ceil(total / state.pembulatan) * state.pembulatan;
+  window._rkReklame={total:total};
   const ppnRp = total * (state.ppn / 100);
   const totalDenganPPN = total + ppnRp;
 
@@ -772,6 +783,7 @@ function normalisasiNoWA(no){
 function updateWALink(total, satuanInfo, hpp, marginRp){
   const no = normalisasiNoWA(state.waKlien);
   const btn = document.getElementById('btnWA');
+  if(!btn) return;
   if(!no){
     btn.href = '#';
     btn.onclick = (e) => { e.preventDefault(); showToast('Isi No. WhatsApp Klien dulu'); };
