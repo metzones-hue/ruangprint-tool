@@ -96,6 +96,7 @@ const _seedReklame = [
   ['visual_m2','Flexy Frontlite','Flexy Frontlite',120000,'/m²',5],
   ['huruf_cm','Acrylic','Acrylic',12000,'/cm',1],
   ['huruf_cm','Stainless','Stainless',15000,'/cm',2],
+  ['huruf_cm','Galvanis','Galvanis',14000,'/cm',3],
   ['komponen','rangkaPerM2','Rangka & Dudukan',250000,'/m²',1],
   ['komponen','elektrikalPerM2','Elektrikal / LED',200000,'/m²',2],
   ['komponen','tiangPerMeter','Tiang',600000,'/m',3],
@@ -108,6 +109,14 @@ if (db.prepare('SELECT COUNT(*) n FROM reklame_harga').get().n === 0) {
   const ins = db.prepare('INSERT INTO reklame_harga (kategori,kode,label,nilai,satuan,urutan) VALUES (?,?,?,?,?,?)');
   db.transaction(rows => rows.forEach(r => ins.run(...r)))(_seedReklame);
   console.log('[Bootstrap] Seed harga reklame ditambahkan.');
+}
+// Tambahan bahan (idempotent) untuk DB lama yang sudah berisi data
+{
+  const _ensureReklameRows = [
+    ['huruf_cm','Galvanis','Galvanis',14000,'/cm',3],
+  ];
+  const insIgn = db.prepare('INSERT OR IGNORE INTO reklame_harga (kategori,kode,label,nilai,satuan,urutan) VALUES (?,?,?,?,?,?)');
+  _ensureReklameRows.forEach(r => insIgn.run(...r));
 }
 if (db.prepare('SELECT COUNT(*) n FROM reklame_toko').get().n === 0) {
   db.prepare('INSERT INTO reklame_toko (id,nama,alamat,telepon) VALUES (1,?,?,?)')
