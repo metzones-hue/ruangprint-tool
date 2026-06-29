@@ -1153,6 +1153,22 @@ document.getElementById('loginLogo').src = logoSrc;
 // Init auth gate
 initAuth();
 
+// Intake item dari kalkulator (offset/booklet/reklame)
+(function(){
+  try{
+    const raw=localStorage.getItem('rp_quot_additem');
+    if(!raw)return;
+    localStorage.removeItem('rp_quot_additem');
+    const arr=JSON.parse(raw);
+    if(!Array.isArray(arr)||!arr.length)return;
+    const blank={nama:'',ukuran:'',bahan:'',kategori:'',cetak:'',finishing:'',custom:'',qty:1,harga:0,imgSrc:''};
+    if(items.length===1) items.length=0;
+    arr.forEach(it=>items.push(Object.assign({},blank,it)));
+    rp(); switchTab('item');
+    setTimeout(()=>toast('✓ '+arr.length+' item dari kalkulator ditambahkan'),300);
+  }catch(e){}
+})();
+
 // Restore cabang + cs name preference
 (function(){
   const cab = localStorage.getItem('rp_cabang');

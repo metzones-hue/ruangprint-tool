@@ -342,7 +342,8 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
         <div style="display:flex;align-items:center;gap:28px;margin-bottom:16px;flex-wrap:wrap">
           <div><div class="l" style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:600">Jumlah Quotation</div><div class="v" style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:800" id="repTotalCount">0</div></div>
           <div><div class="l" style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:600">Total Nilai</div><div class="v" style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:800" id="repTotalValue">Rp 0</div></div>
-          <button class="btn" style="margin-left:auto" onclick="exportReportCSV()">⬇ Export CSV</button>
+          <a href="laporan.html" class="btn sec" style="margin-left:auto;text-decoration:none">📊 Laporan Lengkap (+ Surat Jalan)</a>
+          <button class="btn" onclick="exportReportCSV()">⬇ Export CSV</button>
         </div>
         <table><thead><tr><th>No. Quotation</th><th>Tanggal</th><th>Cabang</th><th>CS</th><th>Customer</th><th style="text-align:right">Nilai</th></tr></thead>
         <tbody id="repBody"></tbody></table>
