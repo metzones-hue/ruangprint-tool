@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjU1NSAxMTAgOTQ2IDEzNjgiIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiI+PHBhdGggZmlsbD0icmdiKDE5Nyw2Nyw1MykiIGQ9Ik0gMTAyMC4zMyAxMzMuMjE5IEMgMTA0OS44NiAxMjkuNzc4IDEwNjAuOTMgMTQzLjU3NCAxMDgwLjM0IDE2Mi4xNzMgTCAxMTE4LjY0IDE5OC44OTkgTCAxMTU4LjM4IDIzNi41NjQgQyAxMTcwLjQ0IDI0Ny45ODYgMTE4Ni40NyAyNjAuMDIzIDExOTAuMTcgMjc2LjQ1MSBDIDExOTIuNSAyODYuODEyIDExOTAuMzIgMzAwLjkyMiAxMTgzLjYgMzA5LjI3OCBDIDExNjMuODYgMzMyLjA1OSAxMTM4LjMzIDM1My44NTYgMTExNS4yNyAzNzMuNTA2IEMgMTA5My42NiAzOTEuOTE1IDEwNjMuNDggNDI1LjI1IDEwMzYuMjIgNDMwLjg0NyBDIDEwMjUuMTcgNDMxLjk3MiAxMDEwLjAxIDQzMC4yMjggMTAwMC45NyA0MjMuNTkyIEMgOTc3Ljg1OSA0MDYuNjI4IDk1NS4wOTcgMzg1LjUzNiA5MzMuNCAzNjYuNTM2IEMgOTEzLjc5NyAzNDkuMzY5IDg5Mi42MDQgMzMxLjMxNSA4NzQuODE0IDMxMi41MjQgQyA4NzAuMjg0IDMwNy4wNjcgODY3LjU3IDMwMC4zMiA4NjYuMDA4IDI5My42IEMgODU5Ljg2NCAyNjcuMTcgODgzLjk4NCAyNTAuMDA0IDkwMSAyMzMuOTQyIEwgOTQyLjg4NSAxOTQuMjcgTCA5NzYuNTQ1IDE2Mi4wODggQyA5OTEuODMgMTQ3LjM4NCA5OTguNjk5IDEzNy40NDMgMTAyMC4zMyAxMzMuMjE5IHoiLz48cGF0aCBmaWxsPSJyZ2IoMjQwLDIwMiw3NykiIGQ9Ik0gMTAxOS43NyAxMTU5LjE3IEMgMTAzMS42NiAxMTU4LjI4IDEwNDMuMDQgMTE1OS4wNiAxMDUzLjczIDExNjQuODcgQyAxMDY5LjE4IDExNzMuMjcgMTE2NS43MiAxMjU4Ljc3IDExODAuNTYgMTI3NS45OSBDIDExODQuODcgMTI4MC45IDExODguMDcgMTI4Ni42OSAxMTg5Ljk0IDEyOTIuOTYgQyAxMTkyLjg1IDEzMDMuMTkgMTE5MS41NSAxMzE0LjE3IDExODYuMzIgMTMyMy40MyBDIDExNzMuNTkgMTM0NS44MyAxMTI3LjY5IDEzNzkuMzIgMTEwOC45NiAxNDAwLjE5IEMgMTA5NS42OCAxNDE0Ljk5IDEwNzYuNzUgMTQzMS4xNCAxMDYyLjE3IDE0NDQuODkgQyAxMDU2LjA0IDE0NTAuNjggMTA0NS4zNCAxNDU0LjQ5IDEwMzcuMjMgMTQ1Ni44IEMgMTAyNS4zNiAxNDU3LjkxIDEwMTMuNzEgMTQ1Ni42MyAxMDAzLjE0IDE0NTAuNzUgQyA5OTQuNjkzIDE0NDYuMDUgODg2Ljc3MyAxMzQzLjUyIDg3Ni4zOTggMTMzMS42OSBDIDg3Mi4xMTQgMTMyNi44MSA4NjguODc3IDEzMjEuMzYgODY3LjEzOSAxMzE1LjA2IEMgODY0LjI3NCAxMzA0LjYgODY1Ljc2NyAxMjkzLjQzIDg3MS4yNzcgMTI4NC4xIEMgODg0LjAzMSAxMjYyLjEyIDkyNi42NDYgMTIzMS45MiA5NDUuODc2IDEyMTIuNTIgQyA5NjAuMDk5IDExOTguMTcgOTgwLjM5NiAxMTgzLjA4IDk5NS44MjcgMTE2OS43NCBDIDEwMDEuNjggMTE2NC42OCAxMDEyLjI2IDExNjEuMTEgMTAxOS43NyAxMTU5LjE3IHoiLz48cGF0aCBmaWxsPSJyZ2IoMjE4LDEzOSw2NikiIGQ9Ik0gMTE5Ni4zOSAxMDIwLjMgQyAxMjE2LjExIDEwMTguOTEgMTIyNy40IDEwMjIuODYgMTI0My4yMSAxMDM0LjkxIEMgMTI3Ny45OCAxMDYxLjM4IDEzMTEuMzEgMTA5MC4xMyAxMzQ0LjIgMTExOC44MiBDIDEzNjQuMSAxMTM2LjE2IDEzNzUuMjQgMTE1Ny42NyAxMzUxLjQ1IDExNzcuOCBDIDEzMjYuNTUgMTE5OS41IDEzMDEuMjcgMTIyMC44MSAxMjc3LjE1IDEyNDMuMzkgQyAxMjYzLjA3IDEyNTYuNTggMTI1Ny4wNCAxMjYyLjkyIDEyMzguMTEgMTI2Ny4xMSBDIDEyMDUuNzkgMTI2Ny42NyAxMTk0LjM4IDEyNTEuNTcgMTE3MS44MiAxMjMxLjMgQyAxMTU3LjUyIDEyMTguNDcgMTE0My4xNCAxMjA1Ljc0IDExMjguNjcgMTE5My4xMSBDIDExMTUuNzIgMTE4MS43MyAxMDg2LjQ3IDExNTguMjIgMTA3Ni42MiAxMTQ3LjM3IEMgMTA3Mi42NyAxMTQzLjA5IDEwNjkuOSAxMTM3Ljg2IDEwNjguNTkgMTEzMi4xOSBDIDEwNjYuNjIgMTEyNC4wNiAxMDY3Ljc5IDExMTYuNDkgMTA3Mi4zIDExMDkuNDQgQyAxMDgxLjgyIDEwOTQuNTMgMTE2MC4xOCAxMDM4LjIzIDExODAuMjIgMTAyNi43NyBDIDExODUuNTcgMTAyMy43MSAxMTkwLjM5IDEwMjEuNjggMTE5Ni4zOSAxMDIwLjMgeiIvPjxwYXRoIGZpbGw9InJnYigyMTgsMTM5LDY2KSIgZD0iTSA4NTIuNTUgMTAyMC40IEMgODYxLjM3NSAxMDIwLjIzIDg2Ny40ODUgMTAyMS42OSA4NzUuMTU0IDEwMjYuMjkgQyA4OTQuMjM5IDEwMzguMyA5MTUuMDY3IDEwNTIuNTEgOTMyLjc3NyAxMDY2LjM3IEMgOTQ3LjM0MyAxMDc3Ljc2IDk4My4wODYgMTA5OS41OCA5ODcuODcgMTExNi44NyBDIDk5MC4xNTggMTEyNS4wNCA5ODkuMDI3IDExMzMuNzkgOTg0LjczOSAxMTQxLjEgQyA5NzcuOTczIDExNTIuNjYgOTYxLjA1NCAxMTY0LjkgOTUwLjUxOSAxMTczLjk2IEwgOTA1LjkyMyAxMjEyLjg5IEMgODg4Ljk2NiAxMjI3LjgzIDg3MS43MDEgMTI0NC42NSA4NTQuMDA5IDEyNTguNDIgQyA4NDguNzA4IDEyNjIuNTQgODM3LjY2MiAxMjY1LjQ3IDgzMS4yNDUgMTI2Ny4xMSBDIDgxOS4yMDIgMTI2Ny42OCA4MDYuMzYzIDEyNjYuNyA3OTYuOTQ1IDEyNTguMjcgQyA3NjMuODkgMTIyOC42OCA3MjkuMzMzIDEyMDAgNjk3LjE5MyAxMTY5LjUxIEMgNjg3LjI5MiAxMTYwLjEyIDY5Mi43NzcgMTEzOC40MyA3MDIuMDI2IDExMjkuODIgQyA3NDAuOTE3IDEwOTMuNjMgNzgyLjU4MiAxMDU3LjMyIDgyNi4wMTQgMTAyNi42OSBDIDgzMS44OTUgMTAyMi41NSA4NDUuNjM1IDEwMjAuOTggODUyLjU1IDEwMjAuNCB6Ii8+PHBhdGggZmlsbD0icmdiKDE1Niw2NywxMTgpIiBkPSJNIDEyMzEuMDcgMzIyLjM3MyBDIDEyNDAuOTQgMzIyLjUgMTI1MS44MyAzMjQuNDIgMTI1OS40NSAzMzEuMTU4IEMgMTI5Mi44IDM2MC42MzQgMTMyNi45MyAzODkuNzE5IDEzNTkuNTQgNDE5Ljk1MyBDIDEzNjIuMzggNDIyLjU4MyAxMzY0LjM4IDQyOC4xMjkgMTM2NC43NiA0MzEuOTMzIEMgMTM2Ni40MiA0NDguNjE1IDEzNTQuODIgNDYxLjE3IDEzNDMuMjIgNDcxLjQxNCBDIDEzMTYuOTcgNDk0LjU5NCAxMjkwLjUzIDUxNi45NzYgMTI2My4zMyA1MzguOTExIEMgMTI0Mi4zMiA1NTUuODU0IDEyMzEuMzcgNTY3LjY0NSAxMjAzLjM2IDU2OS44OTMgQyAxMTkwLjc4IDU2OC42NzggMTE4Mi45IDU2NS42OCAxMTcyLjQgNTU4LjAxNSBDIDExNDAuOCA1MzQuOTU2IDExMDYuNzIgNTEyLjcxMiAxMDc3LjQ4IDQ4Ni44OTMgQyAxMDYzLjY4IDQ3NC43MDggMTA2NS4zMSA0NTMuMzIxIDEwNzcuODEgNDQxLjEyNyBDIDEwODUuMzEgNDMzLjgxNiAxMDkzLjE5IDQyNy4wMDggMTEwMS40MyA0MTkuOTg3IEMgMTExMy45NyA0MDkuMzc0IDExMjYuNDEgMzk4LjY0NSAxMTM4Ljc1IDM4Ny44MDIgQyAxMTUyLjAzIDM3Ni4xMDkgMTE2NS4yMyAzNjQuMzExIDExNzguMzMgMzUyLjQxIEMgMTE5Ny4xMyAzMzUuNDIyIDEyMDQuNjYgMzI1LjE4NiAxMjMxLjA3IDMyMi4zNzMgeiIvPjxwYXRoIGZpbGw9InJnYigxNTYsNjcsMTE4KSIgZD0iTSA4MTcuMTA4IDMyMy4yMTIgQyA4MjUuNTI1IDMyMi4yMjggODQxLjk3MiAzMjMuNjExIDg0OC44OTggMzI4LjY3NyBDIDg4Mi42NDggMzUzLjM2MSA5MTIuMjQzIDM4NC43OSA5NDQuOTE3IDQxMS4yMjYgQyA5NTUuMjk0IDQxOS42MjIgOTY5LjU0MyA0MzEuMTc5IDk3OC43NTMgNDQwLjYzNSBDIDk4Mi42OSA0NDQuNjgyIDk4NS42NjMgNDQ5LjU2NSA5ODcuNDUgNDU0LjkyMSBDIDk4OS45OTIgNDYyLjY1NSA5ODkuNjc0IDQ3MC43NiA5ODUuODYyIDQ3Ny45OTUgQyA5ODMuODc3IDQ4MS43NjMgOTc4Ljc4MyA0ODguMTkxIDk3NS42ODIgNDkwLjU2NCBDIDk1NC41OTYgNTA2LjY5OSA4ODUuMzc5IDU2MS45NzggODY0LjMwMiA1NjguNyBDIDgzNC4xODQgNTc1LjMyNCA4MTMuNTQxIDU1NS4zOTQgNzkyLjE3NyA1MzguMDU2IEMgNzc2LjU3NiA1MjUuNDMxIDc2MS4xMzkgNTEyLjYwNCA3NDUuODcyIDQ5OS41NzggQyA3MzEuNzk4IDQ4Ny41ODYgNzE2LjYyIDQ3NS4yMjIgNzAzLjc2MyA0NjIuMDg1IEMgNjk2LjIzNiA0NTQuMzk0IDY4OS4wNTIgNDM5Ljk5NCA2OTIuNjY2IDQyOS4zMzUgQyA2OTQuNDMyIDQyNC4xMjcgNjk5LjU0IDQxNy4zNTkgNzAzLjY4NiA0MTMuNjgzIEMgNzI3LjU5OCAzOTIuNDg0IDc1Mi4yMzQgMzcyLjE2NyA3NzUuNTM4IDM1MC4yNjkgQyA3ODIuNTczIDM0My42NTkgNzg5LjkzMSAzMzYuODc4IDc5Ny43MjIgMzMxLjIwNSBDIDgwNC4zNSAzMjYuMzY1IDgwOS4yMDMgMzI0LjkyOCA4MTcuMTA4IDMyMy4yMTIgeiIvPjxwYXRoIGZpbGw9InJnYigxOTcsNjcsNTMpIiBkPSJNIDEzMjYuMzUgOTQ4LjIyOCBDIDEzMzUuMTMgOTQ4LjEyOCAxMzQ4LjIxIDk1Mi4xMTEgMTM1NS40IDk1Ny4xNjIgQyAxMzk0LjY0IDk4NC43MTIgMTQzMS4xMSAxMDE3LjgzIDE0NjYuODQgMTA0OS43NyBDIDE0NzIuNzUgMTA1NS4wNSAxNDgwLjk0IDEwNjUuODMgMTQ4MC45MSAxMDczLjk0IEMgMTQ3Ni42IDEwODEuNjYgMTQzMy42OSAxMTA2LjM0IDE0MjQuODcgMTExNi40MSBDIDE0MTkuMTUgMTEyMi45NCAxNDA2LjYxIDExMjUuMTUgMTM5Ny44MSAxMTI0Ljk3IEMgMTM5My4wMSAxMTIzLjk3IDEzODMuNzkgMTEyMS43MSAxMzc5LjYgMTExOS4xMiBDIDEzNTQuODkgMTEwMy44OCAxMzMxLjYyIDEwNzkuNjUgMTMwOC4zNiAxMDYxLjIxIEMgMTI4OS42NSAxMDQ1LjE2IDEyNjkuMjIgMTAzMC4zOSAxMjUxLjEgMTAxMy43MiBDIDEyNDUuMjEgMTAwOC4zIDEyMzguNjYgOTk0LjQ1MSAxMjQ0LjI3IDk4OC4zMDIgQyAxMjYwLjEyIDk3MC45NiAxMzA0LjQ4IDk1My4yMDUgMTMyNi4zNSA5NDguMjI4IHoiLz48cGF0aCBmaWxsPSJyZ2IoMTA0LDc0LDEzMykiIGQ9Ik0gNjQ2LjA4OCA0NjUuMjA0IEMgNjU1LjUzNiA0NjQuNDg2IDY2OC40NjkgNDY1LjMzMyA2NzYuNjY3IDQ3MC4zOTYgQyA3MDIuMzAyIDQ4Ni4yMjcgNzI2LjUzMSA1MTEuNTU1IDc1MC42ODEgNTMwLjU2NSBDIDc2OC41MDEgNTQ1LjUyNyA3ODcuNjIzIDU1OS41MiA4MDQuODI1IDU3NS4xNDYgQyA4MTAuNjI2IDU4MC40MTYgODE3Ljc0NyA1OTUuNTMzIDgxMi43MzggNjAxLjI3MSBDIDc5OC41IDYxNy41ODUgNzYxLjg0NCA2MzEuNDA3IDc0Mi4wMTUgNjM4LjQ3IEMgNzMyLjQyNyA2NDEuNTY0IDcyNS42NTIgNjQyLjUwMSA3MTUuOTQzIDYzOS4zNjYgQyA3MDcuMzE3IDYzNi41ODIgNjk4LjgyNyA2MzEuMTAyIDY5MS40NTIgNjI1LjkyNiBDIDY3MC43OSA2MTEuNDI2IDU4Ny4xMjEgNTQyLjY0OCA1NzguMDUzIDUyNC4xNTEgQyA1NzYuNTQ0IDUyMS4wNzMgNTc1LjQ2MiA1MTguMDc5IDU3Ni41OTUgNTE0Ljc4NCBDIDU4Mi44MDIgNTA4LjY5MiA2MzguNzYyIDQ2OC4yOCA2NDYuMDg4IDQ2NS4yMDQgeiIvPjxwYXRoIGZpbGw9InJnYigxOTcsNjcsNTMpIiBkPSJNIDcyMi44NiA5NDkuMTY1IEMgNzQzLjIxIDk0Ni41NzQgNzc2LjE5NiA5NjcuMzY5IDc5NC43MDYgOTc0Ljg1NCBDIDgxNy4zOTQgOTg0LjAyOCA4MjAuODE4IDEwMDIuNCA4MDEuMTggMTAxOC4yOCBDIDc2Mi4xMjMgMTA0OS44NyA3MjQuMDI3IDEwODIuMjYgNjg1LjY0IDExMTQuNjEgQyA2ODAuNzc3IDExMTguNzEgNjcxLjE4NSAxMTIyLjE4IDY2NS4yMDYgMTEyNC4xMyBDIDY0MS40NjQgMTEyOS40MyA2MzIuMjUzIDExMTYuOCA2MTQuMzE0IDExMDIuOTIgQyA2MDUuNzIxIDEwOTYuMjggNTgwLjkyNiAxMDgxLjk4IDU3NS45NjEgMTA3NC42NiBDIDU3NS44NTMgMTA3MC4wNCA1NzcuNTc2IDEwNjYuMzMgNTgwLjAxMSAxMDYyLjUgQyA1OTEuODY4IDEwNDMuODcgNjc1LjYyNSA5NzQuNzA4IDY5NS40MTIgOTYxLjY0NCBDIDcwNC4xMDYgOTU1LjkwNSA3MTIuNjkyIDk1MS41MTQgNzIyLjg2IDk0OS4xNjUgeiIvPjxwYXRoIGZpbGw9InJnYigxMDQsNzQsMTMzKSIgZD0iTSAxNDAwLjk3IDQ2NC4zMjIgQyAxNDExLjY4IDQ2My41MiAxNDI0LjI1IDQ3MC40ODggMTQzMS4xMiA0NzcuODUyIEMgMTQzOC43NiA0ODYuMDM2IDE0NzkuOTIgNTA5Ljk0MSAxNDgxLjA1IDUxNi40ODIgQyAxNDc4LjExIDU0MC4yNyAxMzg5LjU0IDYwMy45NjggMTM2Ny45NSA2MjMuNDY5IEMgMTM1OC4yIDYzMi4yNzcgMTMzOC42NiA2NDIuMDM3IDEzMjQuNzQgNjQwLjg3NiBDIDEzMDMuNDggNjM1LjkyNyAxMjc0Ljg1IDYyMS42ODQgMTI1NS43NyA2MTEuMzgxIEMgMTIyMS4yMyA1OTIuNzM4IDEyNjIuMiA1NjUuOTU3IDEyNzguNDYgNTUyLjg3MyBDIDEyOTAuOTggNTQyLjgyNSAxMzAzLjM4IDUzMi42MTggMTMxNS42NCA1MjIuMjU2IEMgMTMzMy45MSA1MDYuODg1IDEzNTEuODEgNDkwLjcwMSAxMzcwLjQ4IDQ3NS44NDMgQyAxMzc5LjQyIDQ2OC43MyAxMzg5LjgzIDQ2NS45MDkgMTQwMC45NyA0NjQuMzIyIHoiLz48L3N2Zz4K">
+<script>if(!localStorage.getItem('rp_auth_token'))location.href='index.html';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kalkulator Reklame — RuangPrint Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root[data-theme="dark"]{
+  --bg:#0A0A0B; --surface:#131316; --surface-2:#1B1B20; --surface-3:#26262D;
+  --border:rgba(255,255,255,.06); --border-strong:rgba(255,255,255,.12);
+  --text:#FAFAFA; --text-dim:#A1A1AA; --text-muted:#71717A;
+  --gold:#F5A800; --gold-soft:rgba(245,168,0,.12); --gold-border:rgba(245,168,0,.25);
+  --green:#22C55E; --green-soft:rgba(34,197,94,.12);
+  --blue:#3B82F6; --blue-soft:rgba(59,130,246,.12);
+  --red:#EF4444; --red-soft:rgba(239,68,68,.12);
+  --purple:#A855F7; --purple-soft:rgba(168,85,247,.12);
+  --shadow:0 20px 60px rgba(0,0,0,.4);
+}
+:root[data-theme="light"]{
+  --bg:#F7F7F8; --surface:#FFFFFF; --surface-2:#F4F4F5; --surface-3:#E4E4E7;
+  --border:rgba(0,0,0,.06); --border-strong:rgba(0,0,0,.12);
+  --text:#09090B; --text-dim:#52525B; --text-muted:#71717A;
+  --gold:#D97706; --gold-soft:rgba(217,119,6,.10); --gold-border:rgba(217,119,6,.30);
+  --green:#16A34A; --green-soft:rgba(22,163,74,.10);
+  --blue:#2563EB; --blue-soft:rgba(37,99,235,.10);
+  --red:#DC2626; --red-soft:rgba(220,38,38,.10);
+  --purple:#9333EA; --purple-soft:rgba(147,51,234,.10);
+  --shadow:0 20px 50px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Outfit',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s}
+
+/* TOPBAR */
+header.topbar{position:sticky;top:0;z-index:30;background:rgba(10,10,11,.78);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+[data-theme="light"] header.topbar{background:rgba(247,247,248,.82)}
+.top-left{display:flex;align-items:center;gap:16px;min-width:0;flex:1}
+.back-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text-dim);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;text-decoration:none;flex-shrink:0}
+.back-btn:hover{color:var(--text);background:var(--surface-2);border-color:var(--border-strong)}
+.back-btn svg{width:16px;height:16px}
+.crumb{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-muted);min-width:0}
+.crumb a{color:var(--text-muted);text-decoration:none}
+.crumb a:hover{color:var(--text)}
+.crumb b{color:var(--text);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crumb svg{width:14px;height:14px;flex-shrink:0}
+.save-status{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);margin-left:8px}
+.save-status .dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.top-right{display:flex;align-items:center;gap:8px}
+.iconbtn{width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text-dim);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.iconbtn:hover{color:var(--text);border-color:var(--border-strong);background:var(--surface-2)}
+.iconbtn svg{width:16px;height:16px}
+.btn{height:36px;padding:0 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap;text-decoration:none}
+.btn:hover{border-color:var(--border-strong);background:var(--surface-2)}
+.btn.primary{background:var(--gold);color:#0A0A0B;border-color:var(--gold)}
+.btn.primary:hover{background:#fbbb1f}
+.btn.success{background:var(--green);color:#fff;border-color:var(--green)}
+.btn.success:hover{filter:brightness(1.1)}
+.btn.ghost{background:transparent}
+.btn svg{width:14px;height:14px}
+kbd{font-size:10px;padding:1px 5px;background:rgba(0,0,0,.15);border-radius:3px;margin-left:4px;font-family:'JetBrains Mono',monospace}
+
+/* TABS */
+nav.tabs{position:sticky;top:60px;z-index:25;background:var(--bg);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+nav.tabs .tab{height:46px;padding:0 18px;background:none;border:none;color:var(--text-muted);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
+nav.tabs .tab svg{width:15px;height:15px}
+nav.tabs .tab:hover{color:var(--text-dim)}
+nav.tabs .tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:1fr 340px;gap:18px;padding:18px 24px;align-items:start;max-width:1500px;margin:0 auto}
+.main-col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.aside-col{position:sticky;top:120px;display:flex;flex-direction:column;gap:14px}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.card-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card-title{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text)}
+.card-title-ic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.card-title-ic svg{width:16px;height:16px}
+.card-body{padding:18px}
+.acc-blue   .card-title-ic{background:var(--blue-soft);color:var(--blue)}
+.acc-green  .card-title-ic{background:var(--green-soft);color:var(--green)}
+.acc-purple .card-title-ic{background:var(--purple-soft);color:var(--purple)}
+.acc-gold   .card-title-ic{background:var(--gold-soft);color:var(--gold)}
+.acc-red    .card-title-ic{background:var(--red-soft);color:var(--red)}
+
+/* FORM */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:1/-1}
+.field label{font-size:11px;font-weight:600;color:var(--text-dim);letter-spacing:.5px;text-transform:uppercase;display:flex;align-items:center;gap:4px}
+.field label .req{color:var(--red)}
+.field label .hint{margin-left:auto;font-size:10px;color:var(--text-muted);font-weight:500;text-transform:none;letter-spacing:0}
+.field input,.field select,.field textarea{height:40px;padding:0 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;font-size:13px;transition:all .15s;width:100%}
+.field textarea{height:auto;padding:10px 12px;font-family:inherit;resize:vertical;min-height:60px}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold);background:var(--surface)}
+.field input[readonly]{background:var(--surface-3);color:var(--text-dim);cursor:not-allowed}
+.field-prefix{position:relative}
+.field-prefix input{padding-left:34px}
+.field-prefix::before{content:attr(data-prefix);position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text-muted);font-weight:600;pointer-events:none;z-index:1}
+.field-suffix{position:relative}
+.field-suffix input{padding-right:48px}
+.field-suffix::after{content:attr(data-suffix);position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--text-muted);font-weight:600;pointer-events:none}
+
+/* RADIO PILLS */
+.pills{display:flex;gap:8px;background:var(--surface-2);padding:4px;border-radius:10px;border:1px solid var(--border)}
+.pills input[type="radio"]{display:none}
+.pills label{flex:1;text-align:center;padding:8px 12px;font-size:12px;font-weight:600;color:var(--text-dim);cursor:pointer;border-radius:7px;transition:all .15s;letter-spacing:0;text-transform:none}
+.pills input[type="radio"]:checked + label{background:var(--gold);color:#0A0A0B}
+
+/* CHECKBOX SWITCH */
+.switch{display:flex;align-items:center;gap:10px;background:var(--surface-2);padding:10px 14px;border-radius:10px;border:1px solid var(--border);cursor:pointer;user-select:none}
+.switch input{display:none}
+.switch .knob{width:36px;height:20px;background:var(--surface-3);border-radius:10px;position:relative;transition:all .2s;flex-shrink:0}
+.switch .knob::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;transition:all .2s}
+.switch input:checked + .knob{background:var(--gold)}
+.switch input:checked + .knob::after{transform:translateX(16px)}
+.switch .switch-label{font-size:13px;font-weight:600;color:var(--text)}
+.switch .switch-sub{font-size:11px;color:var(--text-muted);font-weight:500;display:block;margin-top:1px}
+
+/* FLOW STEPS */
+.flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px}
+.flow-step{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:11px;font-weight:600;min-width:90px;text-align:center}
+.flow-step .step-l{font-size:9px;color:var(--text-muted);font-weight:500;margin-top:2px;letter-spacing:.5px;text-transform:uppercase}
+.flow-step.active{background:var(--gold-soft);border-color:var(--gold-border);color:var(--gold)}
+.flow-step.done{background:var(--green-soft);border-color:rgba(34,197,94,.25);color:var(--green)}
+.flow-arrow{color:var(--text-muted);font-size:14px}
+
+/* TEMPLATE CHIPS */
+.template-chips{display:flex;gap:8px;flex-wrap:wrap;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;align-items:center}
+.tpl-chip{height:32px;padding:0 12px;border-radius:8px;border:1px dashed var(--border-strong);background:transparent;color:var(--text-dim);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+.tpl-chip:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-soft)}
+.tpl-chip.active{border-style:solid;border-color:var(--gold);color:var(--gold);background:var(--gold-soft)}
+.tpl-chip svg{width:12px;height:12px}
+
+/* KPI PANEL */
+.kpi-card{background:var(--surface);border:1px solid var(--gold-border);border-radius:14px;padding:18px;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.kpi-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.kpi-head-title{font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase}
+.kpi-badge{font-size:9px;font-weight:700;padding:3px 8px;border-radius:6px;background:var(--green-soft);color:var(--green);letter-spacing:.5px;display:flex;align-items:center;gap:4px}
+.kpi-badge svg{width:10px;height:10px}
+.kpi-main{padding:12px 0 14px;border-bottom:1px dashed var(--border);margin-bottom:14px}
+.kpi-main-lbl{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.kpi-main-val{font-family:'Outfit';font-size:28px;font-weight:700;line-height:1;color:var(--text)}
+.kpi-main-val small{font-size:14px;color:var(--text-muted);font-weight:500}
+.kpi-main-sub{font-size:11px;color:var(--text-dim);margin-top:6px}
+.kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kpi-mini{background:var(--surface-2);border-radius:10px;padding:10px 12px}
+.kpi-mini-lbl{font-size:9px;font-weight:700;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px}
+.kpi-mini-val{font-family:'Outfit';font-size:16px;font-weight:700;color:var(--text)}
+.kpi-mini-val.green{color:var(--green)}
+.kpi-mini-val.blue{color:var(--blue)}
+.kpi-mini-val.gold{color:var(--gold)}
+.kpi-actions{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.kpi-actions .btn{height:40px;width:100%;justify-content:center}
+
+/* HISTORY */
+.history-item{display:flex;flex-direction:column;gap:4px;padding:10px 12px;background:var(--surface-2);border-radius:10px;cursor:pointer;transition:all .15s}
+.history-item:hover{background:var(--surface-3)}
+.history-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.history-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted)}
+.history-meta .price{color:var(--gold);font-weight:600;font-family:'JetBrains Mono'}
+.icbtn{width:28px;height:28px;border-radius:7px;border:1px solid transparent;background:none;color:var(--text-muted);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .15s}
+.icbtn:hover{background:var(--surface-3);color:var(--text);border-color:var(--border)}
+.icbtn svg{width:14px;height:14px}
+
+/* BREAKDOWN LIST */
+.breakdown{display:flex;flex-direction:column;gap:0;margin-top:8px}
+.breakdown-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;font-size:12px;border-bottom:1px dashed var(--border)}
+.breakdown-row:last-child{border-bottom:none}
+.breakdown-row .lbl{color:var(--text-dim)}
+.breakdown-row .val{font-family:'JetBrains Mono';font-weight:600;color:var(--text)}
+.breakdown-row.total{padding-top:12px;font-size:13px;font-weight:700}
+.breakdown-row.total .lbl{color:var(--text);text-transform:uppercase;letter-spacing:.5px;font-size:11px}
+.breakdown-row.total .val{color:var(--gold);font-size:14px}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(40px);background:var(--surface);border:1px solid var(--border-strong);border-radius:12px;padding:12px 18px;font-size:13px;box-shadow:var(--shadow);opacity:0;transition:all .3s;z-index:200;display:flex;align-items:center;gap:10px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast svg{width:16px;height:16px;color:var(--green)}
+
+/* RESPONSIVE */
+@media(max-width:1100px){
+  .layout{grid-template-columns:1fr}
+  .aside-col{position:static;order:-1}
+  .kpi-card{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:center}
+  .kpi-card::before{display:none}
+  .kpi-main{border:none;padding:0;margin:0}
+  .kpi-actions{flex-direction:row;margin:0;grid-column:1/-1}
+}
+@media(max-width:720px){
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+  .kpi-card{grid-template-columns:1fr}
+  .kpi-actions{flex-direction:column}
+  header.topbar{padding:10px 14px}
+  .top-right .btn{display:none}
+  .top-right .btn.primary{display:inline-flex}
+  nav.tabs{padding:0 14px}
+  .layout{padding:14px}
+}
+
+/* PRINT */
+@media print{
+  body{background:#fff !important;color:#000 !important}
+  header.topbar, nav.tabs, .template-chips, .flow, .kpi-actions, .aside-col .card:last-child, .top-right, .no-print{display:none !important}
+  .layout{grid-template-columns:1fr !important;padding:0 !important;display:block !important}
+  .aside-col{position:static !important;display:block !important}
+  .card{border:1px solid #ddd !important;background:#fff !important;break-inside:avoid;page-break-inside:avoid;margin-bottom:12px}
+  .kpi-card{border:2px solid var(--gold) !important}
+  .kpi-main-val{color:#000 !important}
+  @page{margin:14mm}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ TOPBAR ============ -->
+<header class="topbar">
+  <div class="top-left">
+    <a class="back-btn" href="index.html" title="Kembali ke Dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </a>
+    <div class="crumb">
+      <a href="index.html">Tools</a>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+      <b>Kalkulator Reklame</b>
+    </div>
+    <div class="save-status"><span class="dot"></span>Tersimpan otomatis</div>
+  </div>
+  <div class="top-right">
+    <button class="iconbtn" onclick="toggleTheme()" title="Ganti tema">
+      <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+    </button>
+    <button class="btn ghost" onclick="resetForm()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Reset
+    </button>
+    <button class="btn ghost" onclick="openSettings()" id="btnSettings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Pengaturan
+    </button>
+    <button class="btn primary" onclick="hitung()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h2M8 18h2"/></svg>
+      Hitung <kbd>⌘↵</kbd>
+    </button>
+    <a href="index.html" class="btn ghost">← Beranda</a>
+    <a id="navAdmin" href="admin.html" class="btn ghost" style="display:none">⚙ Admin</a>
+    <button class="btn ghost" onclick="doLogout()">⇥ Keluar</button>
+  </div>
+</header>
+
+<!-- ============ TABS (Jenis Reklame) ============ -->
+<nav class="tabs" id="jenisTabs">
+  <button class="tab active" data-jenis="Neon Box" onclick="switchJenis(this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M8 10h8M8 14h5"/></svg>
+    Neon Box
+  </button>
+  <button class="tab" data-jenis="Billboard" onclick="switchJenis(this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="4" width="20" height="12" rx="1"/><path d="M12 16v6M8 22h8"/></svg>
+    Billboard
+  </button>
+  <button class="tab" data-jenis="Pylon Sign" onclick="switchJenis(this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="6" y="2" width="12" height="10" rx="1"/><path d="M12 12v10M9 22h6"/></svg>
+    Pylon Sign
+  </button>
+  <button class="tab" data-jenis="Baliho" onclick="switchJenis(this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="18" height="14" rx="1"/><path d="M7 17v4M17 17v4"/></svg>
+    Baliho
+  </button>
+  <button class="tab" data-jenis="Huruf Timbul" onclick="switchJenis(this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7V5h16v2M9 19h6M12 5v14"/></svg>
+    Huruf Timbul
+  </button>
+</nav>
+
+<!-- ============ LAYOUT ============ -->
+<div class="layout">
+
+  <!-- ====== MAIN COL ====== -->
+  <div class="main-col">
+
+    <!-- TEMPLATE PRESETS -->
+    <div class="template-chips">
+      <span style="font-size:11px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;font-weight:600">Quick Template:</span>
+      <button class="tpl-chip" onclick="loadTpl('neonbox-toko')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="12" rx="2"/></svg>Neon Box Toko 2×1m
+      </button>
+      <button class="tpl-chip" onclick="loadTpl('billboard-jalan')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="12" rx="1"/></svg>Billboard Jalan 6×4m
+      </button>
+      <button class="tpl-chip" onclick="loadTpl('huruf-acrylic')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V5h16v2M12 5v14"/></svg>Huruf Acrylic 30cm
+      </button>
+      <button class="tpl-chip" onclick="loadTpl('pylon')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="2" width="12" height="10" rx="1"/></svg>Pylon Sign 4m
+      </button>
+    </div>
+
+    <!-- FLOW STEPS -->
+    <div class="flow">
+      <div class="flow-step active" id="flow1">Neon Box<div class="step-l">Jenis</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step active" id="flow2">Acrylic<div class="step-l">Material</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step active" id="flow3">+ LED<div class="step-l">Konstruksi</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step active" id="flow4">35%<div class="step-l">Margin</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step done">✓<div class="step-l">Selesai</div></div>
+    </div>
+
+    <!-- CARD 1: SPESIFIKASI -->
+    <div class="card acc-blue">
+      <div class="card-head">
+        <div class="card-title">
+          <div class="card-title-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+          Spesifikasi Reklame
+        </div>
+        <span style="font-size:11px;color:var(--text-muted)">Step 1 dari 4</span>
+      </div>
+      <div class="card-body">
+        <!-- Group Papan (P x T) -->
+        <div id="groupPapan" class="grid-3">
+          <div class="field">
+            <label>Panjang <span class="req">*</span> <span class="hint">meter</span></label>
+            <div class="field-suffix" data-suffix="m"><input type="number" id="inPanjang" value="2" min="0" step="0.1" oninput="hitung()"></div>
+          </div>
+          <div class="field">
+            <label>Tinggi <span class="req">*</span> <span class="hint">meter</span></label>
+            <div class="field-suffix" data-suffix="m"><input type="number" id="inTinggi" value="1" min="0" step="0.1" oninput="hitung()"></div>
+          </div>
+          <div class="field">
+            <label>Jumlah Sisi</label>
+            <div class="pills">
+              <input type="radio" name="sisi" id="sisi1" value="1" checked onchange="hitung()"><label for="sisi1">1 Sisi</label>
+              <input type="radio" name="sisi" id="sisi2" value="2" onchange="hitung()"><label for="sisi2">2 Sisi</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Group Huruf Timbul -->
+        <div id="groupHuruf" class="grid-2" style="display:none">
+          <div class="field">
+            <label>Tinggi Huruf <span class="req">*</span> <span class="hint">cm per huruf</span></label>
+            <div class="field-suffix" data-suffix="cm"><input type="number" id="inTinggiHuruf" value="30" min="0" step="1" oninput="hitung()"></div>
+          </div>
+          <div class="field">
+            <label>Jumlah Huruf <span class="req">*</span></label>
+            <div class="field-suffix" data-suffix="huruf"><input type="number" id="inJumlahHuruf" value="8" min="0" step="1" oninput="hitung()"></div>
+          </div>
+          <div class="field full">
+            <label style="color:var(--text-muted)">ℹ️ Rumus Huruf Timbul</label>
+            <div style="font-family:'JetBrains Mono';font-size:12px;color:var(--text-dim);background:var(--surface-2);padding:10px 12px;border-radius:8px;border:1px dashed var(--border)">
+              Biaya Visual = Tinggi (cm) × Jumlah Huruf × Harga per cm
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 2: MATERIAL -->
+    <div class="card acc-green">
+      <div class="card-head">
+        <div class="card-title">
+          <div class="card-title-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+          Material &amp; Visual
+        </div>
+        <span style="font-size:11px;color:var(--text-muted)">Step 2 dari 4</span>
+      </div>
+      <div class="card-body">
+        <div class="grid-2">
+          <div class="field full">
+            <label>Bahan Visual <span class="req">*</span> <span class="hint" id="bahanHint">Rp 450.000 / m²</span></label>
+            <select id="inBahan" onchange="hitung()">
+              <!-- diisi dinamis -->
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 3: KONSTRUKSI -->
+    <div class="card acc-purple">
+      <div class="card-head">
+        <div class="card-title">
+          <div class="card-title-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 22L12 2l10 20H2zM12 8v6M12 17v.5"/></svg></div>
+          Konstruksi &amp; Pemasangan
+        </div>
+        <span style="font-size:11px;color:var(--text-muted)">Step 3 dari 4</span>
+      </div>
+      <div class="card-body">
+        <div class="grid-3">
+          <div class="field full">
+            <label class="switch" style="text-transform:none;letter-spacing:0">
+              <input type="checkbox" id="inLED" checked onchange="hitung()">
+              <span class="knob"></span>
+              <span>
+                <span class="switch-label">Menggunakan Lampu / LED</span>
+                <span class="switch-sub">Tambah biaya elektrikal per m²</span>
+              </span>
+            </label>
+          </div>
+          <div class="field">
+            <label>Tinggi Tiang <span class="hint">isi 0 jika tanpa tiang</span></label>
+            <div class="field-suffix" data-suffix="m"><input type="number" id="inTiang" value="0" min="0" step="0.1" oninput="hitung()"></div>
+          </div>
+          <div class="field">
+            <label>Ketinggian Pasang</label>
+            <select id="inKetinggian" onchange="hitung()">
+              <option value="Lantai 1">Lantai 1 (×1.0)</option>
+              <option value="Lantai 2">Lantai 2 (×1.2)</option>
+              <option value="Lantai 3+">Lantai 3+ (×1.4)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Lokasi <span class="hint">opsional</span></label>
+            <input type="text" id="inLokasi" placeholder="Cth: Jl. Sudirman">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 4: MARGIN -->
+    <div class="card acc-gold">
+      <div class="card-head">
+        <div class="card-title">
+          <div class="card-title-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+          Margin &amp; Penjualan
+        </div>
+        <span style="font-size:11px;color:var(--text-muted)">Step 4 dari 4</span>
+      </div>
+      <div class="card-body">
+        <div class="grid-4">
+          <div class="field">
+            <label>Margin %</label>
+            <div class="field-suffix" data-suffix="%"><input type="number" id="inMargin" value="35" min="0" oninput="hitung()"></div>
+          </div>
+          <div class="field">
+            <label>Pajak (PPN)</label>
+            <div class="field-suffix" data-suffix="%"><input type="number" id="inPPN" value="0" min="0" oninput="hitung()"></div>
+          </div>
+          <div class="field">
+            <label>Pembulatan</label>
+            <select id="inPembulatan" onchange="hitung()">
+              <option value="0">Tanpa pembulatan</option>
+              <option value="1000" selected>Ribuan ke atas</option>
+              <option value="10000">Puluhan ribu ke atas</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>HPP Total</label>
+            <div class="field-prefix" data-prefix="Rp"><input type="text" id="outHPP" value="0" readonly></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 5: KLIEN -->
+    <div class="card acc-red">
+      <div class="card-head">
+        <div class="card-title">
+          <div class="card-title-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          Info Klien
+        </div>
+        <span style="font-size:11px;color:var(--text-muted)">Untuk WhatsApp &amp; Print</span>
+      </div>
+      <div class="card-body">
+        <div class="grid-2">
+          <div class="field">
+            <label>Nama Klien</label>
+            <input type="text" id="inNamaKlien" placeholder="Cth: Bapak Budi">
+          </div>
+          <div class="field">
+            <label>No. WhatsApp Klien <span class="hint">format 08xx / 62xx</span></label>
+            <input type="tel" id="inWAKlien" placeholder="Cth: 081234567890">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ====== ASIDE COL ====== -->
+  <aside class="aside-col">
+
+    <!-- KPI PANEL -->
+    <div class="kpi-card">
+      <div class="kpi-head">
+        <div class="kpi-head-title">Hasil Kalkulasi</div>
+        <div class="kpi-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14M22 4L12 14.01l-3-3"/></svg>
+          Updated
+        </div>
+      </div>
+      <div class="kpi-main">
+        <div class="kpi-main-lbl">Total Harga Jual</div>
+        <div class="kpi-main-val" id="kpiTotal">Rp 0</div>
+        <div class="kpi-main-sub" id="kpiPPN">Belum termasuk PPN</div>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi-mini"><div class="kpi-mini-lbl">HPP Total</div><div class="kpi-mini-val blue" id="kpiHPP">Rp 0</div></div>
+        <div class="kpi-mini"><div class="kpi-mini-lbl">Margin Untung</div><div class="kpi-mini-val green" id="kpiMarginRp">Rp 0</div></div>
+      </div>
+
+      <!-- Breakdown -->
+      <div class="breakdown" id="breakdown">
+        <!-- diisi JS -->
+      </div>
+
+      <div class="kpi-actions">
+        <a id="btnWA" href="#" target="_blank" rel="noopener" class="btn success">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.52 3.48A11.93 11.93 0 0 0 12.06 0C5.5 0 .17 5.33.17 11.9c0 2.1.55 4.15 1.6 5.96L0 24l6.3-1.65a11.9 11.9 0 0 0 5.76 1.47h.01c6.55 0 11.88-5.33 11.88-11.9 0-3.18-1.24-6.17-3.43-8.44ZM12.07 21.8a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.27c0-5.46 4.44-9.9 9.9-9.9 2.64 0 5.13 1.03 7 2.9a9.84 9.84 0 0 1 2.9 7c0 5.46-4.44 9.9-9.9 9.9Z"/></svg>
+          Kirim via WhatsApp
+        </a>
+        <button class="btn primary" onclick="window.print()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Cetak Penawaran
+        </button>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title" style="font-size:13px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Riwayat Kalkulasi
+        </div>
+        <button class="icbtn" onclick="clearHistory()" title="Hapus semua">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/></svg>
+        </button>
+      </div>
+      <div class="card-body" id="historyList" style="padding:14px;display:flex;flex-direction:column;gap:8px">
+        <!-- diisi JS -->
+      </div>
+    </div>
+
+  </aside>
+</div>
+
+<!-- TOAST -->
+<!-- ============ MODAL PENGATURAN HARGA ============ -->
+<div id="settingsOverlay" style="display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)"></div>
+<div id="settingsModal" style="display:none;position:fixed;z-index:101;top:50%;left:50%;transform:translate(-50%,-50%);width:min(720px,94vw);max-height:88vh;overflow:auto;background:var(--surface);border:1px solid var(--border-strong);border-radius:16px;box-shadow:var(--shadow)">
+  <div style="position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--border);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;z-index:1">
+    <div style="display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--gold)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82M4.6 9a1.65 1.65 0 0 0-.33-1.82"/></svg>
+      Pengaturan Harga &amp; Toko
+    </div>
+    <button class="iconbtn" onclick="closeSettings()" title="Tutup">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div style="padding:20px" id="settingsBody">
+    <div style="font-size:13px;color:var(--text-muted);text-align:center;padding:20px">Memuat…</div>
+  </div>
+  <div style="position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--border);padding:14px 20px;display:flex;justify-content:flex-end;gap:8px">
+    <button class="btn ghost" onclick="closeSettings()">Batal</button>
+    <button class="btn success" onclick="simpanSettings()" id="btnSimpanSettings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>
+      Simpan ke Database
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+  <span id="toastMsg">Berhasil!</span>
+</div>
+
+<script>
+/* ===== DATABASE HARGA ===== */
+/* Diisi dari API /api/harga saat load. Nilai di bawah hanya FALLBACK
+   bila server belum aktif, supaya kalkulator tetap bisa dipakai offline. */
+const API = '';
+const _tok = localStorage.getItem('rp_auth_token') || '';
+function afetch(u, o){ o = o || {}; o.headers = Object.assign({'Content-Type':'application/json'}, o.headers||{}, _tok?{'Authorization':'Bearer '+_tok}:{}); return fetch(u, o); }
+function doLogout(){ localStorage.removeItem('rp_auth_token'); location.href='index.html'; }
+async function checkRole(){
+  try{
+    const r = await afetch('/api/auth/me');
+    if(!r.ok){ localStorage.removeItem('rp_auth_token'); location.href='index.html'; return; }
+    const u = await r.json();
+    if(u.role === 'superadmin'){ const a=document.getElementById('navAdmin'); if(a) a.style.display='inline-flex'; }
+    else { const b=document.getElementById('btnSettings'); if(b) b.style.display='none'; }
+  }catch(e){}
+}
+let PRICE_DB = {
+  visualPerM2: { "Acrylic":450000, "Flexy Backlite":150000, "Stainless":550000, "Galvanis":300000 },
+  hurufTimbulPerCm: { "Acrylic":12000, "Stainless":15000 },
+  rangkaPerM2:250000, elektrikalPerM2:200000, tiangPerMeter:600000, pasangDasar:500000,
+  pengaliKetinggian: { "Lantai 1":1.0, "Lantai 2":1.2, "Lantai 3+":1.4 },
+  _meta: { visual_m2:[], huruf_cm:[], komponen:[], pengali:[] }
+};
+let TOKO_INFO = { nama:"RuangPrint", alamat:"", telepon:"" };
+
+/* ===== STATE ===== */
+let state = {
+  jenis: "Neon Box",
+  panjang: 2, tinggi: 1, sisi: 1,
+  tinggiHuruf: 30, jumlahHuruf: 8,
+  bahan: "Acrylic",
+  led: true,
+  tiang: 0,
+  ketinggian: "Lantai 1",
+  margin: 35, ppn: 0, pembulatan: 1000,
+  namaKlien: "", waKlien: "",
+  lokasi: ""
+};
+let history = JSON.parse(localStorage.getItem('rk_history') || '[]');
+
+/* ===== THEME ===== */
+function toggleTheme(){
+  const r = document.documentElement;
+  const next = r.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  r.setAttribute('data-theme', next);
+  localStorage.setItem('rk_theme', next);
+  document.getElementById('themeIcon').innerHTML = next === 'dark'
+    ? '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>'
+    : '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+  showToast('Tema ' + (next === 'dark' ? 'Gelap' : 'Terang') + ' aktif');
+}
+(function(){
+  const s = localStorage.getItem('rk_theme');
+  if(s){
+    document.documentElement.setAttribute('data-theme', s);
+    if(s === 'light') document.getElementById('themeIcon').innerHTML = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+  }
+})();
+
+/* ===== TAB JENIS ===== */
+function switchJenis(el){
+  document.querySelectorAll('#jenisTabs .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  state.jenis = el.dataset.jenis;
+  const isHuruf = state.jenis === 'Huruf Timbul';
+  document.getElementById('groupPapan').style.display = isHuruf ? 'none' : 'grid';
+  document.getElementById('groupHuruf').style.display = isHuruf ? 'grid' : 'none';
+  populateBahanOptions();
+  hitung();
+}
+
+function populateBahanOptions(){
+  const sel = document.getElementById('inBahan');
+  const isHuruf = state.jenis === 'Huruf Timbul';
+  const opts = isHuruf ? Object.keys(PRICE_DB.hurufTimbulPerCm) : Object.keys(PRICE_DB.visualPerM2);
+  sel.innerHTML = opts.map(o => `<option value="${o}">${o}</option>`).join('');
+  if(!opts.includes(state.bahan)) state.bahan = opts[0];
+  sel.value = state.bahan;
+}
+populateBahanOptions();
+
+/* ===== HELPER ===== */
+function rp(n){ return 'Rp ' + new Intl.NumberFormat('id-ID').format(Math.round(n||0)); }
+function rpCompact(n){
+  if(n >= 1_000_000) return 'Rp ' + (n/1_000_000).toFixed(n%1_000_000===0?0:1) + 'jt';
+  if(n >= 1_000)     return 'Rp ' + (n/1_000).toFixed(0) + 'k';
+  return rp(n);
+}
+function readState(){
+  state.panjang = +document.getElementById('inPanjang').value || 0;
+  state.tinggi  = +document.getElementById('inTinggi').value || 0;
+  state.sisi    = +document.querySelector('input[name="sisi"]:checked').value || 1;
+  state.tinggiHuruf = +document.getElementById('inTinggiHuruf').value || 0;
+  state.jumlahHuruf = +document.getElementById('inJumlahHuruf').value || 0;
+  state.bahan       = document.getElementById('inBahan').value;
+  state.led         = document.getElementById('inLED').checked;
+  state.tiang       = +document.getElementById('inTiang').value || 0;
+  state.ketinggian  = document.getElementById('inKetinggian').value;
+  state.margin      = +document.getElementById('inMargin').value || 0;
+  state.ppn         = +document.getElementById('inPPN').value || 0;
+  state.pembulatan  = +document.getElementById('inPembulatan').value || 0;
+  state.namaKlien   = document.getElementById('inNamaKlien').value;
+  state.waKlien     = document.getElementById('inWAKlien').value;
+  state.lokasi      = document.getElementById('inLokasi').value;
+}
+
+/* ===== HITUNG ===== */
+function hitung(){
+  readState();
+  const isHuruf = state.jenis === 'Huruf Timbul';
+
+  let visual = 0, rangka = 0, led = 0;
+  let satuanInfo = '';
+
+  if(isHuruf){
+    const hargaCm = PRICE_DB.hurufTimbulPerCm[state.bahan] || 0;
+    visual = state.tinggiHuruf * state.jumlahHuruf * hargaCm;
+    if(state.led) led = state.jumlahHuruf * 0.05 * PRICE_DB.elektrikalPerM2;
+    satuanInfo = `${state.tinggiHuruf}cm × ${state.jumlahHuruf} huruf`;
+    document.getElementById('bahanHint').textContent = rp(hargaCm) + ' / cm tinggi huruf';
+  } else {
+    const luas = state.panjang * state.tinggi * state.sisi;
+    const hargaM2 = PRICE_DB.visualPerM2[state.bahan] || 0;
+    visual = luas * hargaM2;
+    rangka = luas * PRICE_DB.rangkaPerM2;
+    if(state.led) led = luas * PRICE_DB.elektrikalPerM2;
+    satuanInfo = `${state.panjang}×${state.tinggi}m · ${state.sisi} sisi · ${luas.toFixed(2)} m²`;
+    document.getElementById('bahanHint').textContent = rp(hargaM2) + ' / m²';
+  }
+
+  const tiang  = state.tiang * PRICE_DB.tiangPerMeter;
+  const pasang = PRICE_DB.pasangDasar;
+  const subtotal = visual + rangka + led + tiang + pasang;
+  const pengali = PRICE_DB.pengaliKetinggian[state.ketinggian] || 1;
+  const hpp = subtotal * pengali;
+  const marginRp = hpp * (state.margin / 100);
+  let total = hpp + marginRp;
+  if(state.pembulatan > 0) total = Math.ceil(total / state.pembulatan) * state.pembulatan;
+  const ppnRp = total * (state.ppn / 100);
+  const totalDenganPPN = total + ppnRp;
+
+  // Update KPI
+  document.getElementById('kpiTotal').innerHTML = rp(total);
+  document.getElementById('kpiPPN').textContent = state.ppn > 0
+    ? `+ PPN ${state.ppn}% = ${rp(totalDenganPPN)}`
+    : 'Belum termasuk PPN';
+  document.getElementById('kpiHPP').textContent = rp(hpp);
+  document.getElementById('kpiMarginRp').textContent = rp(marginRp);
+  document.getElementById('outHPP').value = new Intl.NumberFormat('id-ID').format(Math.round(hpp));
+
+  // Update breakdown
+  const rows = [];
+  rows.push(['Material Visual', visual]);
+  if(rangka > 0) rows.push(['Rangka & Dudukan', rangka]);
+  if(led > 0)    rows.push(['Elektrikal / LED', led]);
+  if(tiang > 0)  rows.push([`Tiang (${state.tiang}m)`, tiang]);
+  rows.push(['Biaya Pasang Dasar', pasang]);
+  rows.push([`Pengali ${state.ketinggian}`, `× ${pengali}`, true]);
+  rows.push([`Margin ${state.margin}%`, marginRp]);
+
+  document.getElementById('breakdown').innerHTML = rows.map(r => `
+    <div class="breakdown-row">
+      <span class="lbl">${r[0]}</span>
+      <span class="val">${r[2] ? r[1] : rp(r[1])}</span>
+    </div>
+  `).join('') + `
+    <div class="breakdown-row total">
+      <span class="lbl">Total Jual</span>
+      <span class="val">${rp(total)}</span>
+    </div>
+  `;
+
+  // Update flow steps
+  document.getElementById('flow1').firstChild.nodeValue = state.jenis;
+  document.getElementById('flow2').firstChild.nodeValue = state.bahan;
+  document.getElementById('flow3').firstChild.nodeValue = state.led ? '+ LED' : 'Tanpa LED';
+  document.getElementById('flow4').firstChild.nodeValue = state.margin + '%';
+
+  // Update WA link
+  updateWALink(total, satuanInfo, hpp, marginRp);
+
+  // simpan ke state untuk history
+  window._lastCalc = { total, satuanInfo, jenis: state.jenis, bahan: state.bahan };
+}
+
+/* ===== WHATSAPP ===== */
+function normalisasiNoWA(no){
+  if(!no) return '';
+  let n = String(no).replace(/[^0-9]/g,'');
+  if(n.startsWith('0')) n = '62' + n.slice(1);
+  if(n.startsWith('8')) n = '62' + n;
+  return n;
+}
+function updateWALink(total, satuanInfo, hpp, marginRp){
+  const no = normalisasiNoWA(state.waKlien);
+  const btn = document.getElementById('btnWA');
+  if(!no){
+    btn.href = '#';
+    btn.onclick = (e) => { e.preventDefault(); showToast('Isi No. WhatsApp Klien dulu'); };
+    btn.style.opacity = '.6';
+    return;
+  }
+  btn.onclick = null;
+  btn.style.opacity = '1';
+  const sapaan = state.namaKlien ? `Halo Bapak/Ibu ${state.namaKlien},` : 'Halo,';
+  const isHuruf = state.jenis === 'Huruf Timbul';
+  const lines = [
+    `*PENAWARAN HARGA REKLAME*`,
+    `${TOKO_INFO.nama}`,
+    `Tanggal: ${new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'})}`,
+    ``,
+    sapaan,
+    `Berikut estimasi biaya pembuatan reklame:`,
+    ``,
+    `📋 *SPESIFIKASI*`,
+    `• Jenis    : ${state.jenis}`,
+    `• Bahan    : ${state.bahan}`,
+    isHuruf
+      ? `• Ukuran   : ${state.tinggiHuruf} cm × ${state.jumlahHuruf} huruf`
+      : `• Ukuran   : ${state.panjang} m × ${state.tinggi} m (${state.sisi} sisi)`,
+    `• Lampu LED: ${state.led ? 'Ya' : 'Tidak'}`,
+    `• Tiang    : ${state.tiang} m`,
+    `• Pasang   : ${state.ketinggian}`,
+    state.lokasi ? `• Lokasi   : ${state.lokasi}` : '',
+    ``,
+    `💰 *TOTAL HARGA*`,
+    `${rp(total)}`,
+    state.ppn > 0 ? `+ PPN ${state.ppn}% = ${rp(total + total*state.ppn/100)}` : '',
+    ``,
+    `*Catatan:*`,
+    `- Penawaran berlaku 14 hari`,
+    `- DP 50% di awal, pelunasan saat pemasangan selesai`,
+    ``,
+    `Terima kasih 🙏`,
+    `${TOKO_INFO.nama}`,
+    `${TOKO_INFO.telepon}`
+  ].filter(Boolean);
+  btn.href = `https://wa.me/${no}?text=${encodeURIComponent(lines.join('\n'))}`;
+}
+
+/* ===== TEMPLATE ===== */
+function loadTpl(tpl){
+  const tpls = {
+    'neonbox-toko': { jenis:'Neon Box', panjang:2, tinggi:1, sisi:1, bahan:'Acrylic', led:true, tiang:0, ketinggian:'Lantai 1' },
+    'billboard-jalan': { jenis:'Billboard', panjang:6, tinggi:4, sisi:2, bahan:'Flexy Backlite', led:true, tiang:6, ketinggian:'Lantai 3+' },
+    'huruf-acrylic': { jenis:'Huruf Timbul', tinggiHuruf:30, jumlahHuruf:8, bahan:'Acrylic', led:true, tiang:0, ketinggian:'Lantai 1' },
+    'pylon': { jenis:'Pylon Sign', panjang:1.5, tinggi:3, sisi:2, bahan:'Galvanis', led:true, tiang:4, ketinggian:'Lantai 1' }
+  };
+  const t = tpls[tpl]; if(!t) return;
+  // Switch tab
+  document.querySelectorAll('#jenisTabs .tab').forEach(b => {
+    if(b.dataset.jenis === t.jenis) switchJenis(b);
+  });
+  // Apply values
+  if(t.panjang)     document.getElementById('inPanjang').value = t.panjang;
+  if(t.tinggi)      document.getElementById('inTinggi').value = t.tinggi;
+  if(t.sisi)        document.querySelector(`input[name="sisi"][value="${t.sisi}"]`).checked = true;
+  if(t.tinggiHuruf) document.getElementById('inTinggiHuruf').value = t.tinggiHuruf;
+  if(t.jumlahHuruf) document.getElementById('inJumlahHuruf').value = t.jumlahHuruf;
+  if(t.bahan)       document.getElementById('inBahan').value = t.bahan;
+  document.getElementById('inLED').checked = !!t.led;
+  document.getElementById('inTiang').value = t.tiang ?? 0;
+  document.getElementById('inKetinggian').value = t.ketinggian || 'Lantai 1';
+  hitung();
+  showToast('Template dimuat: ' + t.jenis);
+}
+
+/* ===== RESET ===== */
+function resetForm(){
+  if(!confirm('Reset semua input ke nilai default?')) return;
+  document.getElementById('inPanjang').value = 2;
+  document.getElementById('inTinggi').value = 1;
+  document.querySelector('input[name="sisi"][value="1"]').checked = true;
+  document.getElementById('inTinggiHuruf').value = 30;
+  document.getElementById('inJumlahHuruf').value = 8;
+  document.getElementById('inLED').checked = true;
+  document.getElementById('inTiang').value = 0;
+  document.getElementById('inKetinggian').value = 'Lantai 1';
+  document.getElementById('inMargin').value = 35;
+  document.getElementById('inPPN').value = 0;
+  document.getElementById('inPembulatan').value = 1000;
+  document.getElementById('inNamaKlien').value = '';
+  document.getElementById('inWAKlien').value = '';
+  document.getElementById('inLokasi').value = '';
+  document.querySelectorAll('#jenisTabs .tab').forEach(b => {
+    if(b.dataset.jenis === 'Neon Box') switchJenis(b);
+  });
+  showToast('Form direset');
+}
+
+/* ===== HISTORY ===== */
+function saveToHistory(){
+  if(!window._lastCalc) return;
+  const c = window._lastCalc;
+  history.unshift({
+    name: `${c.jenis} ${c.bahan}`,
+    spec: c.satuanInfo,
+    price: c.total,
+    time: Date.now()
+  });
+  history = history.slice(0,8);
+  localStorage.setItem('rk_history', JSON.stringify(history));
+  renderHistory();
+  showToast('Kalkulasi disimpan ke riwayat');
+}
+function clearHistory(){
+  if(!confirm('Hapus semua riwayat?')) return;
+  history = [];
+  localStorage.setItem('rk_history','[]');
+  renderHistory();
+  showToast('Riwayat dihapus');
+}
+function renderHistory(){
+  const el = document.getElementById('historyList');
+  if(history.length === 0){
+    el.innerHTML = '<div style="font-size:12px;color:var(--text-muted);text-align:center;padding:8px">Belum ada riwayat.<br>Tekan ⌘↵ atau klik <b>Hitung</b> untuk menyimpan.</div>';
+    return;
+  }
+  el.innerHTML = history.map(h => `
+    <div class="history-item">
+      <div class="history-name">${h.name}</div>
+      <div class="history-meta">
+        <span>${h.spec} · ${timeAgo(h.time)}</span>
+        <span class="price">${rpCompact(h.price)}</span>
+      </div>
+    </div>
+  `).join('');
+}
+function timeAgo(ts){
+  const diff = (Date.now() - ts) / 1000;
+  if(diff < 60) return 'baru saja';
+  if(diff < 3600) return Math.floor(diff/60) + ' menit lalu';
+  if(diff < 86400) return Math.floor(diff/3600) + ' jam lalu';
+  return Math.floor(diff/86400) + ' hari lalu';
+}
+
+/* ===== TOAST ===== */
+function showToast(msg){
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._t);
+  window._t = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ===== KEYBOARD ===== */
+document.addEventListener('keydown', e => {
+  if((e.metaKey || e.ctrlKey) && e.key === 'Enter'){
+    e.preventDefault();
+    hitung();
+    saveToHistory();
+  }
+});
+
+/* ===== API: MUAT HARGA & TOKO DARI DATABASE ===== */
+async function muatDataDariServer(){
+  try{
+    const [h, t] = await Promise.all([
+      afetch('/api/reklame/harga').then(r => r.ok ? r.json() : Promise.reject()),
+      afetch('/api/reklame/toko').then(r => r.ok ? r.json() : Promise.reject())
+    ]);
+    PRICE_DB = h;
+    TOKO_INFO = t;
+    populateBahanOptions();
+    // refresh opsi ketinggian sesuai data pengali dari DB
+    const selK = document.getElementById('inKetinggian');
+    const keys = Object.keys(PRICE_DB.pengaliKetinggian || {});
+    if(keys.length){
+      const cur = selK.value;
+      selK.innerHTML = keys.map(k => `<option value="${k}">${k}</option>`).join('');
+      if(keys.includes(cur)) selK.value = cur;
+    }
+    hitung();
+    showToast('Harga dimuat dari database');
+  }catch(e){
+    showToast('⚠ Server tidak aktif — pakai harga default');
+  }
+}
+
+/* ===== MODAL PENGATURAN ===== */
+function inputRow(it){
+  return `<div class="field" style="flex-direction:row;align-items:center;gap:10px">
+    <label style="flex:1;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text)">${it.label}
+      <span style="color:var(--text-muted);font-weight:500">${it.satuan||''}</span></label>
+    <div class="field-prefix" data-prefix="Rp" style="width:160px">
+      <input type="number" step="any" value="${Number(it.nilai)}" data-id="${it.id}" style="text-align:right">
+    </div>
+  </div>`;
+}
+function pengaliRow(it){
+  return `<div class="field" style="flex-direction:row;align-items:center;gap:10px">
+    <label style="flex:1;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text)">${it.label}</label>
+    <div class="field-suffix" data-suffix="×" style="width:120px">
+      <input type="number" step="0.05" value="${Number(it.nilai)}" data-id="${it.id}" style="text-align:right">
+    </div>
+  </div>`;
+}
+function sect(title){ return `<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin:18px 0 10px">${title}</div>`; }
+
+function openSettings(){
+  const m = PRICE_DB._meta || { visual_m2:[], huruf_cm:[], komponen:[], pengali:[] };
+  const body = document.getElementById('settingsBody');
+  body.innerHTML =
+    sect('Info Toko') +
+    `<div class="grid-2" style="gap:12px">
+      <div class="field full"><label>Nama Toko</label><input id="setNama" value="${TOKO_INFO.nama||''}"></div>
+      <div class="field"><label>Telepon / WA</label><input id="setTelepon" value="${TOKO_INFO.telepon||''}"></div>
+      <div class="field"><label>Alamat</label><input id="setAlamat" value="${TOKO_INFO.alamat||''}"></div>
+    </div>` +
+    sect('Material Visual — per m²') + m.visual_m2.map(inputRow).join('') +
+    sect('Huruf Timbul — per cm tinggi') + m.huruf_cm.map(inputRow).join('') +
+    sect('Komponen Biaya') + m.komponen.map(inputRow).join('') +
+    sect('Pengali Ketinggian') + m.pengali.map(pengaliRow).join('') +
+    `<div style="font-size:11px;color:var(--text-muted);margin-top:16px">Perubahan tersimpan permanen di database dan langsung dipakai semua perangkat yang terhubung.</div>`;
+  document.getElementById('settingsOverlay').style.display = 'block';
+  document.getElementById('settingsModal').style.display = 'block';
+}
+function closeSettings(){
+  document.getElementById('settingsOverlay').style.display = 'none';
+  document.getElementById('settingsModal').style.display = 'none';
+}
+async function simpanSettings(){
+  const btn = document.getElementById('btnSimpanSettings');
+  btn.disabled = true;
+  const items = [...document.querySelectorAll('#settingsBody input[data-id]')]
+    .map(i => ({ id: +i.dataset.id, nilai: +i.value || 0 }));
+  try{
+    await afetch('/api/reklame/toko', {
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        nama: document.getElementById('setNama').value,
+        alamat: document.getElementById('setAlamat').value,
+        telepon: document.getElementById('setTelepon').value
+      })
+    });
+    const updated = await afetch('/api/reklame/harga', {
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(items)
+    }).then(r => r.json());
+    PRICE_DB = updated;
+    TOKO_INFO = {
+      nama: document.getElementById('setNama').value,
+      alamat: document.getElementById('setAlamat').value,
+      telepon: document.getElementById('setTelepon').value
+    };
+    populateBahanOptions();
+    hitung();
+    closeSettings();
+    showToast('Tersimpan ke database');
+  }catch(e){
+    showToast('⚠ Gagal menyimpan — cek koneksi server');
+  }finally{ btn.disabled = false; }
+}
+document.getElementById('settingsOverlay').addEventListener('click', closeSettings);
+
+/* ===== INIT ===== */
+checkRole();
+renderHistory();
+hitung();
+muatDataDariServer();
+</script>
+</body>
+</html>

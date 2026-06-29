@@ -69,7 +69,51 @@ db.exec(`
     created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+  CREATE TABLE IF NOT EXISTS reklame_harga (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    kategori  TEXT NOT NULL,
+    kode      TEXT NOT NULL,
+    label     TEXT NOT NULL,
+    nilai     REAL NOT NULL DEFAULT 0,
+    satuan    TEXT DEFAULT '',
+    urutan    INTEGER DEFAULT 0,
+    UNIQUE(kategori,kode)
+  );
+  CREATE TABLE IF NOT EXISTS reklame_toko (
+    id       INTEGER PRIMARY KEY,
+    nama     TEXT NOT NULL,
+    alamat   TEXT DEFAULT '',
+    telepon  TEXT DEFAULT ''
+  );
 `);
+
+// Seed harga reklame (sekali, dari kalkulator lokal) bila kosong
+const _seedReklame = [
+  ['visual_m2','Acrylic','Acrylic',450000,'/m²',1],
+  ['visual_m2','Flexy Backlite','Flexy Backlite',150000,'/m²',2],
+  ['visual_m2','Stainless','Stainless',550000,'/m²',3],
+  ['visual_m2','Galvanis','Galvanis',300000,'/m²',4],
+  ['visual_m2','Flexy Frontlite','Flexy Frontlite',120000,'/m²',5],
+  ['huruf_cm','Acrylic','Acrylic',12000,'/cm',1],
+  ['huruf_cm','Stainless','Stainless',15000,'/cm',2],
+  ['komponen','rangkaPerM2','Rangka & Dudukan',250000,'/m²',1],
+  ['komponen','elektrikalPerM2','Elektrikal / LED',200000,'/m²',2],
+  ['komponen','tiangPerMeter','Tiang',600000,'/m',3],
+  ['komponen','pasangDasar','Biaya Pasang Dasar',500000,'flat',4],
+  ['pengali','Lantai 1','Lantai 1',1.0,'x',1],
+  ['pengali','Lantai 2','Lantai 2',1.2,'x',2],
+  ['pengali','Lantai 3+','Lantai 3+',1.4,'x',3],
+];
+if (db.prepare('SELECT COUNT(*) n FROM reklame_harga').get().n === 0) {
+  const ins = db.prepare('INSERT INTO reklame_harga (kategori,kode,label,nilai,satuan,urutan) VALUES (?,?,?,?,?,?)');
+  db.transaction(rows => rows.forEach(r => ins.run(...r)))(_seedReklame);
+  console.log('[Bootstrap] Seed harga reklame ditambahkan.');
+}
+if (db.prepare('SELECT COUNT(*) n FROM reklame_toko').get().n === 0) {
+  db.prepare('INSERT INTO reklame_toko (id,nama,alamat,telepon) VALUES (1,?,?,?)')
+    .run('RuangPrint', 'Jl. Gilimanuk No 60 Kalideres, Jakarta Barat', '0812 8816 1119');
+}
+
 
 // Migrasi kolom untuk DB lama
 function ensureColumn(col, ddl) {
@@ -423,6 +467,55 @@ app.delete('/api/calc-saves/:id', auth, (req, res) => {
   const row = db.prepare('SELECT cabang FROM calc_saves WHERE id=?').get(req.params.id);
   if (!canAccess(req.user, row)) return res.status(404).json({ error: 'Tidak ditemukan.' });
   db.prepare('DELETE FROM calc_saves WHERE id=?').run(req.params.id);
+  res.json({ ok: true });
+});
+
+// ── KALKULATOR REKLAME: harga & info toko (master, global) ───
+function bentukPriceDB(rows) {
+  const out = {
+    visualPerM2: {}, hurufTimbulPerCm: {},
+    rangkaPerM2: 0, elektrikalPerM2: 0, tiangPerMeter: 0, pasangDasar: 0,
+    pengaliKetinggian: {},
+    _meta: { visual_m2: [], huruf_cm: [], komponen: [], pengali: [] },
+  };
+  for (const r of rows) {
+    const nilai = Number(r.nilai);
+    if (r.kategori === 'visual_m2')      out.visualPerM2[r.kode] = nilai;
+    else if (r.kategori === 'huruf_cm')  out.hurufTimbulPerCm[r.kode] = nilai;
+    else if (r.kategori === 'pengali')   out.pengaliKetinggian[r.kode] = nilai;
+    else if (r.kategori === 'komponen')  out[r.kode] = nilai;
+    if (out._meta[r.kategori]) out._meta[r.kategori].push(r);
+  }
+  return out;
+}
+const _selHarga = () => db.prepare('SELECT id,kategori,kode,label,nilai,satuan,urutan FROM reklame_harga ORDER BY kategori,urutan').all();
+
+app.get('/api/reklame/harga', auth, (req, res) => res.json(bentukPriceDB(_selHarga())));
+
+app.put('/api/reklame/harga', auth, adminOnly, (req, res) => {
+  const items = Array.isArray(req.body) ? req.body : [];
+  const upd = db.prepare('UPDATE reklame_harga SET nilai=?, label=COALESCE(?,label), satuan=COALESCE(?,satuan) WHERE id=?');
+  const ins = db.prepare(`INSERT INTO reklame_harga (kategori,kode,label,nilai,satuan,urutan) VALUES (?,?,?,?,?,?)
+    ON CONFLICT(kategori,kode) DO UPDATE SET nilai=excluded.nilai,label=excluded.label,satuan=excluded.satuan`);
+  db.transaction(rows => {
+    for (const it of rows) {
+      if (it.id) upd.run(it.nilai, it.label ?? null, it.satuan ?? null, it.id);
+      else if (it.kategori && it.kode) ins.run(it.kategori, it.kode, it.label || it.kode, it.nilai || 0, it.satuan || '', it.urutan || 99);
+    }
+  })(items);
+  res.json(bentukPriceDB(_selHarga()));
+});
+
+app.get('/api/reklame/toko', auth, (req, res) => {
+  const row = db.prepare('SELECT nama,alamat,telepon FROM reklame_toko WHERE id=1').get();
+  res.json(row || { nama: 'RuangPrint', alamat: '', telepon: '' });
+});
+
+app.put('/api/reklame/toko', auth, adminOnly, (req, res) => {
+  const { nama, alamat, telepon } = req.body || {};
+  db.prepare(`INSERT INTO reklame_toko (id,nama,alamat,telepon) VALUES (1,?,?,?)
+    ON CONFLICT(id) DO UPDATE SET nama=excluded.nama,alamat=excluded.alamat,telepon=excluded.telepon`)
+    .run(nama || 'RuangPrint', alamat || '', telepon || '');
   res.json({ ok: true });
 });
 
