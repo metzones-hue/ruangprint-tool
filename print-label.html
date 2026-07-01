@@ -75,6 +75,7 @@ input[readonly]{color:var(--muted);background:var(--surf-el)}
 .label .txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:0.6mm;justify-content:center}
 .label .nm{font-family:'Outfit',Arial,sans-serif;font-weight:700;color:#111;line-height:1.12;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3}
 .label .cd{font-family:'JetBrains Mono',monospace;color:#333;line-height:1.15;word-break:break-all;letter-spacing:-.2px}
+.label .pr{font-family:'Outfit',Arial,sans-serif;color:#444;line-height:1.12;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}
 .label .br{font-family:'Outfit',Arial,sans-serif;color:#999;letter-spacing:.06em;text-transform:uppercase}
 .sheet .empty{width:100%;text-align:center;color:#bbb;font-size:13px;padding:40mm 0}
 
@@ -119,7 +120,7 @@ input[readonly]{color:var(--muted);background:var(--surf-el)}
     </div>
     <div class="cs-bar">
       <span class="cs-label">Cabang:</span>
-      <select id="cs_cabang" class="cs-field" onchange="savePref();render()">
+      <select id="cs_cabang" class="cs-field" onchange="savePref();syncBrand();render()">
         <option value="HO">Head Office</option>
         <option value="DMB">Daan Mogot</option>
         <option value="CTR">Citra Raya</option>
@@ -160,12 +161,14 @@ input[readonly]{color:var(--muted);background:var(--surf-el)}
         <div class="toggle-row"><input type="checkbox" id="t_qr" checked onchange="render()"><label for="t_qr">Tampilkan QR</label></div>
         <div class="toggle-row"><input type="checkbox" id="t_name" checked onchange="render()"><label for="t_name">Tampilkan nama</label></div>
         <div class="toggle-row"><input type="checkbox" id="t_code" checked onchange="render()"><label for="t_code">Tampilkan teks kode</label></div>
+        <div class="toggle-row"><input type="checkbox" id="t_produk" checked onchange="render()"><label for="t_produk">Tampilkan produk</label></div>
         <div class="toggle-row"><input type="checkbox" id="t_brand" onchange="render()"><label for="t_brand">Tampilkan brand</label></div>
       </div>
+      <div class="fc" style="margin-top:2px"><label>Teks Brand <span style="text-transform:none;color:var(--muted)">(opsional)</span></label><input id="s_brand" placeholder="RUANGPRINT DMB" oninput="brandEdited=true;render()"></div>
 
-      <div class="st">Produk / Item</div>
+      <div class="st">Data Label</div>
       <div id="prodList"></div>
-      <button class="badd" onclick="addProd()">+ Tambah Produk</button>
+      <button class="badd" onclick="addProd()">+ Tambah Label</button>
     </div>
   </div>
 
@@ -2507,8 +2510,20 @@ var qrcode = function() {
 
 <script>
 let products=[];
+let brandEdited=false;
 const _qrCache=new Map();
 const RAND_AL='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+function syncBrand(){if(!brandEdited)g('s_brand').value='RUANGPRINT '+(g('cs_cabang').value||'HO');}
+
+const API='/api';
+let _tok=localStorage.getItem('rp_auth_token')||'';
+async function api(method,path,body){
+  const o={method,headers:{'Content-Type':'application/json'}};
+  if(_tok)o.headers['Authorization']='Bearer '+_tok;
+  if(body)o.body=JSON.stringify(body);
+  try{const r=await fetch(API+path,o);let d=null;try{d=await r.json();}catch(e){}return{ok:r.ok,status:r.status,data:d};}
+  catch(e){return{ok:false,status:0,data:null};}
+}
 
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(window._t);window._t=setTimeout(()=>t.classList.remove('show'),2200);}
 function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
@@ -2556,21 +2571,22 @@ function qrSvg(text){
   return svg;
 }
 
-/* PRODUCTS */
-function addProd(p){products.push(p||{name:'',kat:'',qty:12,_rand:[]});renderProds();render();}
+/* PRODUCTS / DATA LABEL */
+function addProd(p){products.push(p||{nama:'',produk:'',kat:'',qty:12,_rand:[]});renderProds();render();}
 function delProd(i){products.splice(i,1);renderProds();render();}
-function updProd(i,k,v){products[i][k]=v;render();}
+function updProd(i,k,v){products[i][k]=v;if(k==='nama')renderProds();render();}
 function renderProds(){
   g('prodList').innerHTML=products.map((p,i)=>`
     <div class="it-card">
-      <div class="it-head"><span class="it-no">Produk ${i+1}</span><button class="it-del" onclick="delProd(${i})" title="Hapus">🗑</button></div>
-      <div class="fc"><input placeholder="Nama produk (mis. Kartu Nama Art 260)" value="${esc(p.name)}" oninput="updProd(${i},'name',this.value)"></div>
+      <div class="it-head"><span class="it-no">Label ${i+1}</span><button class="it-del" onclick="delProd(${i})" title="Hapus">🗑</button></div>
+      <div class="fc"><label>Nama <span style="color:var(--red)">*wajib</span></label><input placeholder="mis. Dani" value="${esc(p.nama)}" oninput="updProd(${i},'nama',this.value)" style="${!(p.nama||'').trim()?'border-color:var(--red)':''}"></div>
+      <div class="fc"><label>Produk <span style="text-transform:none;color:var(--muted)">(opsional)</span></label><input placeholder="mis. Art carton 260gr" value="${esc(p.produk)}" oninput="updProd(${i},'produk',this.value)"></div>
       <div class="it-row2">
         <input placeholder="Kategori (opsional)" value="${esc(p.kat)}" oninput="updProd(${i},'kat',this.value.toUpperCase())" title="Kosong = pakai kategori global">
         <input type="number" min="1" placeholder="Jumlah" value="${esc(p.qty)}" oninput="updProd(${i},'qty',this.value)" title="Jumlah label">
         <input readonly value="label" style="text-align:center;color:var(--muted)">
       </div>
-    </div>`).join('') || '<div style="font-size:11px;color:var(--muted);padding:6px 0">Belum ada produk. Klik "Tambah Produk".</div>';
+    </div>`).join('') || '<div style="font-size:11px;color:var(--muted);padding:6px 0">Belum ada label. Klik "Tambah Label".</div>';
 }
 
 /* ensure each product has a stable random suffix per copy */
@@ -2589,6 +2605,7 @@ function labelMetrics(w,h){
   return {
     nm:Math.max(6.5,Math.min(13,H*0.16)),
     cd:Math.max(5.5,Math.min(10,H*0.115)),
+    pr:Math.max(5.5,Math.min(10,H*0.10)),
     br:Math.max(5,Math.min(8,H*0.085)),
     qr:Math.max(8,h-4)   // qr box side in mm
   };
@@ -2601,30 +2618,32 @@ function render(){
 
   const [w,h]=curSize();
   const unique=g('t_unique').checked;
-  const showQR=g('t_qr').checked,showName=g('t_name').checked,showCode=g('t_code').checked,showBrand=g('t_brand').checked;
+  const showQR=g('t_qr').checked,showName=g('t_name').checked,showCode=g('t_code').checked,showProduk=g('t_produk').checked,showBrand=g('t_brand').checked;
   const m=labelMetrics(w,h);
   buildRands(false);
 
-  const brandTxt='RUANGPRINT · '+cab;
+  const brandTxt=(g('s_brand').value||('RUANGPRINT '+cab)).trim();
   let html='',count=0;
   products.forEach(p=>{
     const q=Math.max(0,parseInt(p.qty)||0);
     const pkat=(p.kat||'').trim()||kat;
+    const hasProduk=showProduk&&(p.produk||'').trim();
     for(let k=0;k<q;k++){
       const rnd=unique?p._rand[k]:p._rand[0];
       const code=fullCode(pkat,rnd);
       const qrHtml=showQR?`<div class="qr" style="width:${m.qr}mm;height:${m.qr}mm">${qrSvg(code)}</div>`:'';
       const txtInner=
-        (showName?`<div class="nm" style="font-size:${m.nm}px">${esc(p.name)||'&nbsp;'}</div>`:'')+
+        (showName?`<div class="nm" style="font-size:${m.nm}px">${esc(p.nama)||'&nbsp;'}</div>`:'')+
         (showCode?`<div class="cd" style="font-size:${m.cd}px">${esc(code)}</div>`:'')+
-        (showBrand?`<div class="br" style="font-size:${m.br}px">${esc(brandTxt)}</div>`:'');
-      const txtHtml=(showName||showCode||showBrand)?`<div class="txt">${txtInner}</div>`:'';
+        (hasProduk?`<div class="pr" style="font-size:${m.pr}px">${esc(p.produk)}</div>`:'')+
+        (showBrand&&brandTxt?`<div class="br" style="font-size:${m.br}px">${esc(brandTxt)}</div>`:'');
+      const txtHtml=(showName||showCode||hasProduk||(showBrand&&brandTxt))?`<div class="txt">${txtInner}</div>`:'';
       html+=`<div class="label" style="width:${w}mm;height:${h}mm">${qrHtml}${txtHtml}</div>`;
       count++;
     }
   });
   const sheet=g('sheet');
-  sheet.innerHTML=count?html:'<div class="empty">Belum ada label. Tambah produk &amp; isi jumlah di panel kiri.</div>';
+  sheet.innerHTML=count?html:'<div class="empty">Belum ada label. Isi Nama &amp; jumlah di panel kiri.</div>';
   g('cntHint').textContent=count+' label · '+w+'×'+h+' mm';
 }
 
@@ -2639,9 +2658,17 @@ function regen(){buildRands(true);render();toast('✓ Kode di-generate ulang.');
 
 /* 1-klik cetak: pastikan render terbaru, lalu langsung print.
    Jika Chrome dibuka dengan --kiosk-printing, ini langsung keluar dari printer tanpa dialog. */
+/* Nama wajib diisi untuk tiap label yang punya jumlah > 0 */
+function validateNames(){
+  const bad=products.some(p=>(Math.max(0,parseInt(p.qty)||0)>0)&&!(p.nama||'').trim());
+  if(bad){toast('⚠ Nama wajib diisi di tiap label.');renderProds();}
+  return !bad;
+}
 function doPrint(){
   render();
   if(!g('sheet').querySelector('.label')){toast('Belum ada label untuk dicetak.');return;}
+  if(!validateNames())return;
+  saveLabels();  // simpan riwayat cetak ke backend (fire-and-forget)
   // beri browser 1 frame untuk melukis QR sebelum print
   requestAnimationFrame(()=>requestAnimationFrame(()=>window.print()));
 }
@@ -2664,7 +2691,10 @@ function copyCodes(){
     const pkat=(p.kat||'').trim()||katG;
     for(let k=0;k<q;k++){
       const rnd=unique?p._rand[k]:p._rand[0];
-      lines.push((p.name?p.name+'\t':'')+fullCode(pkat,rnd));
+      const cols=[fullCode(pkat,rnd)];
+      if(p.nama)cols.unshift(p.nama);
+      if(p.produk)cols.push(p.produk);
+      lines.push(cols.join('\t'));
     }
   });
   if(!lines.length){toast('Belum ada label.');return;}
@@ -2675,6 +2705,38 @@ function copyCodes(){
 }
 function fallbackCopy(txt,cb){const ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');cb();}catch(e){toast('Gagal menyalin.');}document.body.removeChild(ta);}
 
+/* Simpan riwayat cetak ke backend (dipanggil saat doPrint). Fire-and-forget:
+   print tetap jalan walau simpan gagal (mis. offline). */
+async function saveLabels(){
+  const cab=g('cs_cabang').value||'HO';
+  const kat=(g('s_kat').value||'GEN').trim()||'GEN';
+  const unique=g('t_unique').checked;
+  buildRands(false);
+  const items=[]; let count=0; const names=[];
+  products.forEach(p=>{
+    const q=Math.max(0,parseInt(p.qty)||0); if(!q)return;
+    const pkat=(p.kat||'').trim()||kat;
+    const codes=[];
+    for(let k=0;k<q;k++){const rnd=unique?p._rand[k]:p._rand[0];codes.push(fullCode(pkat,rnd));}
+    items.push({nama:p.nama||'',produk:p.produk||'',kategori:pkat,qty:q,codes});
+    count+=q; if((p.nama||'').trim())names.push(p.nama.trim());
+  });
+  if(!count)return;
+  const [w,h]=curSize();
+  const summary=(names.slice(0,3).join(', ')||'-')+(names.length>3?' +'+(names.length-3)+' lainnya':'')+' · '+count+' label';
+  const payload={
+    id:'LBL-'+ymd()+'-'+rand8(),
+    cabang:cab, cs_name:g('cs_name').value||'', tanggal:g('s_date').value||'',
+    jml_label:count, kategori:kat, summary,
+    data_json:JSON.stringify({cabang:cab,tanggal:g('s_date').value,kategori:kat,unique,size:{w,h},brand:g('s_brand').value||'',items})
+  };
+  const r=await api('POST','/labels',payload);
+  if(r.ok)toast('✓ '+count+' label tersimpan ke riwayat.');
+  else if(r.status===401){/* sesi habis — biarkan, print tetap jalan */}
+  else if(r.status===0){/* offline — silent, print tetap jalan */}
+  else toast('Riwayat gagal disimpan'+(r.data&&r.data.error?': '+r.data.error:'.'));
+}
+
 /* INIT */
 (function init(){
   const today=new Date();
@@ -2682,8 +2744,9 @@ function fallbackCopy(txt,cb){const ta=document.createElement('textarea');ta.val
   const cab=localStorage.getItem('rp_cabang'),cs=localStorage.getItem('rp_csname');
   if(cab)g('cs_cabang').value=cab;
   if(cs)g('cs_name').value=cs;
+  syncBrand();
   onSize();
-  addProd({name:'',kat:'',qty:12,_rand:[]});
+  addProd({nama:'',produk:'',kat:'',qty:12,_rand:[]});
   // auto-print: buka dengan ?print=1 (mis. dari shortcut) → langsung cetak
   if(/[?&]print=1/.test(location.search)){setTimeout(doPrint,350);}
 })();
