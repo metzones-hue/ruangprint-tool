@@ -427,6 +427,39 @@ nav.tabs .tab.active{color:var(--gold);border-bottom-color:var(--gold)}
       </div>
     </div>
 
+    <!-- CARD: LOGO / DESAIN -->
+    <div class="card acc-blue">
+      <div class="card-head">
+        <div class="card-title">
+          <div class="card-title-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M8 12l2.5 2.5L16 9"/></svg></div>
+          Logo / Desain
+        </div>
+        <span style="font-size:11px;color:var(--text-muted)">Opsional</span>
+      </div>
+      <div class="card-body">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+          <input type="checkbox" id="inLogoOn" onchange="toggleLogo();hitung()" style="width:auto;accent-color:var(--gold)">
+          <span style="font-size:13px;color:var(--text)">Hitung biaya logo / desain <span style="color:var(--text-muted)">(ditambahkan flat, tanpa margin)</span></span>
+        </label>
+        <div id="logoFields" style="display:none">
+          <div class="grid-2" style="margin-top:14px">
+            <div class="field">
+              <label>Biaya Logo / Desain</label>
+              <div class="field-prefix" data-prefix="Rp"><input type="number" id="inLogoBiaya" value="0" min="0" oninput="hitung()"></div>
+            </div>
+            <div class="field">
+              <label>Upload Desain (opsional)</label>
+              <input type="file" id="inLogoFile" accept="image/*" onchange="onLogoUpload(event)" style="padding:8px">
+            </div>
+          </div>
+          <div id="logoPreviewWrap" style="display:none;margin-top:12px;align-items:center;gap:12px">
+            <img id="logoPreview" style="max-height:120px;max-width:100%;border-radius:8px;border:1px solid var(--border);background:#fff;padding:4px">
+            <button class="btn ghost" onclick="hapusLogoImg()" style="margin-top:8px;font-size:11px">Hapus desain</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- CARD 4: MARGIN -->
     <div class="card acc-gold">
       <div class="card-head">
@@ -521,7 +554,7 @@ nav.tabs .tab.active{color:var(--gold);border-bottom-color:var(--gold)}
         </button>
         <button class="btn primary" onclick="window.print()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-          Cetak Penawaran
+          Cetak Kalkulasi
         </button>
       </div>
     </div>
@@ -583,13 +616,16 @@ const API = '';
 const _tok = localStorage.getItem('rp_auth_token') || '';
 function afetch(u, o){ o = o || {}; o.headers = Object.assign({'Content-Type':'application/json'}, o.headers||{}, _tok?{'Authorization':'Bearer '+_tok}:{}); return fetch(u, o); }
 function doLogout(){ localStorage.removeItem('rp_auth_token'); location.href='index.html'; }
+function toggleLogo(){ document.getElementById('logoFields').style.display = document.getElementById('inLogoOn').checked ? 'block' : 'none'; }
+function onLogoUpload(ev){ const file=ev.target.files[0]; if(!file)return; const r=new FileReader(); r.onload=e=>{ state.logoImg=e.target.result; document.getElementById('logoPreview').src=state.logoImg; document.getElementById('logoPreviewWrap').style.display='flex'; }; r.readAsDataURL(file); }
+function hapusLogoImg(){ state.logoImg=null; document.getElementById('logoPreviewWrap').style.display='none'; const i=document.getElementById('inLogoFile'); if(i) i.value=''; }
 function kirimKePenawaran(){
   readState();
   const t=(window._rkReklame&&window._rkReklame.total)||0;
   if(!t){showToast('Hitung dulu sebelum kirim ke penawaran');return;}
   const isHuruf=state.jenis==='Huruf Timbul';
   const spec=isHuruf?(state.tinggiHuruf+'cm \u00d7 '+state.jumlahHuruf+' huruf'):(state.panjang+'\u00d7'+state.tinggi+'m \u00b7 '+state.sisi+' sisi');
-  const item={nama:state.jenis+' \u2014 '+state.bahan,ukuran:spec,bahan:state.bahan,kategori:'Reklame',cetak:'',finishing:state.led?'+ LED':'',custom:state.lokasi||'',qty:1,harga:Math.round(t),imgSrc:''};
+  const item={nama:state.jenis+' \u2014 '+state.bahan,ukuran:spec,bahan:state.bahan,kategori:'Reklame',cetak:'',finishing:state.led?'+ LED':'',custom:state.lokasi||'',qty:1,harga:Math.round(t),imgSrc:(state.logoImg||'')};
   try{localStorage.setItem('rp_quot_additem',JSON.stringify([item]));}catch(e){}
   location.href='quotation.html';
 }
@@ -622,7 +658,8 @@ let state = {
   ketinggian: "Lantai 1",
   margin: 35, ppn: 0, pembulatan: 1000,
   namaKlien: "", waKlien: "",
-  lokasi: ""
+  lokasi: "",
+  logoOn: false, logoBiaya: 0, logoImg: null
 };
 let history = JSON.parse(localStorage.getItem('rk_history') || '[]');
 
@@ -690,6 +727,8 @@ function readState(){
   state.namaKlien   = document.getElementById('inNamaKlien').value;
   state.waKlien     = document.getElementById('inWAKlien').value;
   state.lokasi      = document.getElementById('inLokasi').value;
+  state.logoOn      = document.getElementById('inLogoOn').checked;
+  state.logoBiaya   = +document.getElementById('inLogoBiaya').value || 0;
 }
 
 /* ===== HITUNG ===== */
@@ -724,6 +763,8 @@ function hitung(){
   const marginRp = hpp * (state.margin / 100);
   let total = hpp + marginRp;
   if(state.pembulatan > 0) total = Math.ceil(total / state.pembulatan) * state.pembulatan;
+  const logoBiaya = (state.logoOn && state.logoBiaya > 0) ? state.logoBiaya : 0;
+  total = total + logoBiaya;
   window._rkReklame={total:total};
   const ppnRp = total * (state.ppn / 100);
   const totalDenganPPN = total + ppnRp;
@@ -746,6 +787,7 @@ function hitung(){
   rows.push(['Biaya Pasang Dasar', pasang]);
   rows.push([`Pengali ${state.ketinggian}`, `× ${pengali}`, true]);
   rows.push([`Margin ${state.margin}%`, marginRp]);
+  if(logoBiaya > 0) rows.push(['Logo / Desain (flat)', logoBiaya]);
 
   document.getElementById('breakdown').innerHTML = rows.map(r => `
     <div class="breakdown-row">
