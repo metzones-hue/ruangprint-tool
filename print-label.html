@@ -142,8 +142,8 @@ input[readonly]{color:var(--muted);background:var(--surf-el)}
         <div class="fc"><label>Kode Kategori</label><input id="s_kat" value="CMS" maxlength="10" oninput="this.value=this.value.toUpperCase();render()"></div>
         <div class="fc"><label>Tanggal</label><input type="date" id="s_date" oninput="render()"></div>
       </div>
-      <div class="fc"><label>Format Kode</label><input id="s_preview" readonly></div>
-      <div class="toggle-row"><input type="checkbox" id="t_fmt" checked onchange="render()"><label for="t_fmt">Pakai format kode otomatis (Cabang/Kategori/Tanggal). Matikan kalau mau kode manual dipakai apa adanya.</label></div>
+      <div class="fc"><label>Kode Manual <span style="text-transform:none;color:var(--muted)">(opsional — 1 baris = 1 label, urut untuk semua produk)</span></label>
+        <textarea id="s_manual" rows="4" placeholder="Kosongkan → kode acak otomatis (Cabang/Kategori/Tanggal/XXXXXXXX).&#10;Paste dari data penjualan, 1 baris = 1 label.&#10;• Baris berisi kode LENGKAP (mengandung /) dipakai apa adanya.&#10;• Baris berisi nomor saja (mis. SO/invoice) otomatis diberi prefix cabang/kategori/tanggal." oninput="render()"></textarea></div>
       <div class="toggle-row"><input type="checkbox" id="t_unique" checked onchange="render()"><label for="t_unique">Kode unik per label (tiap label beda kode)</label></div>
 
       <div class="st">Ukuran &amp; Tampilan Label</div>
@@ -2579,7 +2579,7 @@ function qrSvg(text){
 }
 
 /* PRODUCTS / DATA LABEL */
-function addProd(p){products.push(p||{produk:'',kat:'',qty:12,manualRaw:'',_rand:[]});renderProds();render();}
+function addProd(p){products.push(p||{produk:'',kat:'',qty:12,_rand:[]});renderProds();render();}
 function delProd(i){products.splice(i,1);renderProds();render();}
 function updProd(i,k,v){products[i][k]=v;render();}
 function renderProds(){
@@ -2591,9 +2591,6 @@ function renderProds(){
         <input placeholder="Kategori (opsional)" value="${esc(p.kat)}" oninput="updProd(${i},'kat',this.value.toUpperCase())" title="Kosong = pakai kategori global">
         <input type="number" min="1" placeholder="Jumlah" value="${esc(p.qty)}" oninput="updProd(${i},'qty',this.value)" title="Jumlah label">
         <input readonly value="label" style="text-align:center;color:var(--muted)">
-      </div>
-      <div class="fc"><label>Kode Manual <span style="text-transform:none;color:var(--muted)">(opsional — paste dari data penjualan, 1 baris = 1 label)</span></label>
-        <textarea rows="2" placeholder="Kosongkan = kode acak otomatis.&#10;Paste kode LENGKAP (mis. DMB/CMS/20260701/AB12) → dipakai apa adanya.&#10;Isi cuma nomor (mis. SO/invoice) → otomatis diberi prefix cabang/kategori/tanggal." oninput="updProd(${i},'manualRaw',this.value)">${esc(p.manualRaw)}</textarea>
       </div>
     </div>`).join('') || '<div style="font-size:11px;color:var(--muted);padding:6px 0">Belum ada label. Klik "Tambah Label".</div>';
 }
@@ -2607,22 +2604,18 @@ function buildRands(regen){
   });
 }
 function parseManual(raw){return (raw||'').split('\n').map(s=>s.trim()).filter(Boolean);}
-/* kode utk copy ke-k: pakai kode manual (baris ke-k) bila diisi, sisanya fallback ke acak */
-function useFmt(){const t=g('t_fmt');return t?t.checked:true;}
-function codeForCopy(pkat,p,k,unique){
-  const fmt=useFmt();
-  const manual=parseManual(p.manualRaw);
-  if(manual[k]){
-    const raw=manual[k].toUpperCase().replace(/[^A-Z0-9/_-]/g,'');
-    // Format kode dimatikan → kode manual dipakai apa adanya (tanpa prefix).
-    if(!fmt)return raw;
-    // Format kode aktif: kode dari penjual yang sudah lengkap (mengandung '/')
-    // tetap dipakai apa adanya; kalau cuma nomor, otomatis diberi prefix
-    // cabang/kategori/tanggal.
+/* global manual: 1 kotak untuk SEMUA label. baris ke-N = label global ke-N urut per produk */
+function globalOffset(pi){let o=0;for(let i=0;i<pi;i++)o+=Math.max(0,parseInt(products[i].qty)||0);return o;}
+function codeForCopy(pkat,p,k,unique,pi){
+  const manual=parseManual(g('s_manual').value||'');
+  const idx=globalOffset(pi==null?products.indexOf(p):pi)+k;
+  if(manual[idx]){
+    const raw=manual[idx].toUpperCase().replace(/[^A-Z0-9/_.-]/g,'');
+    // Kode yg mengandung '/' dipakai apa adanya; kalau cuma nomor beri prefix cabang/kategori/tanggal
     return raw.includes('/') ? raw : cabPrefix()+'/'+pkat+'/'+ymd()+'/'+raw;
   }
   const rnd=unique?p._rand[k]:p._rand[0];
-  return fmt ? fullCode(pkat,rnd) : rnd;
+  return fullCode(pkat,rnd);
 }
 function cabPrefix(){return g('cs_cabang').value||'HO';}
 
@@ -2642,11 +2635,6 @@ function labelMetrics(w,h){
 function render(){
   const cab=g('cs_cabang').value||'HO';
   const kat=(g('s_kat').value||'GEN').trim()||'GEN';
-  const fmt=useFmt();
-  g('s_preview').value=fmt?cab+'/'+kat+'/'+ymd()+'/XXXXXXXX':'(tanpa format — kode manual/acak dipakai apa adanya)';
-  // Kalau format dimatikan, Kode Kategori & Tanggal tidak dipakai → beri kesan nonaktif.
-  g('s_kat').disabled=!fmt; g('s_date').disabled=!fmt;
-
   const [w,h]=curSize();
   const unique=g('t_unique').checked;
   const showQR=g('t_qr').checked,showName=g('t_name').checked,showCode=g('t_code').checked,showProduk=g('t_produk').checked,showBrand=g('t_brand').checked;
@@ -2781,7 +2769,7 @@ async function saveLabels(){
   if(cs)g('cs_name').value=cs;
   syncBrand();
   onSize();
-  addProd({produk:'',kat:'',qty:12,manualRaw:'',_rand:[]});
+  addProd({produk:'',kat:'',qty:12,_rand:[]});
   // auto-print: buka dengan ?print=1 (mis. dari shortcut) → langsung cetak
   if(/[?&]print=1/.test(location.search)){setTimeout(doPrint,350);}
 })();
