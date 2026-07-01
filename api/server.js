@@ -69,6 +69,18 @@ db.exec(`
     created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+  CREATE TABLE IF NOT EXISTS label_prints (
+    id          TEXT PRIMARY KEY,
+    cabang      TEXT    DEFAULT '-',
+    cs_name     TEXT    DEFAULT '-',
+    customer    TEXT    DEFAULT '',
+    tanggal     TEXT,
+    jml_label   INTEGER DEFAULT 0,
+    kategori    TEXT    DEFAULT '',
+    summary     TEXT    DEFAULT '',
+    data_json   TEXT,
+    created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
   CREATE TABLE IF NOT EXISTS reklame_harga (
     id        INTEGER PRIMARY KEY AUTOINCREMENT,
     kategori  TEXT NOT NULL,
@@ -131,6 +143,8 @@ function ensureColumn(col, ddl) {
 }
 ensureColumn('role',     "role TEXT DEFAULT 'cabang'");
 ensureColumn('username', "username TEXT");
+try { db.prepare('SELECT customer FROM label_prints LIMIT 1').get(); }
+catch { db.exec("ALTER TABLE label_prints ADD COLUMN customer TEXT DEFAULT ''"); }
 
 // Superadmin lama (sebelum ada kolom username) → set username 'admin'
 try { db.prepare("UPDATE users SET username='admin' WHERE role='superadmin' AND (username IS NULL OR username='')").run(); }
@@ -525,6 +539,72 @@ app.put('/api/reklame/toko', auth, adminOnly, (req, res) => {
   db.prepare(`INSERT INTO reklame_toko (id,nama,alamat,telepon) VALUES (1,?,?,?)
     ON CONFLICT(id) DO UPDATE SET nama=excluded.nama,alamat=excluded.alamat,telepon=excluded.telepon`)
     .run(nama || 'RuangPrint', alamat || '', telepon || '');
+  res.json({ ok: true });
+});
+
+// ── PRINT LABEL (riwayat cetak label) ────────────────────────
+// Akses sama seperti dokumen lain: cabang hanya melihat miliknya, superadmin semua.
+app.get('/api/labels', auth, (req, res) => {
+  const { cabang, from, to } = req.query;
+  const conds = [];
+  const params = [];
+  if (isAdmin(req.user)) {
+    if (cabang && cabang !== 'semua') { conds.push('cabang=?'); params.push(cabang); }
+  } else {
+    conds.push('cabang=?'); params.push(req.user.cabang);
+  }
+  if (from) { conds.push('tanggal>=?'); params.push(from); }
+  if (to)   { conds.push('tanggal<=?'); params.push(to); }
+  const where = conds.length ? 'WHERE ' + conds.join(' AND ') : '';
+  const rows = db.prepare(`
+    SELECT id,cabang,cs_name,customer,tanggal,jml_label,kategori,summary,created_at
+    FROM label_prints ${where} ORDER BY created_at DESC LIMIT 1000
+  `).all(...params);
+  res.json(rows);
+});
+
+app.post('/api/labels', auth, (req, res) => {
+  const e = req.body || {};
+  if (!e.id) return res.status(400).json({ error: 'id wajib.' });
+  const cabang  = isAdmin(req.user) ? (e.cabang || '-') : req.user.cabang;
+  const cs_name = isAdmin(req.user) ? (e.cs_name || '-') : (e.cs_name || req.user.name || '-');
+  db.prepare(`
+    INSERT INTO label_prints (id,cabang,cs_name,customer,tanggal,jml_label,kategori,summary,data_json,created_at)
+    VALUES (@id,@cabang,@cs_name,@customer,@tanggal,@jml_label,@kategori,@summary,@data_json,CURRENT_TIMESTAMP)
+    ON CONFLICT(id) DO UPDATE SET
+      cabang=excluded.cabang, cs_name=excluded.cs_name, customer=excluded.customer, tanggal=excluded.tanggal,
+      jml_label=excluded.jml_label, kategori=excluded.kategori, summary=excluded.summary,
+      data_json=excluded.data_json
+  `).run({
+    id: String(e.id), cabang, cs_name, customer: e.customer || '',
+    tanggal: e.tanggal || '', jml_label: parseInt(e.jml_label) || 0,
+    kategori: e.kategori || '', summary: e.summary || '',
+    data_json: e.data_json || '{}'
+  });
+  res.json({ ok: true, id: String(e.id) });
+});
+
+app.get('/api/labels/:id/data', auth, (req, res) => {
+  const row = db.prepare('SELECT cabang, data_json FROM label_prints WHERE id=?').get(req.params.id);
+  if (!canAccess(req.user, row)) return res.status(404).json({ error: 'Tidak ditemukan.' });
+  res.json({ data_json: row.data_json });
+});
+
+app.delete('/api/labels/:id', auth, (req, res) => {
+  const row = db.prepare('SELECT cabang FROM label_prints WHERE id=?').get(req.params.id);
+  if (!canAccess(req.user, row)) return res.status(404).json({ error: 'Tidak ditemukan.' });
+  db.prepare('DELETE FROM label_prints WHERE id=?').run(req.params.id);
+  res.json({ ok: true });
+});
+
+app.delete('/api/labels', auth, (req, res) => {
+  if (isAdmin(req.user)) {
+    const { cabang } = req.query;
+    if (cabang && cabang !== 'semua') db.prepare('DELETE FROM label_prints WHERE cabang=?').run(cabang);
+    else db.prepare('DELETE FROM label_prints').run();
+  } else {
+    db.prepare('DELETE FROM label_prints WHERE cabang=?').run(req.user.cabang);
+  }
   res.json({ ok: true });
 });
 
