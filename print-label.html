@@ -90,6 +90,18 @@ input[readonly]{color:var(--muted);background:var(--surf-el)}
 }
 #toast{position:fixed;bottom:22px;right:22px;background:var(--dark);color:#fff;padding:11px 18px;border-radius:8px;font-size:12px;opacity:0;transition:opacity .3s;pointer-events:none;border-left:3px solid var(--gold);z-index:9999}
 #toast.show{opacity:1}
+.modal-back{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:9998;padding:20px}
+.modal-back.show{display:flex}
+.modal{background:var(--panel);border:1px solid var(--border);border-radius:14px;max-width:520px;width:100%;padding:20px 22px;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.modal-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.modal-h b{font-family:'Outfit',sans-serif;font-size:15px}
+.modal-h button{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;width:auto;padding:4px 8px}
+.modal p{font-size:12.5px;color:#d4d4d8;line-height:1.6;margin-bottom:10px}
+.modal ol{margin:0 0 8px 18px;padding:0;display:flex;flex-direction:column;gap:9px}
+.modal li{font-size:12.5px;color:#e4e4e7;line-height:1.55}
+.modal code{display:block;background:#0a0a0b;border:1px solid var(--border);border-radius:7px;padding:9px 11px;margin:6px 0;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);word-break:break-all;white-space:pre-wrap}
+.modal .mnote{font-size:11px;color:var(--muted);border-top:1px solid var(--border);padding-top:10px;margin-top:6px}
+.modal .mnote code{display:inline;padding:1px 5px;margin:0;font-size:10.5px}
 </style>
 </head>
 <body>
@@ -160,14 +172,34 @@ input[readonly]{color:var(--muted);background:var(--surf-el)}
   <!-- RIGHT: PREVIEW -->
   <div class="right">
     <div class="rtbar">
-      <button class="btn-print" onclick="window.print()">🖨 Print / PDF</button>
+      <button class="btn-print" onclick="doPrint()">🖨 Cetak Langsung</button>
       <button class="btool baru" onclick="regen()">↻ Generate ulang kode</button>
       <button class="btool" onclick="copyCodes()">⧉ Salin daftar kode</button>
+      <button class="btool" id="kioskBtn" onclick="showKiosk()" title="Cara agar klik langsung keluar dari printer tanpa dialog">⚡ Cetak tanpa dialog?</button>
       <span class="thint" id="cntHint">0 label</span>
     </div>
     <div class="rscroll">
       <div class="sheet" id="sheet"></div>
     </div>
+  </div>
+</div>
+
+<!-- MODAL: cara cetak tanpa dialog -->
+<div id="kioskModal" class="modal-back" onclick="if(event.target===this)hideKiosk()">
+  <div class="modal">
+    <div class="modal-h"><b>⚡ Cetak 1-klik tanpa dialog</b><button onclick="hideKiosk()">✕</button></div>
+    <p>Demi keamanan, browser normal <u>selalu</u> menampilkan dialog print. Agar klik <b>Cetak Langsung</b> langsung keluar dari printer <b>tanpa dialog</b>, buka aplikasi ini lewat Chrome mode <b>kiosk-printing</b> (cukup sekali setup):</p>
+    <ol>
+      <li>Klik kanan Desktop → <b>New → Shortcut</b>.</li>
+      <li>Isi lokasi shortcut dengan:
+        <code id="kioskCmd"></code>
+        <button class="btool" style="margin-top:6px" onclick="copyKiosk()">⧉ Salin perintah</button>
+      </li>
+      <li>Beri nama <b>Print Label</b> → Finish.</li>
+      <li>Pastikan <b>printer label sudah jadi printer default</b> di Windows, dan ukuran kertas/label sudah diset di driver printer.</li>
+      <li>Buka lewat shortcut itu. Sekarang tombol <b>Cetak Langsung</b> = 1 klik → langsung tercetak. 🎉</li>
+    </ol>
+    <p class="mnote">Tips: shortcut sudah pakai <code>?print=1</code> sehingga saat halaman terbuka bisa langsung memicu cetak. Hapus <code>?print=1</code> bila ingin isi data dulu baru klik Cetak.</p>
   </div>
 </div>
 
@@ -2605,6 +2637,23 @@ function onSize(){g('customSize').style.display=g('s_size').value==='custom'?'gr
 
 function regen(){buildRands(true);render();toast('✓ Kode di-generate ulang.');}
 
+/* 1-klik cetak: pastikan render terbaru, lalu langsung print.
+   Jika Chrome dibuka dengan --kiosk-printing, ini langsung keluar dari printer tanpa dialog. */
+function doPrint(){
+  render();
+  if(!g('sheet').querySelector('.label')){toast('Belum ada label untuk dicetak.');return;}
+  // beri browser 1 frame untuk melukis QR sebelum print
+  requestAnimationFrame(()=>requestAnimationFrame(()=>window.print()));
+}
+function kioskCommand(){
+  let url=location.href.split('#')[0].split('?')[0];
+  url+=(url.indexOf('?')<0?'?':'&')+'print=1';
+  return '"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --kiosk-printing --app='+url;
+}
+function showKiosk(){g('kioskCmd').textContent=kioskCommand();g('kioskModal').classList.add('show');}
+function hideKiosk(){g('kioskModal').classList.remove('show');}
+function copyKiosk(){const t=kioskCommand();const done=()=>toast('✓ Perintah shortcut disalin.');if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,()=>fallbackCopy(t,done));}else fallbackCopy(t,done);}
+
 function copyCodes(){
   const unique=g('t_unique').checked;
   const katG=(g('s_kat').value||'GEN').trim()||'GEN';
@@ -2635,6 +2684,8 @@ function fallbackCopy(txt,cb){const ta=document.createElement('textarea');ta.val
   if(cs)g('cs_name').value=cs;
   onSize();
   addProd({name:'',kat:'',qty:12,_rand:[]});
+  // auto-print: buka dengan ?print=1 (mis. dari shortcut) → langsung cetak
+  if(/[?&]print=1/.test(location.search)){setTimeout(doPrint,350);}
 })();
 </script>
 </body>
