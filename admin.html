@@ -382,7 +382,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
           <div><div class="l" style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:600">Total Label Tercetak</div><div class="v" style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:800" id="lblTotalLabels">0</div></div>
           <button class="btn" style="margin-left:auto" onclick="exportLabelCSV()">⬇ Export CSV</button>
         </div>
-        <table><thead><tr><th>ID Cetak</th><th>Tanggal</th><th>Cabang</th><th>Petugas</th><th>Kategori</th><th style="text-align:right">Jml</th><th>Ringkasan</th><th></th></tr></thead>
+        <table><thead><tr><th>ID Cetak</th><th>Tanggal</th><th>Cabang</th><th>Customer</th><th>Petugas</th><th>Kategori</th><th style="text-align:right">Jml</th><th>Ringkasan</th><th></th></tr></thead>
         <tbody id="lblBody"></tbody></table>
         <div class="empty" id="lblEmpty" style="display:none">Belum ada riwayat cetak label untuk filter ini.</div>
       </div>
@@ -648,9 +648,10 @@ async function loadLabels(){
   document.getElementById('lblBody').innerHTML=_lblRows.map(x=>`
     <tr><td><b style="font-family:'JetBrains Mono',monospace;font-size:11px">${esc(x.id)}</b></td>
     <td>${esc(x.tanggal||'-')}</td><td><span class="cab">${esc(x.cabang)}</span></td>
+    <td><b>${esc(x.customer||'-')}</b></td>
     <td>${esc(x.cs_name||'-')}</td><td>${esc(x.kategori||'-')}</td>
     <td style="text-align:right"><b>${x.jml_label||0}</b></td>
-    <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.summary||'-')}</td>
+    <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.summary||'-')}</td>
     <td style="white-space:nowrap">
       <button class="tbtn" onclick="viewLabel('${esc(x.id)}')">Lihat kode</button>
       <button class="tbtn del" onclick="delLabel('${esc(x.id)}')">Hapus</button>
@@ -662,7 +663,7 @@ async function viewLabel(id){
   let d={};try{d=JSON.parse(r.data.data_json||'{}');}catch(e){}
   const lines=[];
   (d.items||[]).forEach(it=>{
-    (it.codes||[]).forEach(c=>lines.push([it.nama||'',it.produk||'',c].filter(Boolean).join('  ·  ')));
+    (it.codes||[]).forEach(c=>lines.push([d.customer||'',it.produk||'',c].filter(Boolean).join('  ·  ')));
   });
   showCodesModal(id, d, lines);
 }
@@ -670,7 +671,7 @@ function showCodesModal(id, d, lines){
   const old=document.getElementById('lblModal'); if(old)old.remove();
   const wrap=document.createElement('div'); wrap.id='lblModal'; wrap.className='lbl-modal-back';
   wrap.onclick=e=>{if(e.target===wrap)wrap.remove();};
-  const meta=[d.cabang?'Cabang '+esc(d.cabang):'',d.tanggal?'Tgl '+esc(d.tanggal):'',d.brand?esc(d.brand):''].filter(Boolean).join(' · ');
+  const meta=[d.customer?'Customer '+esc(d.customer):'',d.cabang?'Cabang '+esc(d.cabang):'',d.tanggal?'Tgl '+esc(d.tanggal):'',d.brand?esc(d.brand):''].filter(Boolean).join(' · ');
   wrap.innerHTML=`<div class="lbl-modal">
     <div class="lbl-modal-h"><b>🏷 ${esc(id)}</b><button onclick="document.getElementById('lblModal').remove()">✕</button></div>
     <div class="lbl-modal-meta">${meta}</div>
@@ -692,8 +693,8 @@ async function delLabel(id){
 }
 function exportLabelCSV(){
   if(!_lblRows.length){toast('Tidak ada data untuk diexport.');return;}
-  const head=['ID Cetak','Tanggal','Cabang','Petugas','Kategori','Jumlah Label','Ringkasan'];
-  const lines=[head.join(',')].concat(_lblRows.map(x=>[x.id,x.tanggal,x.cabang,x.cs_name,x.kategori,x.jml_label,'"'+(x.summary||'').replace(/"/g,'""')+'"'].join(',')));
+  const head=['ID Cetak','Tanggal','Cabang','Customer','Petugas','Kategori','Jumlah Label','Ringkasan'];
+  const lines=[head.join(',')].concat(_lblRows.map(x=>[x.id,x.tanggal,x.cabang,'"'+(x.customer||'').replace(/"/g,'""')+'"',x.cs_name,x.kategori,x.jml_label,'"'+(x.summary||'').replace(/"/g,'""')+'"'].join(',')));
   const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
